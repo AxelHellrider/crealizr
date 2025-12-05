@@ -17,12 +17,18 @@ export interface MonsterBase {
         wis: number;
         cha: number;
     };
-    actions?: Array<{ name: string; type: string; bonus?: number; damage?: string }>;
-    traits?: Array<{ name: string; desc: string }>;
-    legendary_actions?: Array<{ name: string; desc: string }>;
-    reactions?: Array<{ name: string; desc: string }>;
+    actions?: MonsterAction[];
+    traits?: MonsterAction[];
+    legendary_actions?: MonsterAction[];
+    reactions?: MonsterAction[];
     raw_source_ref?: string;
     cr_formula_hint?: string;
 }
+
+export type MonsterAction = {
+    name: string;
+    damage?: string; // e.g., "2d6+3"
+    [key: string]: unknown; // for any other fields
+};
 
 export type MonsterJSON = Record<string, MonsterBase>;
