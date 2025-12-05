@@ -1,4 +1,4 @@
-import type { MonsterBase } from "@/app/types/monsters_schema";
+import type { MonsterBase, MonsterAction } from "@/app/types/monsters_schema";
 import { CR_MATRIX, ABILITY_SCORE_MODIFIERS } from "@/app/data/constants";
 
 function clamp(n: number, min: number, max: number) {
@@ -16,11 +16,11 @@ function findCRRow(cr: number) {
     return CR_MATRIX[0];
 }
 
-function estimateDPR(m: MonsterBase) {
-    if (!m.actions || m.actions.length === 0) return 1;
+function estimateDPR(monster: MonsterBase) {
+    if (!monster.actions || monster.actions.length === 0) return 1;
     let total = 0;
-    for (const a of m.actions) {
-        const dmg = (a as any).damage ?? "";
+    for (const a of monster.actions as MonsterAction[]) {
+        const dmg = a.damage ?? "";
         const diceMatch = String(dmg).match(/(\d+)d(\d+)/g);
         let avg = 0;
         if (diceMatch) {
@@ -39,11 +39,12 @@ function estimateDPR(m: MonsterBase) {
     return Math.max(1, Math.round(total));
 }
 
-function scaleAbilityScore(base: number, crDiff: number): number {
-    let mod = Math.floor((base - 10) / 2);
+function scaleAbilityScore(base: number, crDiff: number) {
+    const mod = abilityModifier(base);
     const modIncrease = Math.floor(crDiff / 2);
     const newMod = clamp(mod + modIncrease, -5, 10);
-    const possibleScores = ABILITY_SCORE_MODIFIERS[newMod >= 0 ? `+${newMod}` : `${newMod}`];
+    const key = (newMod >= 0 ? `+${newMod}` : `${newMod}`) as keyof typeof ABILITY_SCORE_MODIFIERS;
+    const possibleScores = ABILITY_SCORE_MODIFIERS[key];
     if (!possibleScores || possibleScores.length === 0) return base;
     return possibleScores.reduce((a, b) => Math.abs(a - base) <= Math.abs(b - base) ? a : b);
 }
@@ -52,9 +53,9 @@ export function scaleMonster2014(
     monster: MonsterBase,
     targetCR: number,
     options?: {
-        acEquipment?: number,
-        acRace?: number,
-        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>
+        acEquipment?: number;
+        acRace?: number;
+        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
     }
 ): MonsterBase {
     const srcCR = monster.challenge_rating ?? 0.125;
@@ -77,7 +78,6 @@ export function scaleMonster2014(
     const acDiff = tgtRow.ac - monster.stats.ac;
     let finalAC = clamp(monster.stats.ac + Math.sign(acDiff) * Math.min(2, Math.abs(acDiff)), 5, 30);
 
-    // Apply optional AC from equipment or race
     if (options?.acEquipment) finalAC += options.acEquipment;
     if (options?.acRace) finalAC += options.acRace;
 
@@ -87,41 +87,33 @@ export function scaleMonster2014(
     const crDiff = targetCR - srcCR;
 
     for (const ab of abilities) {
-        let base = monster.stats[ab] ?? 10;
+        let base = monster.stats[ab];
         base = scaleAbilityScore(base, crDiff);
-
-        // Apply optional ability score bonuses from race/features/class
-        if (options?.abilityScoreBonus?.[ab]) {
-            base += options.abilityScoreBonus[ab]!;
-        }
-
+        if (options?.abilityScoreBonus?.[ab]) base += options.abilityScoreBonus[ab];
         newStats[ab] = clamp(base, 1, 30);
     }
 
-    // Suggested attack bonus
     const atkAbilityMod = Math.max(abilityModifier(newStats.str), abilityModifier(newStats.dex));
     const srcAtkMod = Math.max(abilityModifier(monster.stats.str), abilityModifier(monster.stats.dex));
     const attackDelta = Number(tgtRow.atkb) - Number(srcRow.atkb);
     const finalAttackBonus = Math.round(Number(srcRow.atkb) + attackDelta + atkAbilityMod - srcAtkMod);
 
-    // Suggested save DC
     const finalSaveDC = tgtRow.save_dc + (abilityModifier(newStats.int) - abilityModifier(monster.stats.int));
 
-    const scaled: MonsterBase = {
+    const scaled: MonsterBase & { _advice?: Record<string, number | unknown> } = {
         ...monster,
         challenge_rating: targetCR,
         stats: newStats,
         raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled (2014)`,
-    };
-
-    (scaled as any)._advice = {
-        suggestedAttackBonus: finalAttackBonus,
-        suggestedSaveDC: finalSaveDC,
-        srcDPR,
-        tgtDPR,
-        hpScale,
-        dprScale,
-        usedRow: tgtRow,
+        _advice: {
+            suggestedAttackBonus: finalAttackBonus,
+            suggestedSaveDC: finalSaveDC,
+            srcDPR,
+            tgtDPR,
+            hpScale,
+            dprScale,
+            usedRow: tgtRow,
+        },
     };
 
     return scaled;
