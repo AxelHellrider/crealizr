@@ -82,16 +82,20 @@ export function scaleMonster2014(
     if (options?.acRace) finalAC += options.acRace;
 
     // Ability scores scaling
-    const abilities: (keyof MonsterBase["stats"])[] = ["str", "dex", "con", "int", "wis", "cha"];
     const newStats: MonsterBase["stats"] = { ...monster.stats, hp: finalHp, ac: finalAC };
     const crDiff = targetCR - srcCR;
+    const numericAbilities: (keyof Omit<MonsterBase["stats"], "speed">)[] = ["ac","hp","str","dex","con","int","wis","cha"];
 
-    for (const ab of abilities) {
-        let base = monster.stats[ab];
+    for (const ab of numericAbilities) {
+        let base: number = monster.stats[ab] as number; // guaranteed number
         base = scaleAbilityScore(base, crDiff);
-        if (options?.abilityScoreBonus?.[ab]) base += options.abilityScoreBonus[ab];
-        newStats[ab] = clamp(base, 1, 30);
+
+        const bonus = options?.abilityScoreBonus?.[ab] ?? 0;
+        base += bonus;
+
+        newStats[ab] = clamp(base, 1, 30) as number;
     }
+
 
     const atkAbilityMod = Math.max(abilityModifier(newStats.str), abilityModifier(newStats.dex));
     const srcAtkMod = Math.max(abilityModifier(monster.stats.str), abilityModifier(monster.stats.dex));
