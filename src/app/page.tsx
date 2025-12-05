@@ -1,8 +1,4 @@
-import Image from "next/image";
 import {Metadata, Viewport} from "next";
-import Link from "next/link";
-import Header from "@/app/components/Header";
-import Footer from "@/app/components/Footer";
 
 export const metadata: Metadata = {
     title: "CRializr | Dungeons & Dragons CR Tool",
@@ -41,12 +37,6 @@ export default function Home() {
                   className="px-8 py-3 rounded-lg bg-amber-600 hover:bg-amber-500 transition font-semibold"
               >
                   Start Scaling
-              </a>
-              <a
-                  href="/monsters"
-                  className="px-8 py-3 rounded-lg border border-zinc-600 hover:bg-zinc-800 transition font-semibold"
-              >
-                  Browse Monsters
               </a>
           </div>
       </section>

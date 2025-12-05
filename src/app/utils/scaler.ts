@@ -1,143 +1,111 @@
 import type { MonsterBase } from "@/app/types/monsters_schema";
-import rawTable from "../data/utils/2014_CR.json";
-import type { DMG2014Row } from "@/app/types/scaler2014";
+import { CR_MATRIX, ABILITY_SCORE_MODIFIERS } from "@/app/data/constants";
 
-/* ---------------------------
-   Normalize the imported JSON (object) into a sorted array of rows
-   --------------------------- */
-const DMG_2014_ROWS: DMG2014Row[] = Object.values(rawTable)
-    .map((r) => {
-        const row = r as unknown as DMG2014Row;
-        return { ...row, cr: Number(row.cr) } as DMG2014Row;
-    })
-    .sort((a, b) => a.cr - b.cr);
-
-/* ---------------------------
-   Basic helpers
-   --------------------------- */
 function clamp(n: number, min: number, max: number) {
     return Math.max(min, Math.min(max, n));
-}
-
-function findRowForCR(cr: number): DMG2014Row | null {
-    const exact = DMG_2014_ROWS.find((r) => r.cr === cr);
-    if (exact) return exact;
-
-    for (let i = DMG_2014_ROWS.length - 1; i >= 0; i--) {
-        const row = DMG_2014_ROWS[i];
-        if (row.cr <= cr) return row;
-    }
-
-    return DMG_2014_ROWS[0] ?? null;
 }
 
 function abilityModifier(score: number) {
     return Math.floor((score - 10) / 2);
 }
 
-/* ---------------------------
-   Exported helper (Helper 1)
-   --------------------------- */
-export function getExpectedForCR(cr: number): DMG2014Row | null {
-    return findRowForCR(cr);
+function findCRRow(cr: number) {
+    for (let i = CR_MATRIX.length - 1; i >= 0; i--) {
+        if (CR_MATRIX[i].cr <= cr) return CR_MATRIX[i];
+    }
+    return CR_MATRIX[0];
 }
 
-/* ---------------------------
-   Core scaler (keeps your logic)
-   --------------------------- */
-export type ScaleOptions = {
-    hpWeight?: number;
-    dmgWeight?: number;
-    softClamp?: boolean;
-};
+function estimateDPR(m: MonsterBase) {
+    if (!m.actions || m.actions.length === 0) return 1;
+    let total = 0;
+    for (const a of m.actions) {
+        const dmg = (a as any).damage ?? "";
+        const diceMatch = String(dmg).match(/(\d+)d(\d+)/g);
+        let avg = 0;
+        if (diceMatch) {
+            for (const dice of diceMatch) {
+                const [countStr, sidesStr] = dice.split("d");
+                avg += Number(countStr) * (Number(sidesStr) + 1) / 2;
+            }
+            const plusMatch = String(dmg).match(/([+-]\s*\d+)/);
+            if (plusMatch) avg += Number(plusMatch[1].replace(/\s+/g, ""));
+        } else {
+            const num = Number(String(dmg).replace(/[^\d-]/g, ""));
+            if (!isNaN(num) && num > 0) avg = num;
+        }
+        total += avg;
+    }
+    return Math.max(1, Math.round(total));
+}
+
+function scaleAbilityScore(base: number, crDiff: number): number {
+    let mod = Math.floor((base - 10) / 2);
+    const modIncrease = Math.floor(crDiff / 2);
+    const newMod = clamp(mod + modIncrease, -5, 10);
+    const possibleScores = ABILITY_SCORE_MODIFIERS[newMod >= 0 ? `+${newMod}` : `${newMod}`];
+    if (!possibleScores || possibleScores.length === 0) return base;
+    return possibleScores.reduce((a, b) => Math.abs(a - base) <= Math.abs(b - base) ? a : b);
+}
 
 export function scaleMonster2014(
     monster: MonsterBase,
     targetCR: number,
-    options?: ScaleOptions
+    options?: {
+        acEquipment?: number,
+        acRace?: number,
+        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>
+    }
 ): MonsterBase {
-    const opts = {
-        hpWeight: 0.7,
-        dmgWeight: 0.8,
-        softClamp: true,
-        ...options,
-    };
-
-    const srcCR = monster.challenge_rating || 0.125;
+    const srcCR = monster.challenge_rating ?? 0.125;
     if (srcCR === targetCR) return { ...monster };
 
-    const srcRow = getExpectedForCR(srcCR) ?? DMG_2014_ROWS[0];
-    const tgtRow = getExpectedForCR(targetCR) ?? DMG_2014_ROWS[DMG_2014_ROWS.length - 1];
-
-    const hpScale = tgtRow.hpMax / Math.max(1, srcRow.hpMax);
-
-    function estimateDPR(m: MonsterBase) {
-        let total = 0;
-        if (!m.actions || m.actions.length === 0) return 1;
-        for (const a of m.actions) {
-            const dmg = (a as any).damage ?? "";
-            const diceMatch = String(dmg).match(/(\d+)d(\d+)/g);
-            let avg = 0;
-            if (diceMatch) {
-                for (const dice of diceMatch) {
-                    const [countStr, sidesStr] = dice.split("d");
-                    const count = Number(countStr);
-                    const sides = Number(sidesStr);
-                    avg += count * (1 + sides) / 2;
-                }
-                const plusMatch = String(dmg).match(/([+-]\s*\d+)/);
-                if (plusMatch) {
-                    avg += Number(plusMatch[1].replace(/\s+/g, ""));
-                }
-            } else {
-                const num = Number(String(dmg).replace(/[^\d-]/g, ""));
-                if (!Number.isNaN(num) && num > 0) avg = num;
-            }
-            total += avg;
-        }
-        return Math.max(1, Math.round(total));
-    }
+    const srcRow = findCRRow(srcCR);
+    const tgtRow = findCRRow(targetCR);
 
     const srcDPR = estimateDPR(monster);
-    const tgtDPRMid = (tgtRow.dprMin + tgtRow.dprMax) / 2 || Math.max(1, srcDPR);
-    const dprScale = tgtDPRMid / Math.max(1, srcDPR);
+    const tgtDPR = tgtRow.dpr;
 
-    const finalHpMultiplier = (1 - opts.hpWeight) + hpScale * opts.hpWeight;
-    const finalDprMultiplier = (1 - opts.dmgWeight) + dprScale * opts.dmgWeight;
+    // HP scaling
+    const hpScale = tgtRow.hp / Math.max(1, monster.stats.hp);
+    const finalHp = Math.max(1, Math.round(monster.stats.hp * hpScale));
 
-    const newStats = { ...monster.stats };
+    // DPR scale (used for reference)
+    const dprScale = tgtDPR / Math.max(1, srcDPR);
 
-    newStats.hp = Math.max(1, Math.round((monster.stats.hp || 1) * finalHpMultiplier));
+    // AC scaling
+    const acDiff = tgtRow.ac - monster.stats.ac;
+    let finalAC = clamp(monster.stats.ac + Math.sign(acDiff) * Math.min(2, Math.abs(acDiff)), 5, 30);
 
-    const abilityScale = (finalHpMultiplier + finalDprMultiplier) / 2;
-    const abilities = ["str", "dex", "con", "int", "wis", "cha"] as const;
+    // Apply optional AC from equipment or race
+    if (options?.acEquipment) finalAC += options.acEquipment;
+    if (options?.acRace) finalAC += options.acRace;
+
+    // Ability scores scaling
+    const abilities: (keyof MonsterBase["stats"])[] = ["str", "dex", "con", "int", "wis", "cha"];
+    const newStats: MonsterBase["stats"] = { ...monster.stats, hp: finalHp, ac: finalAC };
+    const crDiff = targetCR - srcCR;
+
     for (const ab of abilities) {
-        const base = (monster.stats as any)[ab] ?? 10;
-        const scaled = Math.round(base * (1 + (abilityScale - 1) * 0.25));
-        (newStats as any)[ab] = clamp(scaled, 1, 30);
+        let base = monster.stats[ab] ?? 10;
+        base = scaleAbilityScore(base, crDiff);
+
+        // Apply optional ability score bonuses from race/features/class
+        if (options?.abilityScoreBonus?.[ab]) {
+            base += options.abilityScoreBonus[ab]!;
+        }
+
+        newStats[ab] = clamp(base, 1, 30);
     }
 
-    const acDiff = tgtRow.expectedAC - (monster.stats.ac ?? tgtRow.expectedAC);
-    newStats.ac = clamp(
-        Math.round((monster.stats.ac ?? tgtRow.expectedAC) + Math.sign(acDiff) * Math.min(2, Math.abs(acDiff))),
-        5,
-        30
-    );
-
-    const baseAttack = srcRow.atkBonus ?? 0;
-    const targetAttack = tgtRow.atkBonus ?? baseAttack;
-    const attackDelta = targetAttack - baseAttack;
+    // Suggested attack bonus
     const atkAbilityMod = Math.max(abilityModifier(newStats.str), abilityModifier(newStats.dex));
-    const finalAttackBonus = Math.round(baseAttack + attackDelta + atkAbilityMod - Math.max(abilityModifier(monster.stats.str), abilityModifier(monster.stats.dex)));
+    const srcAtkMod = Math.max(abilityModifier(monster.stats.str), abilityModifier(monster.stats.dex));
+    const attackDelta = Number(tgtRow.atkb) - Number(srcRow.atkb);
+    const finalAttackBonus = Math.round(Number(srcRow.atkb) + attackDelta + atkAbilityMod - srcAtkMod);
 
-    const baseSave = srcRow.saveDC ?? 10;
-    const saveDelta = tgtRow.saveDC - baseSave;
-    const abilityModChange = abilityModifier(newStats.int) - abilityModifier(monster.stats.int);
-    const finalSaveDC = Math.round(baseSave + saveDelta + abilityModChange);
-
-    if (opts.softClamp) {
-        newStats.hp = clamp(newStats.hp, tgtRow.hpMin, Math.max(tgtRow.hpMax, newStats.hp));
-    }
+    // Suggested save DC
+    const finalSaveDC = tgtRow.save_dc + (abilityModifier(newStats.int) - abilityModifier(monster.stats.int));
 
     const scaled: MonsterBase = {
         ...monster,
@@ -150,9 +118,9 @@ export function scaleMonster2014(
         suggestedAttackBonus: finalAttackBonus,
         suggestedSaveDC: finalSaveDC,
         srcDPR,
-        tgtDPRMid,
-        finalHpMultiplier,
-        finalDprMultiplier,
+        tgtDPR,
+        hpScale,
+        dprScale,
         usedRow: tgtRow,
     };
 
