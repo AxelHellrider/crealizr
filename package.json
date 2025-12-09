@@ -10,10 +10,10 @@
     "test": "vitest run"
   },
   "engines": {
-    "node": ">=18.18 <=20.x"
+    "node": ">=18.18 <=22.x"
   },
   "dependencies": {
-    "next": "16.0.4",
+    "next": "latest",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
@@ -25,7 +25,7 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.0.4",
+    "eslint-config-next": "latest",
     "@vitest/coverage-v8": "^2.1.5",
     "framer-motion": "^12.23.25",
     "html2canvas": "^1.4.1",
