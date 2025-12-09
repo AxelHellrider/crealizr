@@ -16,6 +16,8 @@ function findCRRow(cr: number) {
     return CR_MATRIX[0];
 }
 
+
+
 function estimateDPR(monster: MonsterBase) {
     if (!monster.actions || monster.actions.length === 0) return 1;
     let total = 0;
@@ -84,9 +86,10 @@ export function scaleMonster2014(
     // Ability scores scaling
     const newStats: MonsterBase["stats"] = { ...monster.stats, hp: finalHp, ac: finalAC };
     const crDiff = targetCR - srcCR;
-    const numericAbilities: (keyof Omit<MonsterBase["stats"], "speed">)[] = ["ac","hp","str","dex","con","int","wis","cha"];
+    // Only scale ability scores (STR, DEX, CON, INT, WIS, CHA). HP and AC were already computed above.
+    const abilityScores: (keyof Pick<MonsterBase["stats"], "str"|"dex"|"con"|"int"|"wis"|"cha">)[] = ["str","dex","con","int","wis","cha"];
 
-    for (const ab of numericAbilities) {
+    for (const ab of abilityScores) {
         let base: number = monster.stats[ab] as number; // guaranteed number
         base = scaleAbilityScore(base, crDiff);
 

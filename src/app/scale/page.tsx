@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { scaleMonster2014 } from "@/app/utils/scaler";
 import type { MonsterBase } from "@/app/types/monsters_schema";
-import { ABILITY_SCORE_MODIFIERS } from "@/app/data/constants";
+import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -15,7 +15,7 @@ export default function ScalePage() {
         size: "Medium",
         type: "",
         alignment: "Unaligned",
-        challenge_rating: 0,
+        challenge_rating: 0.125,
         xp: 0,
         stats: { ac: 10, hp: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, speed: "30 ft" },
         raw_source_ref: "",
@@ -46,6 +46,13 @@ export default function ScalePage() {
             );
             setStep(2);
         }
+    };
+
+    const formatCR = (cr: number) => {
+        if (cr === 0.125) return "1/8";
+        if (cr === 0.25) return "1/4";
+        if (cr === 0.5) return "1/2";
+        return String(cr);
     };
 
     const downloadImage = async () => {
@@ -79,10 +86,13 @@ export default function ScalePage() {
     return (
         <div style={{ maxWidth: 700, margin: "0 auto", padding: 20, color: "#fff", fontFamily: "sans-serif" }}>
             {step === 1 && (
-                <div style={{ backgroundColor: "#111", padding: 20, borderRadius: 12 }}>
-                    <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>
-                        Enter Monster Details
-                    </h1>
+                <div className="glass-panel p-5" style={{ borderRadius: 12 }}>
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+                        <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>
+                            Enter Monster Details
+                        </h1>
+                        <a href="/scale/docs" className="ui-link" style={{ fontSize: 14 }}>How it works</a>
+                    </div>
 
                     {/* --- Basic Info --- */}
                     <div style={{ marginBottom: 20, padding: 12, backgroundColor: "#1a1a1a", borderRadius: 8 }}>
@@ -92,9 +102,26 @@ export default function ScalePage() {
                         <label>Type</label>
                         <input style={inputStyle} value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} />
                         <label>Current CR</label>
-                        <input type="number" style={inputStyle} value={monster.challenge_rating} onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })} />
+                        <select
+                            style={inputStyle}
+                            value={monster.challenge_rating}
+                            onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}
+                        >
+                            {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
+                                <option key={cr} value={cr}>{formatCR(cr)}</option>
+                            ))}
+                        </select>
                         <label>Target CR</label>
-                        <input type="number" style={inputStyle} value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))} />
+                        <select
+                            style={inputStyle}
+                            value={targetCR ?? ""}
+                            onChange={(e) => setTargetCR(Number(e.target.value))}
+                        >
+                            <option value="" disabled>Select target CR</option>
+                            {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
+                                <option key={cr} value={cr}>{formatCR(cr)}</option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* --- Base Stats --- */}
@@ -146,21 +173,18 @@ export default function ScalePage() {
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleScale}
-                        style={{ padding: 10, backgroundColor: "#333", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}
-                    >
+                    <button onClick={handleScale} className="ui-button">
                         Generate Statblock
                     </button>
                 </div>
             )}
 
             {step === 2 && scaledMonster && (
-                <div ref={statBlockRef} style={{ backgroundColor: "#111", padding: 20, marginTop: 20, borderRadius: 12 }}>
+                <div ref={statBlockRef} className="neo-card p-5" style={{ marginTop: 20, borderRadius: 12 }}>
                     <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>Scaled Monster</h1>
                     <p><strong>Name:</strong> {scaledMonster.name}</p>
                     <p><strong>Type:</strong> {scaledMonster.type}</p>
-                    <p><strong>CR:</strong> {scaledMonster.challenge_rating}</p>
+                    <p><strong>CR:</strong> {formatCR(scaledMonster.challenge_rating)}</p>
 
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
                         {Object.entries(scaledMonster.stats).map(([key, value]) =>
@@ -174,9 +198,9 @@ export default function ScalePage() {
                     </div>
 
                     <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
-                        <button onClick={() => setStep(1)} style={{ padding: 8, backgroundColor: "#333", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}>Edit Monster</button>
-                        <button onClick={downloadImage} style={{ padding: 8, backgroundColor: "#333", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}>Download Image</button>
-                        <button onClick={downloadPDF} style={{ padding: 8, backgroundColor: "#333", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}>Download PDF</button>
+                        <button onClick={() => setStep(1)} className="ui-button">Edit Monster</button>
+                        <button onClick={downloadImage} className="ui-button">Download Image</button>
+                        <button onClick={downloadPDF} className="ui-button">Download PDF</button>
                     </div>
                 </div>
             )}

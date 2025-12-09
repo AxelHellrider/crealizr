@@ -1,38 +1,38 @@
 export default function Footer() {
     return (
-        <footer className="w-full bg-transparent text-fog">
-            <div className="mx-auto max-w-6xl p-6 flex flex-col md:flex-row justify-between gap-10">
+        <footer className="w-full">
+            <div className="page-wrap glass-panel mt-8 flex flex-col md:flex-row justify-between gap-10">
 
                 {/* Brand */}
                 <div>
-                    <h2 className="text-xl font-semibold text-[#ff9900]">CRializr</h2>
-                    <p className="mt-2 max-w-sm text-sm text-ash">
+                    <h2 className="text-xl font-semibold accent-orange">CRializr</h2>
+                    <p className="mt-2 max-w-sm text-sm text-zinc-400">
                         Tools for Dungeon Masters who engineer their encounters.
                     </p>
                 </div>
 
                 {/* Quick Links */}
                 <div className="space-y-2 text-sm">
-                    <a href="/monsters" className="block hover:text-[#45dbaa] transition">
-                        Monsters
+                    <a href="/scale" className="block ui-link transition">
+                        CR Scaler
                     </a>
-                    <a href="/scale" className="block hover:text-[#45dbaa] transition">
-                        Scaler
+                    <a href="/balance" className="block ui-link transition">
+                        Combat Balancer
                     </a>
-                    <a href="/docs" className="block hover:text-[#45dbaa] transition">
-                        Docs
+                    <a href="/items" className="block ui-link transition">
+                        Item Creator
                     </a>
                     <a
                         href="https://github.com/your-repo"
                         target="_blank"
-                        className="block hover:text-[#45dbaa] transition"
+                        className="block ui-link transition"
                     >
                         GitHub
                     </a>
                 </div>
 
                 {/* Legal */}
-                <div className="text-xs text-ash max-w-sm">
+                <div className="text-xs text-zinc-500 max-w-sm">
                     <p>
                         Built for D&D 2014 + 2024 rulesets.
                         Not affiliated with Wizards of the Coast.
@@ -43,7 +43,7 @@ export default function Footer() {
 
             {/* Arcane runes strip */}
             <div className="w-full">
-                <div className="flex justify-center py-4 text-[#4511bd] text-sm tracking-widest select-none">
+                <div className="flex justify-center py-4 accent-purple text-sm tracking-widest select-none">
                     ✦ ✧ ✦ ✧ ✦
                 </div>
             </div>

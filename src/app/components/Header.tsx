@@ -2,30 +2,26 @@ import Link from "next/link";
 
 export default function Header() {
     return (
-        <header className="sticky top-0 z-50 w-full border-b-white bg-black/80 backdrop-blur-lg">
-            <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <header className="sticky top-0 z-50 w-full">
+            <div className="page-wrap glass-panel flex items-center justify-between px-4 py-3">
                 {/* Logo */}
-                <Link href="/" className="text-xl font-semibold text-[#ff9900]">
+                <Link href="/" className="text-xl font-semibold accent-orange">
                     CRializr
                 </Link>
 
                 {/* Navigation */}
-                <nav className="flex items-center gap-6 text-fog">
-                    <Link className="hover:text-[#45dbaa] transition" href="/monsters">
-                        Monsters
+                <nav className="flex items-center gap-6 text-sm">
+                    <Link className="ui-link transition" href="/scale">
+                        CR Scaler
                     </Link>
-                    <Link className="hover:text-[#45dbaa] transition" href="/scale">
-                        Scaler
+                    <Link className="ui-link transition" href="/balance">
+                        Combat Balancer
                     </Link>
-                    <Link className="hover:text-[#45dbaa] transition" href="/docs">
-                        Docs
+                    <Link className="ui-link transition" href="/items">
+                        Item Creator
                     </Link>
 
-                    <a
-                        href="https://github.com/your-repo"
-                        target="_blank"
-                        className="rounded-md border border-[#45dbaa] px-3 py-1 text-[#45dbaa] hover:bg-[#45dbaa] hover:text-black transition"
-                    >
+                    <a href="https://github.com/your-repo" target="_blank" className="ui-button">
                         GitHub
                     </a>
                 </nav>

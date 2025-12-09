@@ -2,7 +2,7 @@ import React from "react";
 
 export const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(
     ({ children }, ref) => (
-        <div ref={ref} className="bg-zinc-900 border border-zinc-700 rounded-xl shadow p-4">
+        <div ref={ref} className="neo-card p-4">
             {children}
         </div>
     )

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
     "next": "16.0.4",
@@ -21,10 +22,12 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.4",
+    "@vitest/coverage-v8": "^2.1.5",
     "framer-motion": "^12.23.25",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.5"
   }
 }
