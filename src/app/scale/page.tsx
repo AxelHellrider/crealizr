@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { scaleMonster2014 } from "@/app/utils/scaler";
+import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import type { MonsterBase } from "@/app/types/monsters_schema";
 import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
 import html2canvas from "html2canvas";
@@ -20,6 +20,7 @@ export default function ScalePage() {
         stats: { ac: 10, hp: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, speed: "30 ft" },
         raw_source_ref: "",
     });
+    const [edition, setEdition] = useState<"2014" | "2024">("2014");
     const [targetCR, setTargetCR] = useState<number | null>(null);
     const [scaledMonster, setScaledMonster] = useState<MonsterBase | null>(null);
     const [acEquipment, setAcEquipment] = useState<number>(0);
@@ -37,8 +38,10 @@ export default function ScalePage() {
 
     const handleScale = () => {
         if (targetCR !== null) {
+            const base = { ...monster, edition };
+            const fn = edition === "2024" ? scaleMonster2024 : scaleMonster2014;
             setScaledMonster(
-                scaleMonster2014(monster, targetCR, {
+                fn(base, targetCR, {
                     acEquipment,
                     acRace,
                     abilityScoreBonus: abilityBonus
@@ -101,6 +104,15 @@ export default function ScalePage() {
                         <input style={inputStyle} value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} />
                         <label>Type</label>
                         <input style={inputStyle} value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} />
+                        <label>Ruleset</label>
+                        <select
+                            style={inputStyle}
+                            value={edition}
+                            onChange={(e) => setEdition(e.target.value as "2014" | "2024")}
+                        >
+                            <option value="2014">2014</option>
+                            <option value="2024">2024</option>
+                        </select>
                         <label>Current CR</label>
                         <select
                             style={inputStyle}
@@ -184,7 +196,7 @@ export default function ScalePage() {
                     <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>Scaled Monster</h1>
                     <p><strong>Name:</strong> {scaledMonster.name}</p>
                     <p><strong>Type:</strong> {scaledMonster.type}</p>
-                    <p><strong>CR:</strong> {formatCR(scaledMonster.challenge_rating)}</p>
+                    <p><strong>CR:</strong> {formatCR(scaledMonster.challenge_rating)} <span className="text-zinc-400">({scaledMonster.edition})</span></p>
 
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
                         {Object.entries(scaledMonster.stats).map(([key, value]) =>

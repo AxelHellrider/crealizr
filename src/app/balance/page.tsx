@@ -1,19 +1,40 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { suggestEncounters, partyBudget, suggestGroupEncounters } from "@/app/utils/encounter";
+import {
+  suggestEncounters,
+  partyBudget,
+  suggestGroupEncounters,
+  suggestEncounters2024,
+  partyBudget2024,
+  suggestGroupEncounters2024,
+} from "@/app/utils/encounter";
 
 type Mode = "solo" | "group";
+type Ruleset = "2014" | "2024";
 
 export default function CombatBalancerPage() {
   const [partySize, setPartySize] = useState(4);
   const [avgLevel, setAvgLevel] = useState(5);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "deadly">("medium");
   const [mode, setMode] = useState<Mode>("solo");
-  
-  const soloSuggestions = useMemo(() => suggestEncounters({ level: avgLevel, size: partySize, difficulty }), [partySize, avgLevel, difficulty]);
-  const groupSuggestions = useMemo(() => suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty }), [partySize, avgLevel, difficulty]);
-  const budget = useMemo(() => partyBudget(avgLevel, partySize, difficulty), [partySize, avgLevel, difficulty]);
+  const [ruleset, setRuleset] = useState<Ruleset>("2014");
+
+  const soloSuggestions = useMemo(() => {
+    return ruleset === "2024"
+      ? suggestEncounters2024({ level: avgLevel, size: partySize, difficulty })
+      : suggestEncounters({ level: avgLevel, size: partySize, difficulty });
+  }, [partySize, avgLevel, difficulty, ruleset]);
+
+  const groupSuggestions = useMemo(() => {
+    return ruleset === "2024"
+      ? suggestGroupEncounters2024({ level: avgLevel, size: partySize, difficulty })
+      : suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty });
+  }, [partySize, avgLevel, difficulty, ruleset]);
+
+  const budget = useMemo(() => (
+    ruleset === "2024" ? partyBudget2024(avgLevel, partySize, difficulty) : partyBudget(avgLevel, partySize, difficulty)
+  ), [partySize, avgLevel, difficulty, ruleset]);
 
   const formatCR = (cr: number) => (cr === 0.125 ? "1/8" : cr === 0.25 ? "1/4" : cr === 0.5 ? "1/2" : String(cr));
 
@@ -27,7 +48,7 @@ export default function CombatBalancerPage() {
         <a href="/balance/docs" className="ui-link text-sm">How it works</a>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-5">
         <label className="grid gap-1">
           <span className="text-sm text-zinc-400">Party size</span>
           <input className="ui-input w-full" type="number" min={1} max={8} value={partySize} onChange={(e) => setPartySize(Number(e.target.value))} />
@@ -35,6 +56,13 @@ export default function CombatBalancerPage() {
         <label className="grid gap-1">
           <span className="text-sm text-zinc-400">Average level</span>
           <input className="ui-input w-full" type="number" min={1} max={20} value={avgLevel} onChange={(e) => setAvgLevel(Number(e.target.value))} />
+        </label>
+        <label className="grid gap-1">
+          <span className="text-sm text-zinc-400">Ruleset</span>
+          <select className="ui-select w-full" value={ruleset} onChange={(e) => setRuleset(e.target.value as Ruleset)}>
+            <option value="2014">2014</option>
+            <option value="2024">2024</option>
+          </select>
         </label>
         <label className="grid gap-1">
           <span className="text-sm text-zinc-400">Difficulty</span>
@@ -92,7 +120,7 @@ export default function CombatBalancerPage() {
         )}
       </div>
 
-      <p className="text-xs text-zinc-500">Uses 2014 DMG XP thresholds and multipliers. Adjust to taste at your table.</p>
+      <p className="text-xs text-zinc-500">Using {ruleset} XP thresholds and multipliers. Adjust to taste at your table.</p>
     </section>
   );
 }

@@ -55,3 +55,19 @@ Read about rarity by level and suggested bonus curves:
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Deploy on Netlify
+
+This project is configured to deploy on Netlify using the official Next.js adapter.
+
+Steps:
+
+1. Ensure your site uses Node 20 on Netlify (set automatically by `netlify.toml`).
+2. The plugin `@netlify/plugin-nextjs` is installed as a dev dependency and enabled in `netlify.toml`.
+3. Build command: `npm run build`
+4. Publish directory: `.next`
+
+Notes:
+
+- React Compiler is disabled by default on Netlify (`REACT_COMPILER=false` in `netlify.toml`). If you want it, set an environment variable `REACT_COMPILER=true` in Netlify and confirm compatibility.
+- No custom Netlify Functions folder is needed; the plugin handles server functions generation and upload.

@@ -50,7 +50,10 @@ export default function BalanceDocsPage() {
         <li>Sort by highest <Code>fit</Code>, then by lower <Code>adjustedXP</Code>. Return the top 12.</li>
       </ul>
 
-      <h2 className="mt-8 text-xl font-semibold">Modes: Solo vs Groups</h2>
+      <h2 className="mt-8 text-xl font-semibold">Ruleset and Modes</h2>
+      <p>The page includes a Ruleset toggle to switch between the 2014 and 2024 guidelines. XP thresholds, per‑CR XP, and multipliers come from the selected ruleset.</p>
+      <p className="text-zinc-400 text-sm">Note: For initial 2024 support, values align closely to 2014 to provide parity; you can still tune outcomes at your table.</p>
+      <h3 className="mt-4 font-semibold">Solo vs Groups</h3>
       <p>The UI lets you toggle between two suggestion modes:</p>
       <ul>
         <li>

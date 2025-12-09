@@ -9,6 +9,9 @@
     "lint": "eslint",
     "test": "vitest run"
   },
+  "engines": {
+    "node": ">=18.18 <=20.x"
+  },
   "dependencies": {
     "next": "16.0.4",
     "react": "19.2.0",
@@ -16,6 +19,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@netlify/plugin-nextjs": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
