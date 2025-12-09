@@ -7,9 +7,9 @@ export default function Footer() {
 
                 {/* Brand */}
                 <div>
-                    <h2 className="text-xl font-semibold accent-orange">CRializr</h2>
+                    <h2 className="text-xl font-semibold accent-orange">CRealizr</h2>
                     <p className="mt-2 max-w-sm text-sm text-zinc-400">
-                        Tools for Dungeon Masters who engineer their encounters.
+                        Various tools for Dungeons & Dragons 2014 & 2024.
                     </p>
                 </div>
 

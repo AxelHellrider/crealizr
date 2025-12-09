@@ -6,7 +6,7 @@ export default function Header() {
             <div className="page-wrap glass-panel flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <Link href="/" className="text-xl font-semibold accent-orange">
-                    CRializr
+                    CRealizr
                 </Link>
 
                 {/* Navigation */}
