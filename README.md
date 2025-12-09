@@ -62,7 +62,7 @@ This project is configured to deploy on Netlify using the official Next.js adapt
 
 Steps:
 
-1. Ensure your site uses Node 20 on Netlify (set automatically by `netlify.toml`).
+1. Ensure your site uses Node 22 on Netlify (set automatically by `netlify.toml`).
 2. The plugin `@netlify/plugin-nextjs` is installed as a dev dependency and enabled in `netlify.toml`.
 3. Build command: `npm run build`
 4. Publish directory: `.next`
@@ -71,3 +71,18 @@ Notes:
 
 - React Compiler is disabled by default on Netlify (`REACT_COMPILER=false` in `netlify.toml`). If you want it, set an environment variable `REACT_COMPILER=true` in Netlify and confirm compatibility.
 - No custom Netlify Functions folder is needed; the plugin handles server functions generation and upload.
+
+## Versions and requirements
+
+- Next.js: pinned to the latest stable (currently resolved to 16.0.8)
+- React / React DOM: 19.2.0
+- TypeScript / ESLint / eslint-config-next: latest compatible
+- Node runtime: >=20 and <=22.x (Netlify set to 22)
+
+If you update dependencies, run:
+
+```
+npm install
+npm run build
+npm test
+```

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
     return (
         <footer className="w-full">
@@ -13,15 +15,15 @@ export default function Footer() {
 
                 {/* Quick Links */}
                 <div className="space-y-2 text-sm">
-                    <a href="/scale" className="block ui-link transition">
+                    <Link href="/scale" className="block ui-link transition">
                         CR Scaler
-                    </a>
-                    <a href="/balance" className="block ui-link transition">
+                    </Link>
+                    <Link href="/balance" className="block ui-link transition">
                         Combat Balancer
-                    </a>
-                    <a href="/items" className="block ui-link transition">
+                    </Link>
+                    <Link href="/items" className="block ui-link transition">
                         Item Creator
-                    </a>
+                    </Link>
                     <a
                         href="https://github.com/your-repo"
                         target="_blank"

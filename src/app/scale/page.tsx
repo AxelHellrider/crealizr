@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import type { MonsterBase } from "@/app/types/monsters_schema";
 import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
+import { formatCR } from "@/app/lib/format";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -51,13 +52,6 @@ export default function ScalePage() {
         }
     };
 
-    const formatCR = (cr: number) => {
-        if (cr === 0.125) return "1/8";
-        if (cr === 0.25) return "1/4";
-        if (cr === 0.5) return "1/2";
-        return String(cr);
-    };
-
     const downloadImage = async () => {
         if (!statBlockRef.current) return;
         const canvas = await html2canvas(statBlockRef.current, { scale: 2 });
@@ -83,125 +77,118 @@ export default function ScalePage() {
         return "0";
     };
 
-    const boxStyle: React.CSSProperties = { backgroundColor: "#222", padding: 12, borderRadius: 8, textAlign: "center", flex: "1 0 30%" };
-    const inputStyle: React.CSSProperties = { display: "block", width: "100%", padding: 8, marginBottom: 12, borderRadius: 6, border: "1px solid #555", backgroundColor: "#222", color: "#fff" };
-
     return (
-        <div style={{ maxWidth: 700, margin: "0 auto", padding: 20, color: "#fff", fontFamily: "sans-serif" }}>
+        <section className="glass-panel p-6">
             {step === 1 && (
-                <div className="glass-panel p-5" style={{ borderRadius: 12 }}>
-                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-                        <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>
-                            Enter Monster Details
-                        </h1>
-                        <a href="/scale/docs" className="ui-link" style={{ fontSize: 14 }}>How it works</a>
-                    </div>
+                <div className="grid gap-4">
+                    <header className="flex items-baseline justify-between gap-3">
+                        <h1 className="text-2xl font-semibold">Enter Monster Details</h1>
+                        <a href="/scale/docs" className="ui-link text-sm">How it works</a>
+                    </header>
 
                     {/* --- Basic Info --- */}
-                    <div style={{ marginBottom: 20, padding: 12, backgroundColor: "#1a1a1a", borderRadius: 8 }}>
-                        <h2 style={{ marginBottom: 8 }}>Basic Info</h2>
-                        <label>Name</label>
-                        <input style={inputStyle} value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} />
-                        <label>Type</label>
-                        <input style={inputStyle} value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} />
-                        <label>Ruleset</label>
-                        <select
-                            style={inputStyle}
-                            value={edition}
-                            onChange={(e) => setEdition(e.target.value as "2014" | "2024")}
-                        >
-                            <option value="2014">2014</option>
-                            <option value="2024">2024</option>
-                        </select>
-                        <label>Current CR</label>
-                        <select
-                            style={inputStyle}
-                            value={monster.challenge_rating}
-                            onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}
-                        >
-                            {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
-                                <option key={cr} value={cr}>{formatCR(cr)}</option>
-                            ))}
-                        </select>
-                        <label>Target CR</label>
-                        <select
-                            style={inputStyle}
-                            value={targetCR ?? ""}
-                            onChange={(e) => setTargetCR(Number(e.target.value))}
-                        >
-                            <option value="" disabled>Select target CR</option>
-                            {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
-                                <option key={cr} value={cr}>{formatCR(cr)}</option>
-                            ))}
-                        </select>
+                    <div className="neo-card p-4">
+                        <h2 className="mb-2 font-medium">Basic Info</h2>
+                        <label className="grid gap-1">
+                            <span className="text-sm text-zinc-400">Name</span>
+                            <input className="ui-input w-full" value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} />
+                        </label>
+                        <label className="mt-3 grid gap-1">
+                            <span className="text-sm text-zinc-400">Type</span>
+                            <input className="ui-input w-full" value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} />
+                        </label>
+                        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                            <label className="grid gap-1">
+                                <span className="text-sm text-zinc-400">Ruleset</span>
+                                <select className="ui-select w-full" value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
+                                    <option value="2014">2014</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </label>
+                            <label className="grid gap-1">
+                                <span className="text-sm text-zinc-400">Current CR</span>
+                                <select className="ui-select w-full" value={monster.challenge_rating} onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}>
+                                    {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
+                                        <option key={cr} value={cr}>{formatCR(cr)}</option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="grid gap-1">
+                                <span className="text-sm text-zinc-400">Target CR</span>
+                                <select className="ui-select w-full" value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))}>
+                                    <option value="" disabled>Select target CR</option>
+                                    {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
+                                        <option key={cr} value={cr}>{formatCR(cr)}</option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
                     </div>
 
                     {/* --- Base Stats --- */}
-                    <div style={{ marginBottom: 20, padding: 12, backgroundColor: "#1a1a1a", borderRadius: 8 }}>
-                        <h2 style={{ marginBottom: 8 }}>Base Stats</h2>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                    <div className="neo-card p-4">
+                        <h2 className="mb-2 font-medium">Base Stats</h2>
+                        <div className="flex flex-wrap gap-3">
                             {Object.entries(monster.stats).map(([key, value]) => (
-                                <div key={key} style={{ flex: "1 0 30%" }}>
-                                    <label>{key.toUpperCase()}</label>
+                                <label key={key} className="grid gap-1 flex-[1_0_30%] min-w-[140px]">
+                                    <span className="text-sm text-zinc-400">{key.toUpperCase()}</span>
                                     <input
-                                        style={inputStyle}
+                                        className="ui-input w-full"
                                         type={key === "speed" ? "text" : "number"}
                                         value={value as string | number}
                                         onChange={(e) => handleStatChange(key as keyof MonsterBase["stats"], key === "speed" ? e.target.value : Number(e.target.value))}
                                     />
-                                </div>
+                                </label>
                             ))}
                         </div>
                     </div>
 
                     {/* --- Additional Bonuses --- */}
-                    <div style={{ marginBottom: 20, padding: 12, backgroundColor: "#1a1a1a", borderRadius: 8 }}>
-                        <h2 style={{ marginBottom: 8 }}>Additional Bonuses</h2>
+                    <div className="neo-card p-4">
+                        <h2 className="mb-2 font-medium">Additional Bonuses</h2>
 
-                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                            <div style={{ flex: "1 0 45%" }}>
-                                <label>AC from Equipment</label>
-                                <input type="number" style={inputStyle} value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
-                            </div>
-                            <div style={{ flex: "1 0 45%" }}>
-                                <label>AC from Race</label>
-                                <input type="number" style={inputStyle} value={acRace} onChange={(e) => setAcRace(Number(e.target.value))} />
-                            </div>
+                        <div className="flex flex-wrap gap-3">
+                            <label className="grid gap-1 flex-[1_0_45%] min-w-[200px]">
+                                <span className="text-sm text-zinc-400">AC from Equipment</span>
+                                <input type="number" className="ui-input w-full" value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
+                            </label>
+                            <label className="grid gap-1 flex-[1_0_45%] min-w-[200px]">
+                                <span className="text-sm text-zinc-400">AC from Race</span>
+                                <input type="number" className="ui-input w-full" value={acRace} onChange={(e) => setAcRace(Number(e.target.value))} />
+                            </label>
                         </div>
 
-                        <h3 style={{ marginTop: 12, marginBottom: 8 }}>Ability Score Bonuses</h3>
-                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                        <h3 className="mt-3 mb-2 font-medium">Ability Score Bonuses</h3>
+                        <div className="flex flex-wrap gap-3">
                             {["str", "dex", "con", "int", "wis", "cha"].map((ab) => (
-                                <div key={ab} style={{ flex: "1 0 30%" }}>
-                                    <label>{ab.toUpperCase()}</label>
+                                <label key={ab} className="grid gap-1 flex-[1_0_30%] min-w-[140px]">
+                                    <span className="text-sm text-zinc-400">{ab.toUpperCase()}</span>
                                     <input
                                         type="number"
-                                        style={inputStyle}
+                                        className="ui-input w-full"
                                         value={abilityBonus[ab as keyof MonsterBase["stats"]] ?? 0}
                                         onChange={(e) => handleAbilityBonusChange(ab as keyof MonsterBase["stats"], Number(e.target.value))}
                                     />
-                                </div>
+                                </label>
                             ))}
                         </div>
                     </div>
 
-                    <button onClick={handleScale} className="ui-button">
-                        Generate Statblock
-                    </button>
+                    <button onClick={handleScale} className="ui-button">Generate Statblock</button>
                 </div>
             )}
 
             {step === 2 && scaledMonster && (
-                <div ref={statBlockRef} className="neo-card p-5" style={{ marginTop: 20, borderRadius: 12 }}>
-                    <h1 style={{ fontSize: 24, marginBottom: 16, borderBottom: "1px solid #444", paddingBottom: 8 }}>Scaled Monster</h1>
+                <div ref={statBlockRef} className="neo-card p-5 mt-5">
+                    <h1 className="text-xl font-semibold pb-2 border-b border-zinc-700 mb-3">Scaled Monster</h1>
                     <p><strong>Name:</strong> {scaledMonster.name}</p>
                     <p><strong>Type:</strong> {scaledMonster.type}</p>
                     <p><strong>CR:</strong> {formatCR(scaledMonster.challenge_rating)} <span className="text-zinc-400">({scaledMonster.edition})</span></p>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 12 }}>
+                    <div className="flex flex-wrap gap-2 mt-3">
                         {Object.entries(scaledMonster.stats).map(([key, value]) =>
                             !["speed"].includes(key) ? (
-                                <div key={key} style={boxStyle}>
+                                <div key={key} className="neo-card p-3 text-center flex-[1_0_30%] min-w-[120px]">
                                     <strong>{key.toUpperCase()}</strong>
                                     <div>{value} {!["ac", "hp"].includes(key) ? `(${getModifier(Number(value))})` : null}</div>
                                 </div>
@@ -209,13 +196,13 @@ export default function ScalePage() {
                         )}
                     </div>
 
-                    <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+                    <div className="mt-4 flex gap-2">
                         <button onClick={() => setStep(1)} className="ui-button">Edit Monster</button>
                         <button onClick={downloadImage} className="ui-button">Download Image</button>
                         <button onClick={downloadPDF} className="ui-button">Download PDF</button>
                     </div>
                 </div>
             )}
-        </div>
+        </section>
     );
 }

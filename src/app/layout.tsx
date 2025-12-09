@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import RouteProgress from "@/app/components/RouteProgress";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,8 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased` }>
-        <div className="min-h-screen">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Top route change progress bar */}
+        <RouteProgress />
+        {/* Isolated scroll container prevents viewport rubber-band bounce */}
+        <div className="scroll-container">
           <Header />
           <main className="page-wrap">
             {children}

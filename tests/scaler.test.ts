@@ -93,8 +93,8 @@ describe("scaleMonster2014", () => {
   });
 
   it("computes advice fields (attack bonus, save DC, DPR estimates)", () => {
-    const res = scaleMonster2014(monster, 1);
-    const advice = (res as any)._advice as Record<string, any>;
+    const res = scaleMonster2014(monster, 1) as unknown as { _advice?: Record<string, unknown> };
+    const advice = res._advice as Record<string, unknown>;
     expect(advice).toBeTruthy();
     // source DPR: two attacks 1d6+2 each -> avg 5.5+2=7.5 each -> total 15 -> but estimator sums and rounds; our impl yields 11 for this monster
     expect(advice.srcDPR).toBe(11);

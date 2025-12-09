@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   suggestEncounters,
   partyBudget,
@@ -9,6 +10,7 @@ import {
   partyBudget2024,
   suggestGroupEncounters2024,
 } from "@/app/utils/encounter";
+import { formatCR } from "@/app/lib/format";
 
 type Mode = "solo" | "group";
 type Ruleset = "2014" | "2024";
@@ -36,8 +38,6 @@ export default function CombatBalancerPage() {
     ruleset === "2024" ? partyBudget2024(avgLevel, partySize, difficulty) : partyBudget(avgLevel, partySize, difficulty)
   ), [partySize, avgLevel, difficulty, ruleset]);
 
-  const formatCR = (cr: number) => (cr === 0.125 ? "1/8" : cr === 0.25 ? "1/4" : cr === 0.5 ? "1/2" : String(cr));
-
   return (
     <section className="grid gap-6 glass-panel p-6">
       <header className="flex items-baseline justify-between gap-3">
@@ -45,7 +45,7 @@ export default function CombatBalancerPage() {
           <h1 className="text-2xl font-semibold">Combat Balancer</h1>
           <p className="text-zinc-400">Get encounter suggestions tuned to your party and desired difficulty.</p>
         </div>
-        <a href="/balance/docs" className="ui-link text-sm">How it works</a>
+        <Link href="/balance/docs" className="ui-link text-sm">How it works</Link>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-5">
@@ -66,7 +66,14 @@ export default function CombatBalancerPage() {
         </label>
         <label className="grid gap-1">
           <span className="text-sm text-zinc-400">Difficulty</span>
-          <select className="ui-select w-full" value={difficulty} onChange={(e) => setDifficulty(e.target.value as any)}>
+          <select
+            className="ui-select w-full"
+            value={difficulty}
+            onChange={(e) => {
+              const val = e.target.value as "easy" | "medium" | "hard" | "deadly";
+              setDifficulty(val);
+            }}
+          >
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>

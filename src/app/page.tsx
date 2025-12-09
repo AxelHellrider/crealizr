@@ -1,8 +1,9 @@
 import {Metadata, Viewport} from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-    title: "CRializr | Dungeons & Dragons CR Tool",
-    description: "Optimize your monster encounters",
+    title: "CRealizr | Dungeons & Dragons Toolkit",
+    description: "For a better TTRPG experience",
 };
 
 export const viewport: Viewport = {
@@ -21,24 +22,24 @@ export default function Home() {
         <div className="absolute bottom-0 right-1/3 h-72 w-72 rounded-full" style={{background:"radial-gradient(circle, rgba(124,58,237,0.35), transparent 60%)"}} />
       </div>
 
-      <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">Where Arcana Meets Algorithm</h1>
+      <h1 className="text-3xl sm:text-5xl font-bold tracking-tight">Take your figts to the next level</h1>
       <p className="mt-4 max-w-2xl text-zinc-400">
         Prepare sessions faster with a mobile-first toolkit: scale monsters, balance encounters, and forge magic items.
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <a href="/scale" className="neo-card p-4 border border-orange-400/20 hover:border-orange-400/40 transition">
+        <Link href="/scale" className="neo-card p-4 border border-orange-400/20 hover:border-orange-400/40 transition">
           <div className="font-semibold">Monster CR Scaler</div>
           <div className="text-sm text-zinc-300">Scale stats and DPR to a target CR.</div>
-        </a>
-        <a href="/balance" className="neo-card p-4 border border-teal-400/20 hover:border-teal-400/40 transition">
+        </Link>
+        <Link href="/balance" className="neo-card p-4 border border-teal-400/20 hover:border-teal-400/40 transition">
           <div className="font-semibold">Combat Balancer</div>
           <div className="text-sm text-zinc-300">Encounter suggestions by party and difficulty.</div>
-        </a>
-        <a href="/items" className="neo-card p-4 border border-purple-400/20 hover:border-purple-400/40 transition">
+        </Link>
+        <Link href="/items" className="neo-card p-4 border border-purple-400/20 hover:border-purple-400/40 transition">
           <div className="font-semibold">Magic Item Creator</div>
           <div className="text-sm text-zinc-300">Forge level-tuned, balanced items.</div>
-        </a>
+        </Link>
       </div>
     </section>
   );

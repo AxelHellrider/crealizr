@@ -34,6 +34,22 @@ body {
   color: var(--text);
 }
 
+/* Prevent rubber-band bounce and scroll chaining */
+html, body {
+  height: 100%;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+/* App scroll container to isolate scrolling from viewport */
+.scroll-container {
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; /* smooth momentum on iOS */
+}
+
 /* Glassmorphism utility */
 .glass-panel {
   background: var(--glass-bg);
@@ -99,3 +115,16 @@ body {
 
 /* Container spacing */
 .page-wrap { max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
+
+/* Top route progress bar */
+.top-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent-teal), var(--accent-purple));
+  box-shadow: 0 0 12px rgba(124,58,237,0.45), 0 0 8px rgba(69,219,170,0.35);
+  z-index: 80;
+  transition: width 180ms ease-out, opacity 180ms ease-out;
+}
