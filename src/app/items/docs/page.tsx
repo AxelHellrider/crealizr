@@ -59,12 +59,6 @@ export default function ItemsDocsPage() {
         <li><Code>notes</Code>: summary text if targets were provided</li>
       </ul>
 
-      <h2 className="mt-8 text-xl font-semibold">Where this lives in code</h2>
-      <ul>
-        <li>Logic: <Code>src/app/utils/items.ts</Code> (<Code>rarityForLevel</Code>, <Code>suggestedBonuses</Code>, <Code>buildItem</Code>).</li>
-        <li>UI: <Code>src/app/items/page.tsx</Code>.</li>
-      </ul>
-
       <p className="mt-8 text-sm text-zinc-500">These are baseline heuristics for quick prep on mobile. Adjust or extend to fit your table’s tone.</p>
     </section>
   );

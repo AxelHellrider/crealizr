@@ -92,13 +92,6 @@ export default function ScaleDocsPage() {
       <h2 className="mt-8 text-xl font-semibold">Randomness note</h2>
       <p>The in‑app 2014 CR matrix spans the DMG ranges and includes some randomized values for AC/HP/DPR within official bands to avoid singular results. The production app uses the real matrix; you can always override outcomes via the bonuses described above.</p>
 
-      <h2 className="mt-8 text-xl font-semibold">Where this lives in code</h2>
-      <ul>
-        <li>Scaler implementation: <Code>src/app/utils/scaler.ts</Code> (function <Code>scaleMonster2014</Code> and helpers).</li>
-        <li>Constants and CR matrix: <Code>src/app/data/constants.ts</Code>.</li>
-        <li>UI: <Code>src/app/scale/page.tsx</Code>.</li>
-      </ul>
-
       <p className="mt-8 text-sm text-zinc-500">Rules basis: D&D 5e 2014 DMG guidelines, adapted for quick mobile use. Always adjust to taste for your table.</p>
     </section>
   );

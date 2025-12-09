@@ -74,12 +74,6 @@ export default function BalanceDocsPage() {
       <p><Code>adjustedXP = round((Σ countᵢ × xpEachᵢ) × multiplier(N))</Code></p>
       <p>We compute the same fit metric and keep mixes with <Code>fit ≥ 0.7</Code>, deduplicate by CR×count, sort, and return the top 12.</p>
 
-      <h2 className="mt-8 text-xl font-semibold">Where this lives in code</h2>
-      <ul>
-        <li>Helpers and data: <Code>src/app/utils/encounter.ts</Code>.</li>
-        <li>UI: <Code>src/app/balance/page.tsx</Code>.</li>
-      </ul>
-
       <p className="mt-8 text-sm text-zinc-500">Rules basis: D&D 5e 2014 DMG encounter building guidelines. Use as a starting point and adjust to your table.</p>
     </section>
   );
