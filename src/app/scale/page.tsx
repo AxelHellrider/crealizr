@@ -15,6 +15,11 @@ export default function ScalePage() {
         edition: "2014",
         size: "Medium",
         type: "",
+        dpr: {
+            min: 1,
+            max: 1,
+            range: ""
+        },
         alignment: "Unaligned",
         challenge_rating: 0.125,
         xp: 0,
@@ -183,6 +188,9 @@ export default function ScalePage() {
                     <h1 className="text-xl font-semibold pb-2 border-b border-zinc-700 mb-3">Scaled Monster</h1>
                     <p><strong>Name:</strong> {scaledMonster.name}</p>
                     <p><strong>Type:</strong> {scaledMonster.type}</p>
+                    {scaledMonster.dpr && (
+                        <p><strong>Damage per Round:</strong> {scaledMonster.dpr.range}</p>
+                    )}
                     <p><strong>CR:</strong> {formatCR(scaledMonster.challenge_rating)} <span className="text-zinc-400">({scaledMonster.edition})</span></p>
 
                     <div className="flex flex-wrap gap-2 mt-3">

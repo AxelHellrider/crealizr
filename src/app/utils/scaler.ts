@@ -87,6 +87,16 @@ export function scaleMonster2014(
     const srcDPR = estimateDPR(monster);
     const tgtDPR = tgtRow.dpr;
 
+    const finalDPR = {
+        min: Math.max(1, Math.round(tgtDPR * 0.75)),
+        max: Math.max(1, Math.round(tgtDPR * 1.25)),
+        range: `${Math.max(1, Math.round(tgtDPR * 0.75))}–${Math.max(
+            1,
+            Math.round(tgtDPR * 1.25)
+        )}`
+    };
+
+
     // HP scaling
     const hpScale = tgtRow.hp / Math.max(1, monster.stats.hp);
     const finalHp = Math.max(1, Math.round(monster.stats.hp * hpScale));
@@ -129,6 +139,7 @@ export function scaleMonster2014(
         ...monster,
         challenge_rating: targetCR,
         stats: newStats,
+        dpr: finalDPR,
         raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled (2014)`,
         _advice: {
             suggestedAttackBonus: finalAttackBonus,
@@ -161,6 +172,16 @@ export function scaleMonster2024(
 
     const srcDPR = estimateDPR(monster);
     const tgtDPR = tgtRow.dpr;
+
+    const finalDPR = {
+        min: Math.max(1, Math.round(tgtDPR * 0.75)),
+        max: Math.max(1, Math.round(tgtDPR * 1.25)),
+        range: `${Math.max(1, Math.round(tgtDPR * 0.75))}–${Math.max(
+            1,
+            Math.round(tgtDPR * 1.25)
+        )}`
+    };
+
 
     // HP scaling
     const hpScale = tgtRow.hp / Math.max(1, monster.stats.hp);
@@ -201,6 +222,7 @@ export function scaleMonster2024(
         challenge_rating: targetCR,
         edition: "2024",
         stats: newStats,
+        dpr: finalDPR,
         raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled (2024)`,
         _advice: {
             suggestedAttackBonus: finalAttackBonus,

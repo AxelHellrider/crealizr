@@ -5,6 +5,11 @@ export interface MonsterBase {
     type: string;
     alignment: string;
     challenge_rating: number;
+    dpr: {
+        min: number;
+        max: number;
+        range: string;
+    };
     xp: number;
     stats: {
         ac: number;
