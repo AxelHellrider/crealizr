@@ -39,7 +39,7 @@ export default function Footer() {
                         Built for D&D 2014 + 2024 rulesets.
                         Not affiliated with Wizards of the Coast.
                     </p>
-                    <p className="mt-4">© {new Date().getFullYear()} CRializr.</p>
+                    <p className="mt-4">© {new Date().getFullYear()} CRealizr.</p>
                 </div>
             </div>
 
