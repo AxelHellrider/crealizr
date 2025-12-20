@@ -25,7 +25,7 @@ export default function Footer() {
                         Item Creator
                     </Link>
                     <a
-                        href="https://github.com/your-repo"
+                        href="https://github.com/AxelHellrider"
                         target="_blank"
                         className="block ui-link transition"
                     >

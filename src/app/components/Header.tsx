@@ -21,7 +21,7 @@ export default function Header() {
                         Item Creator
                     </Link>
 
-                    <a href="https://github.com/your-repo" target="_blank" className="ui-button">
+                    <a href="https://github.com/AxelHellrider" target="_blank" className="ui-button">
                         GitHub
                     </a>
                 </nav>
