@@ -8,11 +8,12 @@ const TYPES: ItemType[] = ["Weapon", "Armor", "Wand", "Wondrous"];
 export default function ItemCreatorPage() {
   const [name, setName] = useState("");
   const [type, setType] = useState<ItemType>("Weapon");
+  const [attunement, setAttunement] = useState(false);
   const [level, setLevel] = useState(5);
   const [targets, setTargets] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
 
-  const item = useMemo(() => buildItem({ name, type, level, targets }), [name, type, level, targets]);
+  const item = useMemo(() => buildItem({ name, type, attunement, level, targets }), [name, type, attunement, level, targets]);
 
   const addTag = () => {
     const t = tagInput.trim();
@@ -50,7 +51,7 @@ export default function ItemCreatorPage() {
 
         <label className="grid gap-1">
           <span className="text-sm text-zinc-400">Player level (tuning)</span>
-          <input className="ui-input w-full" type="number" min={1} max={20} value={level} onChange={(e) => setLevel(Number(e.target.value))} />
+          <input className="ui-input w-full" value={level} onChange={(e) => setLevel(Number(e.target.value))} />
         </label>
 
         <div className="grid gap-1">
@@ -68,6 +69,16 @@ export default function ItemCreatorPage() {
             ))}
           </div>
         </div>
+
+          <label className="flex items-center gap-2">
+              <span className="text-sm text-zinc-400">Requires Attunement</span>
+              <input
+                  type="checkbox"
+                  className="accent-orange"
+                  checked={attunement}
+                  onChange={(e) => setAttunement(e.target.checked)}
+              />
+          </label>
       </div>
 
       <div className="neo-card p-4">
@@ -76,6 +87,7 @@ export default function ItemCreatorPage() {
           <div><span className="text-zinc-400">Name:</span> {item.name}</div>
           <div><span className="text-zinc-400">Type:</span> {item.type}</div>
           <div><span className="text-zinc-400">Rarity:</span> {item.rarity}</div>
+          <div><span className="text-zinc-400">Requires Attunement:</span> {item.attunement ? 'Yes' : 'No'}</div>
           <div><span className="text-zinc-400">Level tuned:</span> {item.levelTuned}</div>
           <div><span className="text-zinc-400">Targets:</span> {item.targetTags.join(", ") || "—"}</div>
           {item.bonusToHit !== undefined && <div><span className="text-zinc-400">Bonus to hit:</span> +{item.bonusToHit}</div>}

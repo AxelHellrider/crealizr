@@ -128,3 +128,16 @@ html, body {
   z-index: 80;
   transition: width 180ms ease-out, opacity 180ms ease-out;
 }
+
+/* Number inputs to hide */
+/* Hide number input arrows */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield; /* Firefox */
+}
+

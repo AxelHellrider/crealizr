@@ -5,6 +5,7 @@ export type ItemBlueprint = {
   name: string;
   type: ItemType;
   rarity: ItemRarity;
+  attunement: boolean;
   levelTuned: number;
   targetTags: string[];
   bonusToHit?: number;
@@ -37,7 +38,7 @@ export function suggestedBonuses(level: number, type: ItemType) {
   };
 }
 
-export function buildItem(opts: { name: string; type: ItemType; level: number; targets: string[]; }): ItemBlueprint {
+export function buildItem(opts: { name: string; type: ItemType; attunement: boolean; level: number; targets: string[]; }): ItemBlueprint {
   const lvl = Math.max(1, Math.min(20, Math.round(opts.level)));
   const rarity = rarityForLevel(lvl);
   const b = suggestedBonuses(lvl, opts.type);
@@ -46,6 +47,7 @@ export function buildItem(opts: { name: string; type: ItemType; level: number; t
     name: opts.name || `${opts.type} of ${rarity}`,
     type: opts.type,
     rarity,
+    attunement: opts.attunement,
     levelTuned: lvl,
     targetTags: opts.targets,
     bonusToHit: b.toHit,
