@@ -3,7 +3,7 @@ export function Button({ children, onClick, type = "button" }: { children: React
         <button
             type={type}
             onClick={onClick}
-            className="ui-button"
+            className="inline-flex ui-button"
         >
             {children}
         </button>

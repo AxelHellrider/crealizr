@@ -58,7 +58,7 @@ export default function ItemCreatorPage() {
           <span className="text-sm text-zinc-400">Target monster tags (optional)</span>
           <div className="flex gap-2">
             <input className="ui-input w-full" value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="e.g., undead, dragon" />
-            <button onClick={addTag} className="ui-button text-sm">Add</button>
+            <button onClick={addTag} className="inline-flex ui-button text-sm">Add</button>
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {targets.map((t) => (

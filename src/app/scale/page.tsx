@@ -179,7 +179,7 @@ export default function ScalePage() {
                         </div>
                     </div>
 
-                    <button onClick={handleScale} className="ui-button">Generate Statblock</button>
+                    <button onClick={handleScale} className="inline-flex ui-button">Generate Statblock</button>
                 </div>
             )}
 
@@ -205,9 +205,9 @@ export default function ScalePage() {
                     </div>
 
                     <div className="mt-4 flex gap-2">
-                        <button onClick={() => setStep(1)} className="ui-button">Edit Monster</button>
-                        <button onClick={downloadImage} className="ui-button">Download Image</button>
-                        <button onClick={downloadPDF} className="ui-button">Download PDF</button>
+                        <button onClick={() => setStep(1)} className="inline-flex ui-button">Edit Monster</button>
+                        <button onClick={downloadImage} className="inline-flex ui-button">Download Image</button>
+                        <button onClick={downloadPDF} className="inline-flex ui-button">Download PDF</button>
                     </div>
                 </div>
             )}

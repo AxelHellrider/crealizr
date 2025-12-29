@@ -30,7 +30,7 @@ export default function Header() {
                         href="https://github.com/AxelHellrider"
                         target="_blank"
                         rel="noreferrer"
-                        className="ui-button"
+                        className="inline-flex ui-button"
                     >
                         GitHub
                     </a>
@@ -38,7 +38,7 @@ export default function Header() {
 
                 {/* Mobile Menu Button */}
                 <button
-                    className="lg:hidden ui-button px-3 py-2"
+                    className="inline-flex ui-button px-3 py-2 md:hidden"
                     aria-label="Toggle menu"
                     aria-expanded={open}
                     onClick={() => setOpen((v) => !v)}
@@ -83,7 +83,7 @@ export default function Header() {
                             href="https://github.com/AxelHellrider"
                             target="_blank"
                             rel="noreferrer"
-                            className="ui-button mt-2 text-center"
+                            className="inline-flex ui-button mt-2 text-center"
                             onClick={() => setOpen(false)}
                         >
                             GitHub
