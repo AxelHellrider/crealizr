@@ -10,13 +10,14 @@ import {
 import { formatCR } from "@/app/lib/format";
 
 type Mode = "solo" | "group";
+type Difficulty = "easy" | "medium" | "hard" | "deadly";
 type Ruleset = "2014" | "2024";
 type BudgetMode = "encounter" | "daily";
 
 export default function CombatBalancerPage() {
     const [partySize, setPartySize] = useState(4);
     const [avgLevel, setAvgLevel] = useState(5);
-    const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "deadly">("medium");
+    const [difficulty, setDifficulty] = useState<Difficulty>("medium");
     const [mode, setMode] = useState<Mode>("solo");
     const [ruleset, setRuleset] = useState<Ruleset>("2014");
     const [budgetMode, setBudgetMode] = useState<BudgetMode>("encounter");
@@ -95,7 +96,7 @@ export default function CombatBalancerPage() {
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Difficulty</span>
                     <select className="ui-select" value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value as string)}>
+                            onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
