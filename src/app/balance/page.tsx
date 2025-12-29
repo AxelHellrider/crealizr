@@ -95,7 +95,7 @@ export default function CombatBalancerPage() {
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Difficulty</span>
                     <select className="ui-select" value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value as any)}>
+                            onChange={(e) => setDifficulty(e.target.value as string)}>
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
