@@ -1,18 +1,12 @@
-export function Select({ value, onChange, children, className = "", name, id }: {
-  value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   children: React.ReactNode;
-  className?: string;
-  name?: string;
-  id?: string;
-}) {
+}
+
+export function Select({ children, className = "", ...props }: SelectProps) {
   return (
     <select
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className={`ui-select w-full ${className}`}
+      {...props}
+      className={`ui-select w-full min-h-[44px] sm:min-h-[38px] transition-all duration-200 ${className}`}
     >
       {children}
     </select>

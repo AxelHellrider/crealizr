@@ -1,11 +1,10 @@
-export function Input({ value, onChange, type = "text", placeholder }: { value: string | number; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; type?: string; placeholder?: string }) {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export function Input({ className, ...props }: InputProps) {
     return (
         <input
-            type={type}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            className="ui-input w-full"
+            {...props}
+            className={`ui-input w-full min-h-[44px] sm:min-h-[38px] transition-all duration-200 ${className || ""}`}
         />
     );
 }

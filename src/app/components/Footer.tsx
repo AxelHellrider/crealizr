@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="w-full">
-            <div className="page-wrap glass-panel mt-8 flex flex-col md:flex-row justify-between gap-10">
+        <footer className="w-full border-t border-white/5 mt-16 bg-zinc-900/30">
+            <div className="w-full flex flex-col md:flex-row justify-between gap-10 px-8 py-12">
 
                 {/* Brand */}
                 <div>

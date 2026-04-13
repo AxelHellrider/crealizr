@@ -7,8 +7,8 @@ export default function Header() {
     const [open, setOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 w-full">
-            <div className="page-wrap glass-panel flex items-center justify-between px-4 py-3">
+        <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-white/5">
+            <div className="w-full flex items-center justify-between px-6 py-4">
                 {/* Logo */}
                 <Link href="/" className="text-xl font-semibold accent-orange">
                     CRealizr
