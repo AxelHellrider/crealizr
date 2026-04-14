@@ -75,6 +75,7 @@ export default function CombatBalancerPage() {
                     <Input type="number" min={1} max={8}
                            value={partySize}
                            onChange={(e) => setPartySize(+e.target.value)}
+                           aria-label="Party size (number of players)"
                     />
                 </label>
 
@@ -83,13 +84,15 @@ export default function CombatBalancerPage() {
                     <Input type="number" min={1} max={20}
                            value={avgLevel}
                            onChange={(e) => setAvgLevel(+e.target.value)}
+                           aria-label="Average party level"
                     />
                 </label>
 
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Ruleset</span>
                     <Select value={ruleset}
-                            onChange={(e) => setRuleset(e.target.value as Ruleset)}>
+                            onChange={(e) => setRuleset(e.target.value as Ruleset)}
+                            aria-label="Ruleset version">
                         <option value="2014">2014</option>
                         <option value="2024">2024</option>
                     </Select>
@@ -98,7 +101,8 @@ export default function CombatBalancerPage() {
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Difficulty</span>
                     <Select value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+                            onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+                            aria-label="Encounter difficulty">
                         <option value="easy">Easy</option>
                         <option value="medium">Medium</option>
                         <option value="hard">Hard</option>
@@ -109,7 +113,8 @@ export default function CombatBalancerPage() {
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Budget Type</span>
                     <Select value={budgetMode}
-                            onChange={(e) => setBudgetMode(e.target.value as BudgetMode)}>
+                            onChange={(e) => setBudgetMode(e.target.value as BudgetMode)}
+                            aria-label="XP budget type">
                         <option value="encounter">Encounter</option>
                         <option value="daily">Daily</option>
                     </Select>
@@ -118,7 +123,8 @@ export default function CombatBalancerPage() {
                 <label className="grid gap-1">
                     <span className="text-sm text-zinc-400">Mode</span>
                     <Select value={mode}
-                            onChange={(e) => setMode(e.target.value as Mode)}>
+                            onChange={(e) => setMode(e.target.value as Mode)}
+                            aria-label="Encounter type mode">
                         <option value="solo">Solo</option>
                         <option value="group">Group</option>
                     </Select>
