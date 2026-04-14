@@ -1,6 +1,9 @@
 import {Metadata, Viewport} from "next";
 import Link from "next/link";
 
+import { Card } from "@/app/components/atoms/Card";
+import { Button } from "@/app/components/atoms/Button";
+
 export const metadata: Metadata = {
     title: "CRealizr | Dungeons & Dragons Toolkit",
     description: "For a better TTRPG experience",
@@ -16,128 +19,138 @@ export const viewport: Viewport = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-16 -mt-4">
+    <div className="flex flex-col gap-20 -mt-4">
       {/* Hero Section */}
-      <section className="relative glass-panel p-10 sm:p-20 flex flex-col items-center text-center overflow-hidden min-h-[60vh] justify-center">
-        <div className="pointer-events-none absolute inset-0 opacity-30">
-          <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full blur-[100px]" style={{background:"radial-gradient(circle, rgba(255,153,0,0.4), transparent 70%)"}} />
-          <div className="absolute -bottom-20 -right-20 h-96 w-96 rounded-full blur-[100px]" style={{background:"radial-gradient(circle, rgba(124,58,237,0.4), transparent 70%)"}} />
+      <section className="relative glass-panel p-10 sm:p-24 flex flex-col items-center text-center overflow-hidden min-h-[70vh] justify-center fantasy-border">
+        <div className="pointer-events-none absolute inset-0 opacity-20">
+          <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(197,160,89,0.3), transparent 70%)"}} />
+          <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(44,62,80,0.4), transparent 70%)"}} />
         </div>
 
         <div className="relative z-10 max-w-4xl">
-          <h1 className="text-4xl sm:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white via-zinc-200 to-zinc-500">
-            Forge Legendary <br /> <span className="text-orange-500">Encounters</span>
+          <h1 className="text-5xl sm:text-8xl font-serif tracking-tight text-foreground drop-shadow-sm">
+            BUILD BETTER <br /> <span className="accent-gold uppercase italic">Encounters</span>
           </h1>
-          <p className="mt-6 text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            CRealizr is the ultimate mobile-first toolkit for Dungeons & Dragons Game Masters. 
-            Scale monsters, balance combats, and create magic items in seconds.
+          <p className="mt-8 text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
+            Precise tabletop utilities for Dungeons & Dragons. 
+            Reliable monster scaling, combat balancing, and artifact generation based on 2014 &amp; 2024 rulesets.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link href="/scale" className="ui-button px-8 py-3 text-lg">
-              Start Scaling
+          <div className="mt-12 flex flex-wrap justify-center gap-6">
+            <Link href="/scale">
+              <Button variant="primary" className="px-10 py-4 text-xl uppercase font-serif tracking-widest">
+                SCALE MONSTERS
+              </Button>
             </Link>
-            <Link href="/balance" className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold rounded-xl border border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800 transition-all">
-              Balance Combat
+            <Link href="/balance">
+              <Button className="px-10 py-4 text-xl uppercase font-serif tracking-widest">
+                BALANCE COMBAT
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Services/Tools Section */}
-      <section className="grid gap-8">
+      <section className="grid gap-12">
         <div className="flex flex-col items-center text-center">
-          <h2 className="text-3xl font-bold">Our DM Arsenal</h2>
-          <p className="text-zinc-400 mt-2 max-w-lg">Everything you need to keep the game flowing smoothly without getting bogged down by math.</p>
+          <h2 className="text-4xl font-serif accent-gold uppercase tracking-widest">Core Toolkit</h2>
+          <p className="text-muted mt-4 max-w-lg text-lg italic">Mathematical precision for every session.</p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-3">
-          <Link href="/scale" className="neo-card p-8 border border-orange-400/20 hover:border-orange-400/40 hover:shadow-[0_0_30px_rgba(255,153,0,0.1)] transition-all group flex flex-col h-full">
-            <div className="h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="text-2xl">⚖️</span>
-            </div>
-            <h3 className="font-bold text-xl group-hover:text-orange-400 transition-colors">Monster CR Scaler</h3>
-            <p className="text-zinc-400 mt-4 leading-relaxed flex-grow">
-              Instantly adjust any creature's stats to a target Challenge Rating. Support for both 2014 and 2024 rulesets ensures your math is always spot-on.
-            </p>
-            <div className="mt-6 text-orange-400 text-sm font-semibold flex items-center gap-2">
-              Scale now <span>→</span>
-            </div>
+        <div className="grid gap-8 sm:grid-cols-3">
+          <Link href="/scale" className="group">
+            <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
+              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
+                <span className="text-3xl">⚖️</span>
+              </div>
+              <h3 className="font-serif text-2xl group-hover:text-gold transition-colors uppercase tracking-tight text-foreground">Monster Scaler</h3>
+              <p className="text-muted mt-6 leading-relaxed flex-grow text-base">
+                Mathematically accurate CR adjustment. Recalculates HP, AC, and DPR targets across both rulesets instantly.
+              </p>
+              <div className="mt-8 text-gold text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
+                Open Scaler <span>&rarr;</span>
+              </div>
+            </Card>
           </Link>
 
-          <Link href="/balance" className="neo-card p-8 border border-teal-400/20 hover:border-teal-400/40 hover:shadow-[0_0_30px_rgba(69,219,170,0.1)] transition-all group flex flex-col h-full">
-            <div className="h-12 w-12 rounded-lg bg-teal-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="text-2xl">⚔️</span>
-            </div>
-            <h3 className="font-bold text-xl group-hover:text-teal-400 transition-colors">Combat Balancer</h3>
-            <p className="text-zinc-400 mt-4 leading-relaxed flex-grow">
-              Generate encounter suggestions tailored to your party's size and level. Use "Budget Fit" technology to ensure perfectly tuned difficulty.
-            </p>
-            <div className="mt-6 text-teal-400 text-sm font-semibold flex items-center gap-2">
-              Balance now <span>→</span>
-            </div>
+          <Link href="/balance" className="group">
+            <Card className="p-10 border-silver/10 hover:border-silver/40 transition-all flex flex-col h-full bg-card">
+              <div className="h-16 w-16 rounded-full border border-silver/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-silver transition-all shadow-glow bg-bg">
+                <span className="text-3xl">⚔️</span>
+              </div>
+              <h3 className="font-serif text-2xl group-hover:text-silver transition-colors uppercase tracking-tight text-foreground">Combat Balancer</h3>
+              <p className="text-muted mt-6 leading-relaxed flex-grow text-base">
+                Calculates XP budgets and suggested formations based on encounter difficulty and party composition.
+              </p>
+              <div className="mt-8 text-silver text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
+                Check Balance <span>&rarr;</span>
+              </div>
+            </Card>
           </Link>
 
-          <Link href="/items" className="neo-card p-8 border border-purple-400/20 hover:border-purple-400/40 hover:shadow-[0_0_30px_rgba(124,58,237,0.1)] transition-all group flex flex-col h-full">
-            <div className="h-12 w-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <span className="text-2xl">✨</span>
-            </div>
-            <h3 className="font-bold text-xl group-hover:text-purple-400 transition-colors">Magic Item Creator</h3>
-            <p className="text-zinc-400 mt-4 leading-relaxed flex-grow">
-              Forge unique magic items with bonuses and abilities tuned for specific levels and target monster types. Professional-grade loot, simplified.
-            </p>
-            <div className="mt-6 text-purple-400 text-sm font-semibold flex items-center gap-2">
-              Forge now <span>→</span>
-            </div>
+          <Link href="/items" className="group">
+            <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
+              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
+                <span className="text-3xl">✨</span>
+              </div>
+              <h3 className="font-serif text-2xl group-hover:text-gold transition-colors uppercase tracking-tight text-foreground">Artifact Forge</h3>
+              <p className="text-muted mt-6 leading-relaxed flex-grow text-base">
+                Generate magic items with balanced mechanical bonuses (To Hit, AC, Save DC) appropriate for player level.
+              </p>
+              <div className="mt-8 text-gold text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
+                Create Item <span>&rarr;</span>
+              </div>
+            </Card>
           </Link>
         </div>
       </section>
 
       {/* Brief about services / why us */}
-      <section className="neo-card p-10 bg-gradient-to-b from-zinc-900/50 to-transparent">
-        <div className="grid gap-12 md:grid-cols-2 items-center">
+      <Card className="p-12 bg-card fantasy-border">
+        <div className="grid gap-16 md:grid-cols-2 items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-6">Designed for the Table</h2>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="text-teal-400 text-xl font-bold">01</div>
+            <h2 className="text-4xl font-serif mb-8 accent-gold uppercase tracking-tight">Reliability First</h2>
+            <div className="space-y-8">
+              <div className="flex gap-6">
+                <div className="text-gold text-2xl font-serif">I</div>
                 <div>
-                  <h4 className="font-semibold text-zinc-200">Mobile-First Design</h4>
-                  <p className="text-zinc-400 text-sm">Perfect for use on your phone or tablet right behind the DM screen.</p>
+                  <h4 className="font-serif text-xl text-foreground uppercase tracking-wide">Ruleset Parity</h4>
+                  <p className="text-muted text-base mt-2">Tools are cross-referenced with both 2014 and 2024 core rules for consistent results.</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="text-orange-400 text-xl font-bold">02</div>
+              <div className="flex gap-6">
+                <div className="text-gold text-2xl font-serif">II</div>
                 <div>
-                  <h4 className="font-semibold text-zinc-200">Dual Edition Support</h4>
-                  <p className="text-zinc-400 text-sm">Seamlessly switch between 2014 and 2024 rulesets with a single toggle.</p>
+                  <h4 className="font-serif text-xl text-foreground uppercase tracking-wide">Instant Export</h4>
+                  <p className="text-muted text-base mt-2">Generate high-fidelity PNG or PDF statblocks directly for immediate use at the table.</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="text-purple-400 text-xl font-bold">03</div>
+              <div className="flex gap-6">
+                <div className="text-gold text-2xl font-serif">III</div>
                 <div>
-                  <h4 className="font-semibold text-zinc-200">Fast Export</h4>
-                  <p className="text-zinc-400 text-sm">Download your scaled statblocks as high-quality images or PDFs for your notes.</p>
+                  <h4 className="font-serif text-xl text-foreground uppercase tracking-wide">Clean Utility</h4>
+                  <p className="text-muted text-base mt-2">Designed for high-speed use during live sessions with zero account or login requirements.</p>
                 </div>
               </div>
             </div>
           </div>
-          <div className="relative aspect-video rounded-xl border border-zinc-800 bg-black/40 flex items-center justify-center overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-tr from-orange-500/10 via-transparent to-purple-500/10" />
-             <span className="text-zinc-500 italic text-sm">Preview: Scaled Monster Statblock</span>
+          <div className="relative aspect-video rounded border border-gold/20 bg-background/60 flex items-center justify-center overflow-hidden shadow-2xl">
+             <div className="absolute inset-0 bg-gradient-to-tr from-gold/5 via-transparent to-accent-blue/10" />
+             <span className="text-gold/40 font-serif italic text-sm tracking-widest uppercase">Manuscript Preview: Scaled Monster</span>
              {/* Abstract UI representation */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-3/4 border border-white/5 rounded-lg bg-zinc-900/80 shadow-2xl p-4 flex flex-col gap-2">
-                <div className="h-4 w-2/3 bg-orange-400/20 rounded" />
-                <div className="h-2 w-full bg-white/5 rounded" />
-                <div className="h-2 w-full bg-white/5 rounded" />
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  <div className="h-10 bg-white/5 rounded" />
-                  <div className="h-10 bg-white/5 rounded" />
-                  <div className="h-10 bg-white/5 rounded" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-3/4 border border-gold/30 rounded-sm bg-card shadow-[0_0_50px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-3">
+                <div className="h-5 w-2/3 bg-gold/20 rounded-sm border-b border-gold/30" />
+                <div className="h-2 w-full bg-foreground/5 rounded-full" />
+                <div className="h-2 w-full bg-foreground/5 rounded-full" />
+                <div className="grid grid-cols-3 gap-3 mt-6">
+                  <div className="h-12 border border-gold/10 bg-gold/5 rounded-sm" />
+                  <div className="h-12 border border-gold/10 bg-gold/5 rounded-sm" />
+                  <div className="h-12 border border-gold/10 bg-gold/5 rounded-sm" />
                 </div>
              </div>
           </div>
         </div>
-      </section>
+      </Card>
     </div>
   );
 }

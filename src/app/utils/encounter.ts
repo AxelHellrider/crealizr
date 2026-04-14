@@ -94,10 +94,11 @@ export function partyBudget(opts: {
     ruleset: Ruleset;
     mode: BudgetMode;
 }) {
-    const ruleset = XP_THRESHOLDS[opts.ruleset] || XP_THRESHOLDS["2014"];
-    const lvl = Math.min(20, Math.max(1, opts.level));
-    const levels = (ruleset as any)[lvl] || (XP_THRESHOLDS["2014"] as any)[lvl];
-    const base = levels?.[opts.difficulty] || 0;
+    const rulesetKey = opts.ruleset === "2024" ? "2024" : "2014";
+    const rulesetData = XP_THRESHOLDS[rulesetKey];
+    const lvl = Math.min(20, Math.max(1, opts.level)) as keyof typeof rulesetData;
+    const levels = rulesetData[lvl] || XP_THRESHOLDS["2014"][1];
+    const base = levels[opts.difficulty] || 0;
     const encounter = base * opts.size;
     return opts.mode === "daily" ? Math.round(encounter * 3.4) : encounter;
 }

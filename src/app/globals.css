@@ -2,117 +2,353 @@
 
 /* Theme tokens */
 :root {
-  --bg: #0b0b0e;                /* deep charcoal */
-  --bg-elev: #121216;           /* elevated surfaces */
-  --card: #14141a;              /* cards */
-  --muted: #a1a1aa;             /* zinc-400 */
-  --text: #e5e7eb;              /* zinc-200 */
+  /* FFXIV Heavensward & Stormblood Inspired - Refined & Accessible */
+  --bg: #f5f6f8;               /* Clean, cool off-white (Heavensward Ishgardian feel) */
+  --bg-elev: #ffffff;
+  --card: #ffffff;
+  --muted: #5e6471;            /* Improved contrast for gray text */
+  --text: #1a1c22;             /* High contrast dark blue-black */
+  
+  --accent-gold: #c5a059;      /* Classic FFXIV Gold */
+  --accent-silver: #94a3b8;    /* Ishgardian Silver */
+  --accent-crimson: #a62a2a;   /* Stormblood Crimson for highlights/importance */
+  --accent-blue-ishgard: #475a7a; /* Muted Heavensward Blue */
+  
+  --border-gold: 1px solid rgba(197, 160, 89, 0.4);
+  --border-silver: 1px solid rgba(148, 163, 184, 0.3);
+  
+  --glass-border: rgba(197, 160, 89, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-blur: 12px;
 
-  --accent-orange: #ff9900;     /* brand */
-  --accent-teal: #45dbaa;
-  --accent-purple: #7c3aed;
+  --shadow-fantasy: 0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 2px 8px -4px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 10px rgba(197, 160, 89, 0.1);
+  --transition-default: all 0.2s ease;
+}
 
-  --glass-border: rgba(255,255,255,0.08);
-  --glass-bg: rgba(17,17,19,0.6);
-  --glass-blur: 10px;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d0f14;              /* Deep obsidian */
+    --bg-elev: #161922;
+    --card: #12151c;
+    --muted: #a0aec0;
+    --text: #f0f2f5;
+    
+    --accent-gold: #d4af37;
+    --accent-silver: #b2becd;
+    --accent-crimson: #e53e3e;
+    --accent-blue-ishgard: #5a73a3;
 
-  --shadow-soft-dark: 12px 12px 24px rgba(0,0,0,0.45);
-  --shadow-soft-light: -8px -8px 20px rgba(255,255,255,0.04);
+    --border-gold: 1px solid rgba(212, 175, 55, 0.5);
+    --border-silver: 1px solid rgba(178, 190, 205, 0.4);
+    
+    --glass-border: rgba(212, 175, 55, 0.2);
+    --glass-bg: rgba(18, 21, 28, 0.9);
+    
+    --shadow-fantasy: 0 10px 40px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 15px rgba(212, 175, 55, 0.15);
+  }
+}
+
+[data-theme="light"] {
+  --bg: #f5f6f8;
+  --bg-elev: #ffffff;
+  --card: #ffffff;
+  --muted: #5e6471;
+  --text: #1a1c22;
+  
+  --accent-gold: #c5a059;
+  --accent-silver: #94a3b8;
+  --accent-crimson: #a62a2a;
+  --accent-blue-ishgard: #475a7a;
+
+  --border-gold: 1px solid rgba(197, 160, 89, 0.4);
+  --border-silver: 1px solid rgba(148, 163, 184, 0.3);
+  
+  --glass-border: rgba(197, 160, 89, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+
+  --shadow-fantasy: 0 4px 20px -5px rgba(0, 0, 0, 0.1), 0 2px 8px -4px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 10px rgba(197, 160, 89, 0.1);
+}
+
+[data-theme="dark"] {
+  --bg: #0d0f14;
+  --bg-elev: #161922;
+  --card: #12151c;
+  --muted: #a0aec0;
+  --text: #f0f2f5;
+  
+  --accent-gold: #d4af37;
+  --accent-silver: #b2becd;
+  --accent-crimson: #e53e3e;
+  --accent-blue-ishgard: #5a73a3;
+
+  --border-gold: 1px solid rgba(212, 175, 55, 0.5);
+  --border-silver: 1px solid rgba(178, 190, 205, 0.4);
+  
+  --glass-border: rgba(212, 175, 55, 0.2);
+  --glass-bg: rgba(18, 21, 28, 0.9);
+  
+  --shadow-fantasy: 0 10px 40px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 15px rgba(212, 175, 55, 0.15);
 }
 
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
+  --color-gold: var(--accent-gold);
+  --color-silver: var(--accent-silver);
+  --color-crimson: var(--accent-crimson);
+  --color-muted: var(--muted);
+  --font-serif: var(--font-cinzel);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(255,153,0,0.06), transparent 60%),
-              radial-gradient(1000px 500px at 110% 10%, rgba(124,58,237,0.06), transparent 50%),
-              linear-gradient(to bottom, #0b0b0e, #000);
+  background: var(--bg);
   color: var(--text);
+  min-height: 100vh;
+  /* Clean high-fantasy manuscript feel */
+  background-image: radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.03), transparent 70%);
 }
 
-/* Prevent rubber-band bounce and scroll chaining */
-html, body {
-  height: 100%;
-  overscroll-behavior-x: none;
-  overscroll-behavior-y: none;
-  touch-action: manipulation;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* App scroll container to isolate scrolling from viewport */
-.scroll-container {
-  height: 100dvh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch; /* smooth momentum on iOS */
+/* FFXIV-style Border Utility */
+.fantasy-border {
+  border: var(--border-silver);
+  position: relative;
+  box-shadow: var(--shadow-fantasy);
+}
+
+.fantasy-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 /* Glassmorphism utility */
 .glass-panel {
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  border: var(--glass-border);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), var(--shadow-soft-dark);
+  border-radius: 2px;
+  box-shadow: var(--shadow-fantasy);
 }
 
-/* Neumorphism utility */
+/* Fantasy Card utility */
 .neo-card {
   background: var(--card);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
-  box-shadow: var(--shadow-soft-dark), var(--shadow-soft-light);
+  border: var(--border-silver);
+  border-radius: 2px;
+  box-shadow: var(--shadow-fantasy);
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Accent helpers */
-.accent-orange { color: var(--accent-orange); }
-.accent-teal { color: var(--accent-teal); }
-.accent-purple { color: var(--accent-purple); }
+.neo-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.neo-card::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+  opacity: 0.4;
+}
+
+.page-wrap {
+  min-height: calc(100vh - 80px); /* Account for header height approx */
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  contain: layout style;
+}
+
+/* Optimize off-screen content */
+section, .neo-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 200px;
+}
+
+/* Typography Enhancements */
+h1, h2, h3, h4, .font-serif {
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.accent-gold { color: var(--accent-gold); }
+.accent-blue { color: var(--accent-blue-ishgard); }
+.accent-crimson { color: var(--accent-crimson); }
+
+/* UI Components */
+.ui-input, .ui-select {
+  background: var(--bg-elev);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  border-radius: 2px;
+  font-family: var(--font-geist-sans);
+  transition: all 0.2s ease;
+}
+
+.ui-input:focus, .ui-select:focus {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.1);
+  outline: none;
+}
+
+.ui-button {
+  background: var(--bg-elev);
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
+  font-family: var(--font-cinzel);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-button:hover {
+  background: var(--accent-gold);
+  color: white;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
+}
+
+.ui-button-primary {
+  background: var(--accent-gold);
+  color: white;
+}
+
+.ui-button-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
+}
+
+.ui-link {
+  color: var(--accent-gold);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-bottom: 1px solid transparent;
+}
+
+.ui-link:hover {
+  border-bottom-color: var(--accent-gold);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-gold);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
 
 /* Unified inputs */
 .ui-input,
 .ui-select,
 .ui-textarea {
-  background: rgba(24,24,28,0.9);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-elev);
+  border: var(--border-silver);
   color: var(--text);
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 .ui-input:focus,
 .ui-select:focus,
 .ui-textarea:focus {
   outline: none;
-  border-color: var(--accent-teal);
-  box-shadow: 0 0 0 3px rgba(69,219,170,0.15);
+  border-color: var(--accent-gold);
+  box-shadow: var(--shadow-glow), inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
-/* Unified button */
+/* Unified button - FFXIV Menu Button style */
 .ui-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(180deg, rgba(255,153,0,0.95), rgba(255,153,0,0.85));
-  color: #0b0b0e;
-  border: 1px solid rgba(255,153,0,0.6);
-  border-radius: 12px;
+  background: var(--bg-elev);
+  color: var(--text);
+  border: var(--border-silver);
+  border-radius: 4px;
   padding: 0.5rem 1.2rem;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(255,153,0,0.2);
-  transition: all 150ms ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
 }
-.ui-button:hover { filter: brightness(1.1); box-shadow: 0 6px 16px rgba(255,153,0,0.3); }
-.ui-button:active { transform: translateY(1px); }
+.ui-button:hover { 
+  border-color: var(--accent-gold);
+  background: var(--bg-elev);
+  color: var(--accent-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.ui-button:active { transform: translateY(0px); }
 .ui-button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
 
+/* Primary Button - More 'FFXIV' Gold/Blue */
+.ui-button-primary {
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #8e6d2e 100%);
+  color: #ffffff;
+  border: none;
+  font-weight: 700;
+}
+.ui-button-primary:hover {
+  filter: brightness(1.1);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(181, 141, 61, 0.3);
+}
+
 /* Subtle link */
-.ui-link { color: var(--accent-teal); text-decoration: none; }
-.ui-link:hover { color: #72e6c2; }
+.ui-link { 
+  color: var(--accent-gold); 
+  text-decoration: none; 
+  transition: color 0.2s;
+}
+.ui-link:hover { 
+  color: #e0c080;
+  text-decoration: underline;
+}
 
 /* Container spacing */
 .page-wrap { width: 100%; margin: 0 auto; padding: 1.5rem; }

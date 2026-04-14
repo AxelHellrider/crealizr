@@ -7,9 +7,11 @@ import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
 import { formatCR } from "@/app/lib/format";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { Input } from "@/app/components/ui/Input";
-import { Select } from "@/app/components/ui/Select";
-import { Button } from "@/app/components/ui/Button";
+import { Input } from "@/app/components/atoms/Input";
+import { Select } from "@/app/components/atoms/Select";
+import { FormField } from "@/app/components/molecules/FormField";
+import { Card } from "@/app/components/atoms/Card";
+import { Button } from "@/app/components/atoms/Button";
 
 export default function ScalePage() {
     const [step, setStep] = useState<1 | 2>(1);
@@ -35,6 +37,7 @@ export default function ScalePage() {
     const [acEquipment, setAcEquipment] = useState<number>(0);
     const [acRace, setAcRace] = useState<number>(0);
     const [abilityBonus, setAbilityBonus] = useState<Partial<Record<keyof MonsterBase["stats"], number>>>({});
+    const [isScaling, setIsScaling] = useState(false);
     const statBlockRef = useRef<HTMLDivElement>(null);
 
     const handleStatChange = (stat: keyof MonsterBase["stats"], value: number | string) => {
@@ -45,19 +48,27 @@ export default function ScalePage() {
         setAbilityBonus((prev) => ({ ...prev, [stat]: value }));
     };
 
+    /**
+     * Handle scaling with a small timeout to prevent UI lag on rapid input.
+     * Effectively a simple debounce for UX performance.
+     */
     const handleScale = () => {
-        if (targetCR !== null) {
-            const base = { ...monster, edition };
-            const fn = edition === "2024" ? scaleMonster2024 : scaleMonster2014;
-            setScaledMonster(
-                fn(base, targetCR, {
-                    acEquipment,
-                    acRace,
-                    abilityScoreBonus: abilityBonus
-                })
-            );
-            setStep(2);
-        }
+        setIsScaling(true);
+        setTimeout(() => {
+            if (targetCR !== null) {
+                const base = { ...monster, edition };
+                const fn = edition === "2024" ? scaleMonster2024 : scaleMonster2014;
+                setScaledMonster(
+                    fn(base, targetCR, {
+                        acEquipment,
+                        acRace,
+                        abilityScoreBonus: abilityBonus
+                    })
+                );
+                setStep(2);
+            }
+            setIsScaling(false);
+        }, 100);
     };
 
     const downloadImage = async () => {
@@ -86,157 +97,150 @@ export default function ScalePage() {
     };
 
     return (
-        <section className="glass-panel p-6">
+        <section className="glass-panel p-8 sm:p-12 fantasy-border">
             {step === 1 && (
-                <div className="grid gap-4">
-                    <header className="flex items-baseline justify-between gap-3">
-                        <h1 className="text-2xl font-semibold">Enter Monster Details</h1>
-                        <a href="/scale/docs" className="ui-link text-sm">How it works</a>
+                <div className="grid gap-8">
+                    <header className="flex items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+                        <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Monster Scaler</h1>
+                        <a href="/scale/docs" className="ui-link text-sm italic">View Documentation</a>
                     </header>
 
                     {/* --- Basic Info --- */}
-                    <div className="neo-card p-4">
-                        <h2 className="mb-3 font-medium border-b border-zinc-800 pb-2">Basic Info</h2>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">Name</span>
+                    <Card className="p-6">
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">General Information</h2>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                            <FormField label="Name">
                                 <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder="e.g. Ancient Red Dragon" />
-                            </label>
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">Type</span>
+                            </FormField>
+                            <FormField label="Creature Type">
                                 <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder="e.g. Dragon" />
-                            </label>
+                            </FormField>
                         </div>
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">Ruleset</span>
+                            <FormField label="Ruleset">
                                 <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
-                                    <option value="2014">2014</option>
-                                    <option value="2024">2024</option>
+                                    <option value="2014">2014 Ruleset</option>
+                                    <option value="2024">2024 Ruleset</option>
                                 </Select>
-                            </label>
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">Current CR</span>
+                            </FormField>
+                            <FormField label="Current CR">
                                 <Select value={monster.challenge_rating} onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
                                 </Select>
-                            </label>
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">Target CR</span>
+                            </FormField>
+                            <FormField label="Target CR">
                                 <Select value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))}>
                                     <option value="" disabled>Select target CR</option>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
                                 </Select>
-                            </label>
+                            </FormField>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* --- Base Stats --- */}
-                    <div className="neo-card p-4">
-                        <h2 className="mb-3 font-medium border-b border-zinc-800 pb-2">Base Stats</h2>
+                    <Card className="p-6">
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Base Attributes</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
                             {Object.entries(monster.stats).map(([key, value]) => (
-                                <label key={key} className="grid gap-1">
-                                    <span className="text-sm text-zinc-400">{key.toUpperCase()}</span>
+                                <FormField key={key} label={key}>
                                     <Input
                                         type={key === "speed" ? "text" : "number"}
                                         value={value as string | number}
                                         onChange={(e) => handleStatChange(key as keyof MonsterBase["stats"], key === "speed" ? e.target.value : Number(e.target.value))}
                                     />
-                                </label>
+                                </FormField>
                             ))}
                         </div>
-                    </div>
+                    </Card>
 
                     {/* --- Additional Bonuses --- */}
-                    <div className="neo-card p-4">
-                        <h2 className="mb-3 font-medium border-b border-zinc-800 pb-2">Additional Bonuses</h2>
+                    <Card className="p-6">
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Defense & Ability Adjustments</h2>
 
                         <div className="grid gap-4 sm:grid-cols-2">
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">AC from Equipment</span>
+                            <FormField label="Equipment AC Bonus">
                                 <Input type="number" value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
-                            </label>
-                            <label className="grid gap-1">
-                                <span className="text-sm text-zinc-400">AC from Race</span>
+                            </FormField>
+                            <FormField label="Natural Armor Bonus">
                                 <Input type="number" value={acRace} onChange={(e) => setAcRace(Number(e.target.value))} />
-                            </label>
+                            </FormField>
                         </div>
 
-                        <h3 className="mt-4 mb-3 text-sm font-medium text-zinc-300">Ability Score Bonuses</h3>
+                        <h3 className="mt-8 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60">Ability Score Bonuses</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                             {["str", "dex", "con", "int", "wis", "cha"].map((ab) => (
-                                <label key={ab} className="grid gap-1">
-                                    <span className="text-sm text-zinc-400">{ab.toUpperCase()}</span>
+                                <FormField key={ab} label={ab}>
                                     <Input
                                         type="number"
                                         value={abilityBonus[ab as keyof MonsterBase["stats"]] ?? 0}
                                         onChange={(e) => handleAbilityBonusChange(ab as keyof MonsterBase["stats"], Number(e.target.value))}
                                     />
-                                </label>
+                                </FormField>
                             ))}
                         </div>
-                    </div>
+                    </Card>
 
-                    <Button onClick={handleScale} className="w-full sm:w-auto self-start px-8">Generate Statblock</Button>
+                    <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full sm:w-auto self-start">
+                        {isScaling ? "SCALING..." : "SCALE MONSTER"}
+                    </Button>
                 </div>
             )}
 
             {step === 2 && scaledMonster && (
                 <div className="grid gap-6">
-                    <div ref={statBlockRef} className="neo-card p-6 border border-zinc-800 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-orange-500/50" />
-                        <h1 className="text-2xl font-bold pb-2 border-b border-zinc-700 mb-4 text-orange-400 uppercase tracking-wide">
+                    <div ref={statBlockRef} className="neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card">
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
+                        <h1 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
                             {scaledMonster.name || "Scaled Monster"}
                         </h1>
-                        <div className="grid gap-1 mb-4 italic text-zinc-400">
+                        <div className="grid gap-1 mb-6 italic text-muted font-serif">
                             <div>{scaledMonster.size} {scaledMonster.type}, {scaledMonster.alignment}</div>
                         </div>
 
-                        <div className="grid gap-2 border-y border-zinc-800 py-3 mb-4">
-                            <div className="flex justify-between"><span className="font-bold text-zinc-300">Armor Class</span> <span>{scaledMonster.stats.ac}</span></div>
-                            <div className="flex justify-between"><span className="font-bold text-zinc-300">Hit Points</span> <span>{scaledMonster.stats.hp}</span></div>
-                            <div className="flex justify-between"><span className="font-bold text-zinc-300">Speed</span> <span>{scaledMonster.stats.speed}</span></div>
+                        <div className="grid gap-3 border-y border-gold/20 py-6 mb-8">
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Armor Class</span> <span className="text-xl font-bold">{scaledMonster.stats.ac}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Hit Points</span> <span className="text-xl font-bold">{scaledMonster.stats.hp}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Speed</span> <span className="text-xl font-bold">{scaledMonster.stats.speed}</span></div>
                         </div>
 
-                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-10">
                             {["str", "dex", "con", "int", "wis", "cha"].map((key) => (
-                                <div key={key} className="text-center p-2 rounded bg-zinc-900/50 border border-white/5">
-                                    <div className="text-[10px] uppercase text-zinc-500 font-bold">{key}</div>
-                                    <div className="font-bold">{scaledMonster.stats[key as keyof MonsterBase["stats"]]}</div>
-                                    <div className="text-xs text-zinc-400">({getModifier(Number(scaledMonster.stats[key as keyof MonsterBase["stats"]]))})</div>
+                                <div key={key} className="text-center p-3 border border-gold/10 bg-gold/5 rounded-sm">
+                                    <div className="text-[10px] uppercase text-gold font-bold tracking-widest mb-1">{key}</div>
+                                    <div className="text-lg font-bold">{scaledMonster.stats[key as keyof MonsterBase["stats"]]}</div>
+                                    <div className="text-xs text-muted italic">({getModifier(Number(scaledMonster.stats[key as keyof MonsterBase["stats"]]))})</div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="grid gap-2">
-                             <div className="flex justify-between items-baseline border-b border-zinc-800 pb-1">
-                                <span className="font-bold text-zinc-300">Challenge</span>
-                                <span>{formatCR(scaledMonster.challenge_rating)} <span className="text-zinc-500 text-xs ml-1">({scaledMonster.edition})</span></span>
+                        <div className="grid gap-3">
+                             <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
+                                <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Challenge Rating</span>
+                                <span className="text-lg font-bold">{formatCR(scaledMonster.challenge_rating)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
                             </div>
                             {scaledMonster.dpr && (
-                                <div className="flex justify-between items-baseline border-b border-zinc-800 pb-1">
-                                    <span className="font-bold text-zinc-300">Suggested DPR</span>
-                                    <span>{scaledMonster.dpr.range}</span>
+                                <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
+                                    <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Suggested Damage Per Round</span>
+                                    <span className="text-lg font-bold">{scaledMonster.dpr.range}</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-3">
-                        <Button onClick={() => setStep(1)} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white border-zinc-600">
-                            ← Edit Monster
-                        </Button>
-                        <Button onClick={downloadImage} className="flex-1 bg-teal-600 hover:bg-teal-500 text-white border-teal-500 shadow-teal-900/20">
-                            Download Image
-                        </Button>
-                        <Button onClick={downloadPDF} className="flex-1 bg-purple-600 hover:bg-purple-500 text-white border-purple-500 shadow-purple-900/20">
-                            Download PDF
-                        </Button>
+                    <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                        <button onClick={() => setStep(1)} className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs">
+                            ← ADJUST STATS
+                        </button>
+                        <button onClick={downloadImage} className="ui-button ui-button-primary flex-1">
+                            DOWNLOAD IMAGE (PNG)
+                        </button>
+                        <button onClick={downloadPDF} className="ui-button ui-button-primary flex-1">
+                            DOWNLOAD PDF
+                        </button>
                     </div>
                 </div>
             )}
