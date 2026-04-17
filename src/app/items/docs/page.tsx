@@ -20,6 +20,9 @@ export default function ItemsDocsPage() {
         <li>Player level (1–20) used for tuning</li>
         <li>Player Attunement Requirement setup</li>
         <li>Optional target monster tags to annotate effectiveness</li>
+        <li>Optional crafting ingredients with quantity (and optional unit)</li>
+        <li>Optional crafting cost, time, and special requirement (place, profession, or specialist)</li>
+        <li>Optional lore description (up to 100 words)</li>
       </ul>
 
       <h2 className="mt-8 text-xl font-semibold">Rarity by level</h2>
@@ -33,12 +36,11 @@ export default function ItemsDocsPage() {
       </ul>
 
       <h2 className="mt-8 text-xl font-semibold">Suggested bonuses</h2>
-      <p>Bonuses are intentionally conservative and scale softly by level tier:</p>
+      <p>Bonuses are intentionally conservative and keyed to rarity bands:</p>
       <ul>
-        <li>Tier: <Code>tier = clamp(1, 5, ceil(level / 4))</Code></li>
-        <li>Bonus: <Code>bonus = min(3, floor((tier - 1)/2) + (level ≥ 17 ? 1 : 0))</Code> → ranges 0..3</li>
-        <li>Avg damage bonus: <Code>avgDamage = max(0, tier - 1)</Code> → ranges 0..4</li>
-        <li>Save DC (for wands): <Code>saveDC = 12 + tier</Code> → 13..17</li>
+        <li>Magic bonus: <Code>Common 0</Code>, <Code>Uncommon +1</Code>, <Code>Rare +2</Code>, <Code>Very Rare +3</Code>, <Code>Legendary +3</Code></li>
+        <li>Avg damage bonus: mirrors magic bonus by rarity</li>
+        <li>Save DC (for wands): <Code>Common/Uncommon 13</Code>, <Code>Rare 15</Code>, <Code>Very Rare 17</Code>, <Code>Legendary 19</Code></li>
       </ul>
       <p>Application by type:</p>
       <ul>
@@ -57,6 +59,11 @@ export default function ItemsDocsPage() {
         <li><Code>rarity</Code>: derived from level</li>
         <li><Code>levelTuned</Code>: clamped level (1–20)</li>
         <li><Code>targetTags</Code>: your optional list</li>
+        <li><Code>ingredients</Code>: list of {`{ name, quantity, unit? }`}</li>
+        <li><Code>craftingCost</Code>: numeric gold piece cost if provided</li>
+        <li><Code>craftingTime</Code> + <Code>craftingTimeUnit</Code>: hours/days/weeks as provided</li>
+        <li><Code>craftingRequirement</Code>: optional place or specialist requirement</li>
+        <li><Code>lore</Code>: optional 100-word description</li>
         <li><Code>bonusToHit</Code>, <Code>bonusAC</Code>, <Code>bonusSaveDC</Code>, <Code>avgDamageBonus</Code>: as applicable</li>
         <li><Code>notes</Code>: summary text if targets were provided</li>
       </ul>

@@ -17,8 +17,29 @@ export default function ItemCreatorPage() {
   const [level, setLevel] = useState(5);
   const [targets, setTargets] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [ingredients, setIngredients] = useState<{ name: string; quantity: number; unit?: string }[]>([]);
+  const [ingredientName, setIngredientName] = useState("");
+  const [ingredientQty, setIngredientQty] = useState<number | "">("");
+  const [ingredientUnit, setIngredientUnit] = useState("");
+  const [craftingCost, setCraftingCost] = useState<number | "">("");
+  const [craftingTime, setCraftingTime] = useState<number | "">("");
+  const [craftingTimeUnit, setCraftingTimeUnit] = useState<"hours" | "days" | "weeks">("days");
+  const [craftingRequirement, setCraftingRequirement] = useState("");
+  const [lore, setLore] = useState("");
 
-  const item = useMemo(() => buildItem({ name, type, attunement, level, targets }), [name, type, attunement, level, targets]);
+  const item = useMemo(() => buildItem({
+    name,
+    type,
+    attunement,
+    level,
+    targets,
+    ingredients,
+    craftingCost: craftingCost === "" ? undefined : craftingCost,
+    craftingTime: craftingTime === "" ? undefined : craftingTime,
+    craftingTimeUnit,
+    craftingRequirement: craftingRequirement.trim() ? craftingRequirement.trim() : undefined,
+    lore: lore.trim() ? lore.trim() : undefined,
+  }), [name, type, attunement, level, targets, ingredients, craftingCost, craftingTime, craftingTimeUnit, craftingRequirement, lore]);
 
   const addTag = () => {
     const t = tagInput.trim();
@@ -29,6 +50,34 @@ export default function ItemCreatorPage() {
 
   const removeTag = (t: string) => setTargets((arr) => arr.filter((x) => x !== t));
 
+  const addIngredient = () => {
+    const nameValue = ingredientName.trim();
+    const quantityValue = typeof ingredientQty === "number" ? ingredientQty : Number(ingredientQty);
+    if (!nameValue || !Number.isFinite(quantityValue) || quantityValue <= 0) return;
+    setIngredients((arr) => [...arr, {
+      name: nameValue,
+      quantity: quantityValue,
+      unit: ingredientUnit.trim() || undefined,
+    }]);
+    setIngredientName("");
+    setIngredientQty("");
+    setIngredientUnit("");
+  };
+
+  const removeIngredient = (index: number) => {
+    setIngredients((arr) => arr.filter((_, i) => i !== index));
+  };
+
+  const loreWordCount = lore.trim() ? lore.trim().split(/\s+/).length : 0;
+  const handleLoreChange = (value: string) => {
+    const words = value.trim() ? value.trim().split(/\s+/) : [];
+    if (words.length <= 100) {
+      setLore(value);
+      return;
+    }
+    setLore(words.slice(0, 100).join(" "));
+  };
+
   return (
     <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
       <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
@@ -36,7 +85,7 @@ export default function ItemCreatorPage() {
           <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Item Creator</h1>
           <p className="text-muted mt-2 font-light italic">Design custom magic items and artifacts for your campaign.</p>
         </div>
-        <a href="/items/docs" className="ui-link text-sm italic">View Documentation</a>
+        <a href="/items/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
       </header>
 
       <div className="grid gap-6 sm:grid-cols-2">
@@ -56,12 +105,12 @@ export default function ItemCreatorPage() {
           <Input type="number" value={level} onChange={(e) => setLevel(Number(e.target.value))} />
         </FormField>
 
-        <FormField label="Special Properties" sublabel="Optional">
+        <FormField label="Effective Against" sublabel="Optional">
           <div className="flex gap-2">
             <Input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="e.g., undead, dragon" />
             <Button onClick={addTag} className="px-4 text-xs font-bold">ADD</Button>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2 min-h-[24px]">
+          <div className="mt-3 flex flex-wrap gap-2 min-h-6">
             {targets.map((t) => (
               <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-gold/20 bg-gold/5 px-3 py-1 text-[10px] uppercase font-bold tracking-widest accent-gold shadow-glow">
                 {t}
@@ -71,30 +120,138 @@ export default function ItemCreatorPage() {
           </div>
         </FormField>
 
-          <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                  type="checkbox"
-                  className="w-5 h-5 rounded-sm border-gold/30 bg-card text-gold focus:ring-gold/20 accent-gold"
-                  checked={attunement}
-                  onChange={(e) => setAttunement(e.target.checked)}
-              />
-              <span className="text-sm font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">Requires Attunement</span>
-          </label>
+        <FormField label="Crafting Ingredients" sublabel="Optional">
+          <div className="grid gap-2 sm:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
+            <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder="Ingredient name" />
+            <Input type="number" value={ingredientQty} onChange={(e) => setIngredientQty(e.target.value === "" ? "" : Number(e.target.value))} placeholder="Qty" />
+            <Input value={ingredientUnit} onChange={(e) => setIngredientUnit(e.target.value)} placeholder="Unit (optional)" />
+            <Button onClick={addIngredient} className="px-4 text-xs font-bold">ADD</Button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2 min-h-6">
+            {ingredients.map((ingredient, index) => (
+              <span key={`${ingredient.name}-${index}`} className="inline-flex items-center gap-1 rounded-sm border border-gold/20 bg-gold/5 px-3 py-1 text-[10px] uppercase font-bold tracking-widest accent-gold shadow-glow">
+                {ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} {ingredient.name}
+                <button onClick={() => removeIngredient(index)} className="text-gold/40 hover:text-red-400 ml-2 transition-colors text-base leading-none">×</button>
+              </span>
+            ))}
+          </div>
+        </FormField>
+
+        <FormField label="Crafting Cost (gp)" sublabel="Optional">
+          <Input type="number" value={craftingCost} onChange={(e) => setCraftingCost(e.target.value === "" ? "" : Number(e.target.value))} placeholder="e.g., 100" />
+        </FormField>
+
+        <FormField label="Crafting Time" sublabel="Optional">
+          <div className="grid gap-2 sm:grid-cols-[1fr_1fr]">
+            <Input type="number" value={craftingTime} onChange={(e) => setCraftingTime(e.target.value === "" ? "" : Number(e.target.value))} placeholder="e.g., 2" />
+            <Select value={craftingTimeUnit} onChange={(e) => setCraftingTimeUnit(e.target.value as "hours" | "days" | "weeks")}>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+            </Select>
+          </div>
+        </FormField>
+
+        <FormField label="Crafting Requirement" sublabel="Optional">
+          <Input value={craftingRequirement} onChange={(e) => setCraftingRequirement(e.target.value)} placeholder="e.g., must be crafted in Neverwinter or by an artificer" />
+        </FormField>
+
+        <FormField label="Item Lore" sublabel={`Optional · ${loreWordCount}/100 words`}>
+          <textarea
+            value={lore}
+            onChange={(e) => handleLoreChange(e.target.value)}
+            placeholder="Short lore or legend behind the item."
+            rows={4}
+            className="ui-input w-full min-h-[120px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold bg-bg-elev border-silver/30 text-foreground"
+          />
+        </FormField>
+
+        <label className="flex items-center gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            className="w-5 h-5 rounded-sm border-gold/30 bg-card text-gold focus:ring-gold/20 accent-gold"
+            checked={attunement}
+            onChange={(e) => setAttunement(e.target.checked)}
+          />
+          <span className="text-sm font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">Requires Attunement</span>
+        </label>
       </div>
 
       <Card className="p-8 border-gold/10">
         <h2 className="mb-6 font-serif text-2xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Item Properties</h2>
         <CardContent className="grid gap-4 text-sm sm:grid-cols-2">
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Name:</span> <span className="font-serif text-lg accent-gold">{item.name || "—"}</span></div>
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Type:</span> <span className="font-medium">{item.type}</span></div>
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Rarity:</span> <span className="font-bold text-blue-400 uppercase tracking-widest">{item.rarity}</span></div>
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Attunement:</span> <span className="font-medium">{item.attunement ? 'Required' : 'None'}</span></div>
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Tier:</span> <span className="font-medium italic">Tier {item.levelTuned}</span></div>
-          <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Special:</span> <span className="font-medium text-silver">{item.targetTags.join(", ") || "None"}</span></div>
-          {item.bonusToHit !== undefined && <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">To Hit:</span> <span className="font-bold text-gold">+{item.bonusToHit}</span></div>}
-          {item.bonusAC !== undefined && <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">AC Bonus:</span> <span className="font-bold text-blue-300">+{item.bonusAC}</span></div>}
-          {item.bonusSaveDC !== undefined && <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Save DC:</span> <span className="font-bold text-purple-400">+{item.bonusSaveDC}</span></div>}
-          {item.avgDamageBonus !== undefined && <div className="flex justify-between border-b border-gold/5 pb-2"><span className="font-bold uppercase tracking-widest text-muted text-[10px]">Damage Bonus:</span> <span className="font-bold text-red-400">+{item.avgDamageBonus} avg</span></div>}
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Name:</span>
+            <span className="font-serif accent-gold break-words sm:text-right">{item.name || "—"}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Type:</span>
+            <span className="font-medium break-words sm:text-right">{item.type}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Rarity:</span>
+            <span className="font-bold text-blue-400 uppercase tracking-widest break-words sm:text-right">{item.rarity}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Attunement:</span>
+            <span className="font-medium break-words sm:text-right">{item.attunement ? 'Required' : 'None'}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Tier:</span>
+            <span className="font-medium italic break-words sm:text-right">Tier {item.levelTuned}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Special:</span>
+            <span className="font-medium text-silver break-words sm:text-right">{item.targetTags.join(", ") || "None"}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Craft Cost:</span>
+            <span className="font-medium break-words sm:text-right">{item.craftingCost !== undefined ? `${item.craftingCost} gp` : "—"}</span>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Craft Time:</span>
+            <span className="font-medium break-words sm:text-right">{item.craftingTime !== undefined ? `${item.craftingTime} ${item.craftingTimeUnit ?? "days"}` : "—"}</span>
+          </div>
+          {item.bonusToHit !== undefined && (
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">To Hit:</span>
+              <span className="font-bold text-gold break-words sm:text-right">+{item.bonusToHit}</span>
+            </div>
+          )}
+          {item.bonusAC !== undefined && (
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">AC Bonus:</span>
+              <span className="font-bold text-blue-300 break-words sm:text-right">+{item.bonusAC}</span>
+            </div>
+          )}
+          {item.bonusSaveDC !== undefined && (
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Save DC:</span>
+              <span className="font-bold text-purple-400 break-words sm:text-right">DC {item.bonusSaveDC}</span>
+            </div>
+          )}
+          {item.avgDamageBonus !== undefined && (
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Damage Bonus:</span>
+              <span className="font-bold text-red-400 break-words sm:text-right">+{item.avgDamageBonus} avg</span>
+            </div>
+          )}
+          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 sm:col-span-2">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Ingredients:</span>
+            <span className="font-medium text-silver break-words">
+              {item.ingredients.length
+                ? item.ingredients.map((ingredient) => `${ingredient.quantity}${ingredient.unit ? ` ${ingredient.unit}` : ""} ${ingredient.name}`).join(", ")
+                : "None"}
+            </span>
+          </div>
+          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 sm:col-span-2">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Crafting Requirement:</span>
+            <span className="font-medium text-silver break-words">{item.craftingRequirement || "None"}</span>
+          </div>
+          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 sm:col-span-2">
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Lore:</span>
+            <span className="font-medium text-silver break-words">{item.lore || "None"}</span>
+          </div>
         </CardContent>
         
         {item.notes && (
@@ -110,6 +267,10 @@ export default function ItemCreatorPage() {
       </Card>
 
       <p className="text-xs text-muted italic text-center">These suggestions provide a balanced baseline; adjust properties to fit your campaign&apos;s power level.</p>
+
+      <div className="sm:hidden pt-4">
+        <a href="/items/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+      </div>
     </section>
   );
 }

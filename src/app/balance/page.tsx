@@ -65,13 +65,13 @@ export default function CombatBalancerPage() {
                         Create balanced encounters based on your party&apos;s level and size.
                     </p>
                 </div>
-                <Link href="/balance/docs" className="ui-link text-sm italic">
+                <Link href="/balance/docs" className="ui-link text-sm italic hidden sm:inline-flex">
                     View Documentation
                 </Link>
             </header>
 
             {/* Controls */}
-            <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  2xl:grid-cols-6">
                 <FormField label="Party Size">
                     <Input type="number" min={1} max={8}
                            value={partySize}
@@ -189,6 +189,12 @@ export default function CombatBalancerPage() {
             <p className="text-xs text-muted italic text-center">
                 Calculations based on standard XP thresholds and encounter multipliers.
             </p>
+
+            <div className="sm:hidden pt-4">
+                <Link href="/balance/docs" className="ui-link text-sm italic inline-flex justify-center w-full">
+                    View Documentation
+                </Link>
+            </div>
         </section>
     );
 }

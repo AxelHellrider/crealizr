@@ -43,6 +43,11 @@ const baseMonster = (): MonsterBase => ({
   alignment: "neutral",
   challenge_rating: 0.125,
   xp: 25,
+  dpr: {
+    min: 20,
+    max: 40,
+    range: 'far',
+  },
   stats: {
     ac: 12,
     hp: 20,

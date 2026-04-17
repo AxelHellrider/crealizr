@@ -8,6 +8,12 @@ export type ItemBlueprint = {
   attunement: boolean;
   levelTuned: number;
   targetTags: string[];
+  ingredients: { name: string; quantity: number; unit?: string }[];
+  craftingCost?: number;
+  craftingTime?: number;
+  craftingTimeUnit?: "hours" | "days" | "weeks";
+  craftingRequirement?: string;
+  lore?: string;
   bonusToHit?: number;
   bonusAC?: number;
   bonusSaveDC?: number;
@@ -15,31 +21,88 @@ export type ItemBlueprint = {
   notes?: string;
 };
 
+type RarityBand = { maxLevel: number; rarity: ItemRarity };
+
+type RulesetConfig = {
+  rarityByLevel: RarityBand[];
+  bonusByRarity: Record<ItemRarity, number>;
+  avgDamageByRarity: Record<ItemRarity, number>;
+  saveDCByRarity: Record<ItemRarity, number>;
+};
+
+const ITEM_TUNING: RulesetConfig = {
+  rarityByLevel: [
+    { maxLevel: 3, rarity: "Common" },
+    { maxLevel: 6, rarity: "Uncommon" },
+    { maxLevel: 10, rarity: "Rare" },
+    { maxLevel: 16, rarity: "Very Rare" },
+    { maxLevel: 20, rarity: "Legendary" },
+  ],
+  bonusByRarity: {
+    Common: 0,
+    Uncommon: 1,
+    Rare: 2,
+    "Very Rare": 3,
+    Legendary: 3,
+  },
+  avgDamageByRarity: {
+    Common: 0,
+    Uncommon: 1,
+    Rare: 2,
+    "Very Rare": 3,
+    Legendary: 3,
+  },
+  saveDCByRarity: {
+    Common: 13,
+    Uncommon: 13,
+    Rare: 15,
+    "Very Rare": 17,
+    Legendary: 19,
+  },
+};
+
+function clampLevel(level: number) {
+  return Math.max(1, Math.min(20, Math.round(level)));
+}
+
 export function rarityForLevel(level: number): ItemRarity {
-  if (level <= 3) return "Common";
-  if (level <= 6) return "Uncommon";
-  if (level <= 10) return "Rare";
-  if (level <= 16) return "Very Rare";
-  return "Legendary";
+  for (const band of ITEM_TUNING.rarityByLevel) {
+    if (level <= band.maxLevel) return band.rarity;
+  }
+  return ITEM_TUNING.rarityByLevel[ITEM_TUNING.rarityByLevel.length - 1].rarity;
 }
 
 export function suggestedBonuses(level: number, type: ItemType) {
-  // Keep bonuses conservative for balance; scale softly with level
-  const tier = Math.max(1, Math.min(5, Math.ceil(level / 4))); // 1..5
-  const bonus = Math.min(3, Math.floor((tier - 1) / 2) + (level >= 17 ? 1 : 0)); // 0..3
-  const dmg = Math.max(0, tier - 1); // 0..4 avg damage
-  const saveDC = 12 + tier; // 13..17
+  const rarity = rarityForLevel(level);
+  const bonus = ITEM_TUNING.bonusByRarity[rarity];
+  const avgDamage = ITEM_TUNING.avgDamageByRarity[rarity];
+  const saveDC = ITEM_TUNING.saveDCByRarity[rarity];
+  const toHit = bonus > 0 ? bonus : undefined;
+  const ac = bonus > 0 ? bonus : undefined;
+  const avgDamageBonus = avgDamage > 0 ? avgDamage : undefined;
 
   return {
-    toHit: type === "Weapon" || type === "Wand" ? bonus : undefined,
-    ac: type === "Armor" ? bonus : undefined,
+    toHit: type === "Weapon" || type === "Wand" ? toHit : undefined,
+    ac: type === "Armor" ? ac : undefined,
     saveDC: type === "Wand" ? saveDC : undefined,
-    avgDamage: type === "Weapon" || type === "Wand" ? dmg : undefined,
+    avgDamage: type === "Weapon" || type === "Wand" ? avgDamageBonus : undefined,
   };
 }
 
-export function buildItem(opts: { name: string; type: ItemType; attunement: boolean; level: number; targets: string[]; }): ItemBlueprint {
-  const lvl = Math.max(1, Math.min(20, Math.round(opts.level)));
+export function buildItem(opts: {
+  name: string;
+  type: ItemType;
+  attunement: boolean;
+  level: number;
+  targets: string[];
+  ingredients?: { name: string; quantity: number; unit?: string }[];
+  craftingCost?: number;
+  craftingTime?: number;
+  craftingTimeUnit?: "hours" | "days" | "weeks";
+  craftingRequirement?: string;
+  lore?: string;
+}): ItemBlueprint {
+  const lvl = clampLevel(opts.level);
   const rarity = rarityForLevel(lvl);
   const b = suggestedBonuses(lvl, opts.type);
 
@@ -50,6 +113,12 @@ export function buildItem(opts: { name: string; type: ItemType; attunement: bool
     attunement: opts.attunement,
     levelTuned: lvl,
     targetTags: opts.targets,
+    ingredients: opts.ingredients ?? [],
+    craftingCost: opts.craftingCost,
+    craftingTime: opts.craftingTime,
+    craftingTimeUnit: opts.craftingTimeUnit,
+    craftingRequirement: opts.craftingRequirement,
+    lore: opts.lore,
     bonusToHit: b.toHit,
     bonusAC: b.ac,
     bonusSaveDC: b.saveDC,

@@ -102,7 +102,7 @@ export default function ScalePage() {
                 <div className="grid gap-8">
                     <header className="flex items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                         <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Monster Scaler</h1>
-                        <a href="/scale/docs" className="ui-link text-sm italic">View Documentation</a>
+                        <a href="/scale/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
                     </header>
 
                     {/* --- Basic Info --- */}
@@ -244,6 +244,10 @@ export default function ScalePage() {
                     </div>
                 </div>
             )}
+
+            <div className="sm:hidden pt-4">
+                <a href="/scale/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+            </div>
         </section>
     );
 }
