@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "netlify:build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:netlify": "vitest run tests/netlify.test.ts"
   },
   "engines": {
     "node": ">=20 <=22.x"

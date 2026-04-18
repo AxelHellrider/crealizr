@@ -73,7 +73,8 @@ export default function CombatBalancerPage() {
         { label: "Lv 15", level: 15 },
     ];
 
-    const primarySuggestion = mode === "solo" ? soloSuggestions[0] : groupSuggestions[0];
+    const primarySolo = soloSuggestions[0];
+    const primaryGroup = groupSuggestions[0];
     const formatGroupMembers = (members: { count: number; cr: number }[]) =>
         members.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ");
     const budgetStatus = (fit: number) => {
@@ -216,16 +217,25 @@ export default function CombatBalancerPage() {
                     <span className="border border-gold/20 px-3 py-1">{budgetMode} budget</span>
                 </div>
 
-                {primarySuggestion && (
+                {mode === "solo" && primarySolo && (
                     <div className="mb-6 rounded-sm border border-gold/20 bg-gold/5 p-4">
                         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Recommended Mix</div>
                         <div className="mt-2 font-serif text-lg accent-gold">
-                            {mode === "solo"
-                                ? `${primarySuggestion.count} × CR ${formatCR(primarySuggestion.cr)}`
-                                : formatGroupMembers(primarySuggestion.members)}
+                            {`${primarySolo.count} × CR ${formatCR(primarySolo.cr)}`}
                         </div>
                         <div className="text-xs text-muted mt-1">
-                            Budget Fit {(primarySuggestion.fit * 100).toFixed(0)}% · {budgetStatus(primarySuggestion.fit).label}
+                            Budget Fit {(primarySolo.fit * 100).toFixed(0)}% · {budgetStatus(primarySolo.fit).label}
+                        </div>
+                    </div>
+                )}
+                {mode === "group" && primaryGroup && (
+                    <div className="mb-6 rounded-sm border border-gold/20 bg-gold/5 p-4">
+                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Recommended Mix</div>
+                        <div className="mt-2 font-serif text-lg accent-gold">
+                            {formatGroupMembers(primaryGroup.members)}
+                        </div>
+                        <div className="text-xs text-muted mt-1">
+                            Budget Fit {(primaryGroup.fit * 100).toFixed(0)}% · {budgetStatus(primaryGroup.fit).label}
                         </div>
                     </div>
                 )}
