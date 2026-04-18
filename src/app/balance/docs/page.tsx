@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Combat Balancer – How it works",
+  title: "Encounter Builder – How it works",
   description: "Explains XP thresholds, multipliers, budgets, and suggestion logic used by CRializr.",
 };
 
@@ -10,7 +10,7 @@ function Code({ children }: { children: React.ReactNode }) {
 export default function BalanceDocsPage() {
   return (
     <section className="prose prose-invert max-w-3xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-semibold">Combat Balancer – How it works</h1>
+      <h1 className="mb-2 text-3xl font-semibold">Encounter Builder – How it works</h1>
       <p className="text-zinc-400">This page documents the simple 2014 DMG encounter math used to generate suggestions.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Inputs</h2>

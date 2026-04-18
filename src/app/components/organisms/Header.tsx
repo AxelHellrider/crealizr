@@ -33,17 +33,17 @@ export default function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/scale">
-                        SCALER
-                    </Link>
                     <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/balance">
-                        BALANCER
+                        ENCOUNTER BUILDER
+                    </Link>
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/scale">
+                        MONSTER SCALER
                     </Link>
                     <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounters-en-route">
-                        EN ROUTE
+                        TRAVEL ENCOUNTERS
                     </Link>
                     <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/items">
-                        ITEM CREATOR
+                        ARTIFACT FORGE
                     </Link>
 
                     <div className="flex items-center gap-4 ml-4">
@@ -108,32 +108,32 @@ export default function Header() {
                 <div id="mobile-menu" className="md:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
                     <nav className="flex flex-col gap-2 px-4 py-4 text-sm font-semibold tracking-widest" aria-label="Mobile Navigation">
                         <Link
-                            href="/scale"
-                            className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
-                            onClick={() => setOpen(false)}
-                        >
-                            SCALER
-                        </Link>
-                        <Link
                             href="/balance"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
-                            BALANCER
+                            ENCOUNTER BUILDER
+                        </Link>
+                        <Link
+                            href="/scale"
+                            className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
+                            onClick={() => setOpen(false)}
+                        >
+                            MONSTER SCALER
                         </Link>
                         <Link
                             href="/encounters-en-route"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
-                            EN ROUTE
+                            TRAVEL ENCOUNTERS
                         </Link>
                         <Link
                             href="/items"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
-                            ITEM CREATOR
+                            ARTIFACT FORGE
                         </Link>
 
                         <a

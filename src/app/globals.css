@@ -184,6 +184,12 @@ body::before {
   contain: layout style;
 }
 
+@media (max-width: 640px) {
+  .page-wrap {
+    padding-bottom: 6rem;
+  }
+}
+
 /* Optimize off-screen content */
 section, .neo-card {
   content-visibility: auto;
@@ -381,4 +387,3 @@ h1, h2, h3, h4, .font-serif {
 .no-spinner {
     -moz-appearance: textfield; /* Firefox */
 }
-

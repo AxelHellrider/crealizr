@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
     partyBudget,
@@ -12,6 +12,8 @@ import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Card } from "@/app/components/atoms/Card";
+import { Button } from "@/app/components/atoms/Button";
+import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 type Mode = "solo" | "group";
 type Difficulty = "easy" | "medium" | "hard" | "deadly";
@@ -25,6 +27,7 @@ export default function CombatBalancerPage() {
     const [mode, setMode] = useState<Mode>("solo");
     const [ruleset, setRuleset] = useState<Ruleset>("2014");
     const [budgetMode, setBudgetMode] = useState<BudgetMode>("encounter");
+    const resultsRef = useRef<HTMLDivElement>(null);
 
     const budget = useMemo(() => {
         return partyBudget({
@@ -56,22 +59,83 @@ export default function CombatBalancerPage() {
         });
     }, [avgLevel, partySize, difficulty, ruleset, budget]);
 
+    const partyPresets = [
+        { label: "3 PCs", size: 3 },
+        { label: "4 PCs", size: 4 },
+        { label: "5 PCs", size: 5 },
+        { label: "6 PCs", size: 6 },
+    ];
+
+    const levelPresets = [
+        { label: "Lv 3", level: 3 },
+        { label: "Lv 5", level: 5 },
+        { label: "Lv 10", level: 10 },
+        { label: "Lv 15", level: 15 },
+    ];
+
+    const primarySuggestion = mode === "solo" ? soloSuggestions[0] : groupSuggestions[0];
+    const formatGroupMembers = (members: { count: number; cr: number }[]) =>
+        members.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ");
+    const budgetStatus = (fit: number) => {
+        if (fit >= 0.95 && fit <= 1.05) return { label: "On target", color: "text-green-400" };
+        if (fit > 1.05) return { label: "Over budget", color: "text-crimson" };
+        return { label: "Under budget", color: "text-amber-400" };
+    };
+
+    const scrollToResults = () => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
     return (
         <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
             <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                 <div>
-                    <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Combat Balancer</h1>
+                    <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Encounter Builder</h1>
                     <p className="text-muted mt-2 font-light italic">
                         Create balanced encounters based on your party&apos;s level and size.
                     </p>
+                    <WhyDifferent className="mt-3" />
                 </div>
                 <Link href="/balance/docs" className="ui-link text-sm italic hidden sm:inline-flex">
                     View Documentation
                 </Link>
             </header>
 
+            <Card className="p-6 border-gold/10">
+                <div className="grid gap-4 md:grid-cols-[1.2fr_1fr] items-center">
+                    <div>
+                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Quick presets</div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {partyPresets.map((preset) => (
+                                <Button
+                                    key={preset.label}
+                                    onClick={() => setPartySize(preset.size)}
+                                    className="px-3 py-2 text-xs uppercase tracking-widest"
+                                >
+                                    {preset.label}
+                                </Button>
+                            ))}
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {levelPresets.map((preset) => (
+                                <Button
+                                    key={preset.label}
+                                    onClick={() => setAvgLevel(preset.level)}
+                                    className="px-3 py-2 text-xs uppercase tracking-widest"
+                                >
+                                    {preset.label}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="text-sm text-muted">
+                        Budget math: XP threshold × encounter multiplier. Ruleset choice changes thresholds and XP values.
+                    </div>
+                </div>
+            </Card>
+
             {/* Controls */}
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  2xl:grid-cols-6">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
                 <FormField label="Party Size">
                     <Input type="number" min={1} max={8}
                            value={partySize}
@@ -88,7 +152,7 @@ export default function CombatBalancerPage() {
                     />
                 </FormField>
 
-                <FormField label="Ruleset">
+                <FormField label="Ruleset" sublabel="2014 DMG or 2024 update">
                     <Select value={ruleset}
                             onChange={(e) => setRuleset(e.target.value as Ruleset)}
                             aria-label="Ruleset version">
@@ -127,14 +191,44 @@ export default function CombatBalancerPage() {
                 </FormField>
             </div>
 
+            <Button
+                variant="primary"
+                onClick={scrollToResults}
+                className="w-full sm:w-auto px-10 py-3 uppercase tracking-widest font-serif"
+            >
+                Show Suggestions
+            </Button>
+
             {/* Results */}
-            <Card className="p-6">
+            <Card className="p-6" ref={resultsRef}>
                 <div className="flex flex-col sm:flex-row sm:justify-between mb-8 border-b border-gold/10 pb-4">
                     <h2 className="font-serif text-2xl accent-gold uppercase tracking-wide">Suggested Encounters</h2>
                     <div className="text-sm font-medium mt-2 sm:mt-0 uppercase tracking-widest">
                         Total XP Budget: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span>
                     </div>
                 </div>
+
+                <div className="mb-6 flex flex-wrap gap-2 text-[10px] uppercase tracking-widest font-bold text-gold/70">
+                    <span className="border border-gold/20 px-3 py-1">Party {partySize}</span>
+                    <span className="border border-gold/20 px-3 py-1">Level {avgLevel}</span>
+                    <span className="border border-gold/20 px-3 py-1">{difficulty}</span>
+                    <span className="border border-gold/20 px-3 py-1">{ruleset} ruleset</span>
+                    <span className="border border-gold/20 px-3 py-1">{budgetMode} budget</span>
+                </div>
+
+                {primarySuggestion && (
+                    <div className="mb-6 rounded-sm border border-gold/20 bg-gold/5 p-4">
+                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Recommended Mix</div>
+                        <div className="mt-2 font-serif text-lg accent-gold">
+                            {mode === "solo"
+                                ? `${primarySuggestion.count} × CR ${formatCR(primarySuggestion.cr)}`
+                                : formatGroupMembers(primarySuggestion.members)}
+                        </div>
+                        <div className="text-xs text-muted mt-1">
+                            Budget Fit {(primarySuggestion.fit * 100).toFixed(0)}% · {budgetStatus(primarySuggestion.fit).label}
+                        </div>
+                    </div>
+                )}
 
                 {mode === "solo" ? (
                     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -144,6 +238,9 @@ export default function CombatBalancerPage() {
                                     <div className="flex justify-between items-start">
                                         <div className="font-serif text-xl accent-gold">{s.count} &times; CR {formatCR(s.cr)}</div>
                                         <div className="text-muted text-xs font-bold uppercase">{s.adjustedXP} XP</div>
+                                    </div>
+                                    <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(s.fit).color}`}>
+                                        {budgetStatus(s.fit).label}
                                     </div>
                                     <div className="mt-4 h-1 w-full bg-gold/10 rounded-full overflow-hidden">
                                         <div className="h-full bg-gold shadow-[0_0_8px_rgba(197,160,89,0.5)]" style={{ width: `${s.fit * 100}%` }} />
@@ -172,6 +269,9 @@ export default function CombatBalancerPage() {
                                             ))}
                                         </div>
                                         <div className="text-muted text-xs font-bold uppercase whitespace-nowrap ml-4">{g.adjustedXP} XP</div>
+                                    </div>
+                                    <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(g.fit).color}`}>
+                                        {budgetStatus(g.fit).label}
                                     </div>
                                     <div className="mt-4 h-1 w-full bg-silver/10 rounded-full overflow-hidden">
                                         <div className="h-full bg-silver shadow-[0_0_8px_rgba(148,163,184,0.5)]" style={{ width: `${g.fit * 100}%` }} />

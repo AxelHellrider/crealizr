@@ -97,6 +97,7 @@ describe("scaleMonster2014", () => {
     expect(res.stats.int).toBe(14);
   });
 
+
   it("computes advice fields (attack bonus, save DC, DPR estimates)", () => {
     const res = scaleMonster2014(monster, 1) as unknown as { _advice?: Record<string, unknown> };
     const advice = res._advice as Record<string, unknown>;

@@ -6,6 +6,7 @@ import Footer from "@/app/components/organisms/Footer";
 import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import { ThemeProvider } from "@/app/context/ThemeContext";
+import { MobileBackToToolkit } from "@/app/components/atoms/MobileBackToToolkit";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -48,6 +49,7 @@ export default function RootLayout({
               </main>
               <Footer />
             </div>
+            <MobileBackToToolkit />
         </ThemeProvider>
       </body>
     </html>

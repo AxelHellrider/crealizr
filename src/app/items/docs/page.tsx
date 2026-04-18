@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Magic Item Creator – How it works",
+  title: "Artifact Forge – How it works",
   description: "Details on rarity by level, suggested bonuses, and the item blueprint produced by CRializr.",
 };
 
@@ -10,7 +10,7 @@ function Code({ children }: { children: React.ReactNode }) {
 export default function ItemsDocsPage() {
   return (
     <section className="prose prose-invert max-w-3xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-semibold">Magic Item Creator – How it works</h1>
+      <h1 className="mb-2 text-3xl font-semibold">Artifact Forge – How it works</h1>
       <p className="text-zinc-400">This page explains the simplified heuristics used to generate a balanced item blueprint tuned to a party level.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Inputs</h2>
@@ -23,6 +23,13 @@ export default function ItemsDocsPage() {
         <li>Optional crafting ingredients with quantity (and optional unit)</li>
         <li>Optional crafting cost, time, and special requirement (place, profession, or specialist)</li>
         <li>Optional lore description (up to 100 words)</li>
+      </ul>
+
+      <h2 className="mt-8 text-xl font-semibold">Quick actions</h2>
+      <ul>
+        <li>Use Example to prefill a complete artifact blueprint.</li>
+        <li>Lock Mechanics to keep type/level/attunement while refining flavor.</li>
+        <li>Clear Flavor or Clear Crafting to iterate quickly.</li>
       </ul>
 
       <h2 className="mt-8 text-xl font-semibold">Rarity by level</h2>

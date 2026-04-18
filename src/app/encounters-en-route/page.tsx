@@ -16,6 +16,7 @@ import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Difficulty, partyBudget, suggestEncounters, suggestGroupEncounters } from "@/app/utils/encounter";
 import { formatCR } from "@/app/lib/format";
+import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export default function EncountersEnRoutePage() {
   const [terrain, setTerrain] = useState<Terrain>("Forest");
@@ -81,6 +82,7 @@ export default function EncountersEnRoutePage() {
           <p className="text-muted mt-2 font-light italic">
             Plan encounters for long journeys based on terrain.
           </p>
+          <WhyDifferent className="mt-3" />
         </div>
       </header>
 

@@ -12,6 +12,7 @@ import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
+import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export default function ScalePage() {
     const [step, setStep] = useState<1 | 2>(1);
@@ -72,8 +73,8 @@ export default function ScalePage() {
     };
 
     const downloadImage = async () => {
-        if (!statBlockRef.current) return;
-        const canvas = await html2canvas(statBlockRef.current, { scale: 2 });
+        const canvas = await captureStatBlock();
+        if (!canvas) return;
         const link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
         link.download = `${scaledMonster?.name || "monster"}.png`;
@@ -81,12 +82,63 @@ export default function ScalePage() {
     };
 
     const downloadPDF = async () => {
-        if (!statBlockRef.current) return;
-        const canvas = await html2canvas(statBlockRef.current, { scale: 2 });
+        const canvas = await captureStatBlock();
+        if (!canvas) return;
         const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [canvas.width, canvas.height] });
         pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
         pdf.save(`${scaledMonster?.name || "monster"}.pdf`);
+    };
+
+    const captureStatBlock = async () => {
+        const element = statBlockRef.current;
+        if (!element) return null;
+        const { scrollWidth, scrollHeight } = element;
+        return html2canvas(element, {
+            scale: 2,
+            width: scrollWidth,
+            height: scrollHeight,
+            windowWidth: scrollWidth,
+            windowHeight: scrollHeight,
+            onclone: (doc) => {
+                const exportRoot = doc.querySelector('[data-export-statblock="true"]');
+                if (!exportRoot) return;
+                exportRoot.setAttribute("data-exporting", "true");
+                const exportElement = exportRoot as HTMLElement;
+                exportElement.style.overflow = "visible";
+                exportElement.style.width = `${scrollWidth}px`;
+                exportElement.style.height = `${scrollHeight}px`;
+                const style = doc.createElement("style");
+                style.textContent = `
+                    [data-exporting="true"] {
+                        background: #12151c !important;
+                        color: #f0f2f5 !important;
+                        border-color: rgba(212, 175, 55, 0.4) !important;
+                        box-shadow: none !important;
+                    }
+                    [data-exporting="true"] * {
+                        color: inherit !important;
+                        border-color: rgba(212, 175, 55, 0.2) !important;
+                        box-shadow: none !important;
+                        text-shadow: none !important;
+                    }
+                    [data-exporting="true"] .accent-gold { color: #d4af37 !important; }
+                    [data-exporting="true"] .text-muted { color: #a0aec0 !important; }
+                    [data-exporting="true"] [class~="text-gold/80"] { color: rgba(212, 175, 55, 0.8) !important; }
+                    [data-exporting="true"] [class~="text-gold/60"] { color: rgba(212, 175, 55, 0.6) !important; }
+                    [data-exporting="true"] [class~="bg-gold/5"] { background-color: rgba(212, 175, 55, 0.08) !important; }
+                    [data-exporting="true"] .bg-card { background-color: #12151c !important; }
+                    [data-exporting="true"] [class~="bg-background/40"] { background-color: rgba(18, 21, 28, 0.4) !important; }
+                    [data-exporting="true"] [class~="border-gold/30"] { border-color: rgba(212, 175, 55, 0.3) !important; }
+                    [data-exporting="true"] [class~="border-gold/20"] { border-color: rgba(212, 175, 55, 0.2) !important; }
+                    [data-exporting="true"] [class~="border-gold/10"] { border-color: rgba(212, 175, 55, 0.1) !important; }
+                    [data-exporting="true"] .text-purple-400 { color: #c4b5fd !important; }
+                    [data-exporting="true"] .text-red-400 { color: #f87171 !important; }
+                    [data-exporting="true"] .text-blue-300 { color: #93c5fd !important; }
+                `;
+                doc.head.appendChild(style);
+            },
+        });
     };
 
     const getModifier = (score: number) => {
@@ -100,10 +152,33 @@ export default function ScalePage() {
         <section className="glass-panel p-8 sm:p-12 fantasy-border">
             {step === 1 && (
                 <div className="grid gap-8">
-                    <header className="flex items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
-                        <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Monster Scaler</h1>
+                    <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+                        <div>
+                            <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Monster Scaler</h1>
+                            <p className="text-muted mt-2 font-light italic">
+                                Scale HP, AC, DPR, and stat targets to a new CR while keeping the creature recognizable.
+                            </p>
+                            <WhyDifferent className="mt-3" />
+                        </div>
                         <a href="/scale/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
                     </header>
+
+                    <Card className="p-6 border-gold/10">
+                        <div className="grid gap-4 sm:grid-cols-3 text-sm">
+                            <div>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">What scales</div>
+                                <p className="text-muted mt-2">AC, HP, DPR targets, and ability modifiers.</p>
+                            </div>
+                            <div>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Ruleset notes</div>
+                                <p className="text-muted mt-2">2014 uses DMG tables. 2024 uses updated bands with softened ranges.</p>
+                            </div>
+                            <div>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Guardrails</div>
+                                <p className="text-muted mt-2">Verify action economy, legendary actions, and unique traits after scaling.</p>
+                            </div>
+                        </div>
+                    </Card>
 
                     {/* --- Basic Info --- */}
                     <Card className="p-6">
@@ -117,7 +192,7 @@ export default function ScalePage() {
                             </FormField>
                         </div>
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
-                            <FormField label="Ruleset">
+                            <FormField label="Ruleset" sublabel="2014 DMG or 2024 update bands">
                                 <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
                                     <option value="2014">2014 Ruleset</option>
                                     <option value="2024">2024 Ruleset</option>
@@ -192,7 +267,58 @@ export default function ScalePage() {
 
             {step === 2 && scaledMonster && (
                 <div className="grid gap-6">
-                    <div ref={statBlockRef} className="neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card">
+                    {(() => {
+                        const advice = (scaledMonster as MonsterBase & { _advice?: { suggestedAttackBonus?: number; suggestedSaveDC?: number } })._advice;
+                        const suggestedAttackBonus = advice?.suggestedAttackBonus;
+                        const suggestedSaveDC = advice?.suggestedSaveDC;
+
+                        return (
+                            <Card className="p-6 border-gold/10">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
+                                    <h2 className="font-serif text-xl uppercase tracking-wide">Tuning Notes</h2>
+                                    <span className="text-xs text-muted italic">Derived from the CR matrix.</span>
+                                </div>
+                                <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                                    <div className="flex justify-between border-b border-gold/5 pb-2">
+                                        <span className="text-muted">Suggested Attack Bonus</span>
+                                        <span className="font-medium">{suggestedAttackBonus ?? "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-gold/5 pb-2">
+                                        <span className="text-muted">Suggested Save DC</span>
+                                        <span className="font-medium">{suggestedSaveDC ?? "—"}</span>
+                                    </div>
+                                </div>
+                            </Card>
+                        );
+                    })()}
+                    <Card className="p-6 border-gold/10">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
+                            <h2 className="font-serif text-xl uppercase tracking-wide">Before / After</h2>
+                            <span className="text-xs text-muted italic">Preview is the exact export output.</span>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                            <div className="space-y-2">
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Original</div>
+                                <div className="flex justify-between"><span className="text-muted">AC</span><span className="font-medium">{monster.stats.ac}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">HP</span><span className="font-medium">{monster.stats.hp}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">DPR</span><span className="font-medium">{monster.dpr.range}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">CR</span><span className="font-medium">{formatCR(monster.challenge_rating)}</span></div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Scaled</div>
+                                <div className="flex justify-between"><span className="text-muted">AC</span><span className="font-medium">{scaledMonster.stats.ac}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">HP</span><span className="font-medium">{scaledMonster.stats.hp}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">DPR</span><span className="font-medium">{scaledMonster.dpr?.range ?? "—"}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">CR</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    <div
+                        ref={statBlockRef}
+                        data-export-statblock="true"
+                        className="neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card"
+                    >
                         <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
                         <h1 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
                             {scaledMonster.name || "Scaled Monster"}
@@ -236,11 +362,14 @@ export default function ScalePage() {
                             ← ADJUST STATS
                         </button>
                         <button onClick={downloadImage} className="ui-button ui-button-primary flex-1">
-                            DOWNLOAD IMAGE (PNG)
+                            DOWNLOAD PNG
                         </button>
                         <button onClick={downloadPDF} className="ui-button ui-button-primary flex-1">
                             DOWNLOAD PDF
                         </button>
+                    </div>
+                    <div className="text-xs text-muted italic text-center">
+                        PNG is optimized for VTT use. PDF is print-friendly. Files use the monster name for easy sorting. Outputs are advisory—review special actions and traits.
                     </div>
                 </div>
             )}

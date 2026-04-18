@@ -11,8 +11,8 @@ export default function Footer() {
                             <h2 className="text-2xl font-serif accent-gold uppercase tracking-[0.2em]">CRealizr</h2>
                         </div>
                         <p className="max-w-sm text-sm text-muted font-light leading-relaxed">
-                            High-precision tabletop utilities for Dungeons & Dragons Game Masters. 
-                            Built for reliability, speed, and accuracy at the table.
+                            A DM-first toolkit for encounter building, monster scaling, and item crafting.
+                            Fast to use at the table, no account required.
                         </p>
                     </div>
 
@@ -21,10 +21,10 @@ export default function Footer() {
                         <div className="space-y-4">
                             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60 border-b border-gold/10 pb-2">Utilities</h3>
                             <nav className="flex flex-col gap-2 text-sm font-semibold tracking-widest">
-                                <Link href="/scale" className="ui-link transition uppercase hover:text-gold">Scaler</Link>
-                                <Link href="/balance" className="ui-link transition uppercase hover:text-gold">Balancer</Link>
-                                <Link href="/encounters-en-route" className="ui-link transition uppercase hover:text-gold">En Route</Link>
-                                <Link href="/items" className="ui-link transition uppercase hover:text-gold">Forge</Link>
+                                <Link href="/balance" className="ui-link transition uppercase hover:text-gold">Encounter Builder</Link>
+                                <Link href="/scale" className="ui-link transition uppercase hover:text-gold">Monster Scaler</Link>
+                                <Link href="/encounters-en-route" className="ui-link transition uppercase hover:text-gold">Travel Encounters</Link>
+                                <Link href="/items" className="ui-link transition uppercase hover:text-gold">Artifact Forge</Link>
                             </nav>
                         </div>
                         <div className="space-y-4">
@@ -40,9 +40,10 @@ export default function Footer() {
                     <div className="max-w-xs space-y-4">
                         <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60 border-b border-gold/10 pb-2">Verification</h3>
                         <p className="text-xs text-muted leading-relaxed">
-                            Validated for 2014 & 2024 SRD rulesets.
+                            Validated for 2014 & 2024 SRD rulesets. Outputs are advisory, not rules-authoritative.
                             Independent development; not affiliated with Wizards of the Coast.
                         </p>
+                        <p className="text-[10px] uppercase tracking-widest text-muted">Version 0.9 · Changelog available on GitHub.</p>
                         <p className="font-serif accent-gold opacity-60 uppercase tracking-widest text-[10px] pt-4">© {new Date().getFullYear()} — All Rights Reserved.</p>
                     </div>
                 </div>
