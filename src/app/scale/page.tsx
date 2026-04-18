@@ -260,7 +260,7 @@ export default function ScalePage() {
                     </Card>
 
                     <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full sm:w-auto self-start">
-                        {isScaling ? "SCALING..." : "SCALE MONSTER"}
+                        {isScaling ? "SCALING..." : "SCALE A MONSTER"}
                     </Button>
                 </div>
             )}
@@ -294,7 +294,7 @@ export default function ScalePage() {
                     <Card className="p-6 border-gold/10">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
                             <h2 className="font-serif text-xl uppercase tracking-wide">Before / After</h2>
-                            <span className="text-xs text-muted italic">Preview is the exact export output.</span>
+                            <span className="text-xs text-muted italic">Snapshot of the exact export output.</span>
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2 text-sm">
                             <div className="space-y-2">
@@ -312,8 +312,26 @@ export default function ScalePage() {
                                 <div className="flex justify-between"><span className="text-muted">CR</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
                             </div>
                         </div>
+                        <div className="mt-4 grid gap-3 sm:grid-cols-3 text-xs">
+                            <div className="flex justify-between border-b border-gold/5 pb-2">
+                                <span className="text-muted">AC Change</span>
+                                <span className="font-medium">{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gold/5 pb-2">
+                                <span className="text-muted">HP Change</span>
+                                <span className="font-medium">{scaledMonster.stats.hp - monster.stats.hp >= 0 ? "+" : ""}{scaledMonster.stats.hp - monster.stats.hp}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gold/5 pb-2">
+                                <span className="text-muted">CR Shift</span>
+                                <span className="font-medium">{formatCR(monster.challenge_rating)} → {formatCR(scaledMonster.challenge_rating)}</span>
+                            </div>
+                        </div>
                     </Card>
 
+                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
+                        <span>Export Preview</span>
+                        <span className="text-muted normal-case tracking-normal">PNG/PDF uses this exact layout.</span>
+                    </div>
                     <div
                         ref={statBlockRef}
                         data-export-statblock="true"
@@ -357,7 +375,8 @@ export default function ScalePage() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Export Options</div>
+                    <div className="flex flex-col sm:flex-row gap-4 mt-2">
                         <button onClick={() => setStep(1)} className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs">
                             ← ADJUST STATS
                         </button>

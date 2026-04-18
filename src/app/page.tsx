@@ -20,9 +20,9 @@ export const viewport: Viewport = {
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-20 -mt-4">
+    <div className="flex flex-col gap-16 sm:gap-20 -mt-4">
       {/* Hero Section */}
-      <section className="relative glass-panel p-10 sm:p-24 flex flex-col items-center text-center overflow-hidden min-h-[70vh] justify-center fantasy-border">
+      <section className="relative glass-panel p-8 sm:p-24 flex flex-col items-center text-center overflow-hidden min-h-[70vh] justify-center fantasy-border">
         <div className="pointer-events-none absolute inset-0 opacity-20">
           <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(197,160,89,0.3), transparent 70%)"}} />
           <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(44,62,80,0.4), transparent 70%)"}} />
@@ -30,11 +30,11 @@ export default function Home() {
 
         <div className="relative z-10 max-w-4xl">
           <h1 className="text-5xl sm:text-7xl font-serif tracking-tight text-foreground drop-shadow-sm">
-            Build, balance, and run <span className="accent-gold uppercase italic">encounters</span> in minutes.
+            Run balanced adventures faster, without breaking the fantasy.
           </h1>
           <p className="mt-6 text-lg sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
-            A table-ready D&amp;D toolkit for Dungeon Masters: encounter budgets, monster scaling, and item forging with
-            clear outputs you can use immediately. Supports 2014 + 2024 guidance so your rulings stay consistent across editions.
+            A table-ready D&amp;D toolkit for Dungeon Masters. Build encounters, scale monsters, and forge artifacts with
+            outputs you can use immediately. Toggle 2014 or 2024 to swap the math underneath without changing your workflow.
           </p>
           <WhyDifferent className="mt-6" />
           <div className="mt-10 flex flex-wrap justify-center gap-4">
@@ -81,11 +81,43 @@ export default function Home() {
                 <div className="text-xs text-muted mt-1">Budget Fit: 96% (on target)</div>
               </div>
               <div className="text-xs text-muted">
-                Budget Fit shows how close the encounter lands to the target XP budget.
+                Budget Fit = adjusted XP / target XP. Example: 1,920 vs 2,000 XP → 96%.
               </div>
             </div>
           </div>
         </Card>
+      </section>
+
+      <section className="grid gap-10">
+        <div className="flex flex-col items-center text-center">
+          <h2 className="text-3xl sm:text-4xl font-serif accent-gold uppercase tracking-widest">Sample Outputs</h2>
+          <p className="text-muted mt-3 max-w-2xl text-base italic">
+            Each tool produces a clear, table-ready result. Exports match the preview.
+          </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-3">
+          <Card className="p-6 border-gold/10 bg-card">
+            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Encounter Builder</div>
+            <div className="mt-3 text-lg font-serif accent-gold">2 × CR 3, 1 × CR 1</div>
+            <div className="text-xs text-muted mt-1">Budget Fit: 92% · Hard</div>
+            <div className="mt-4 text-xs text-muted">2014/2024 toggle adjusts thresholds and XP.</div>
+          </Card>
+          <Card className="p-6 border-gold/10 bg-card">
+            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Monster Scaler</div>
+            <div className="mt-3 grid gap-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted">AC</span><span className="font-medium">13 → 16</span></div>
+              <div className="flex justify-between"><span className="text-muted">HP</span><span className="font-medium">90 → 180</span></div>
+              <div className="flex justify-between"><span className="text-muted">DPR</span><span className="font-medium">12 → 26</span></div>
+            </div>
+            <div className="mt-4 text-xs text-muted">Preview matches PNG/PDF export.</div>
+          </Card>
+          <Card className="p-6 border-gold/10 bg-card">
+            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Artifact Forge</div>
+            <div className="mt-3 text-lg font-serif accent-gold">Aegis of the Dawn</div>
+            <div className="text-xs text-muted mt-1">Rare · +2 AC · Attunement</div>
+            <div className="mt-3 text-xs text-muted italic">&quot;Forged at sunrise to turn the restless dead.&quot;</div>
+          </Card>
+        </div>
       </section>
 
       <section className="grid gap-10">
@@ -130,7 +162,7 @@ export default function Home() {
                 Adjust HP, AC, DPR, and suggested combat targets to a new CR. Includes export-ready statblocks.
               </p>
               <div className="mt-8 text-gold text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
-                Open Scaler <span>&rarr;</span>
+                Scale a Monster <span>&rarr;</span>
               </div>
             </Card>
           </Link>
@@ -145,7 +177,7 @@ export default function Home() {
                 Builds encounter budgets and enemy mixes from party size, level, and difficulty target.
               </p>
               <div className="mt-8 text-silver text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
-                Build Encounter <span>&rarr;</span>
+                Build an Encounter <span>&rarr;</span>
               </div>
             </Card>
           </Link>
@@ -160,7 +192,7 @@ export default function Home() {
                 Craft items with tuned bonuses, materials, and lore. Separates mechanical output from flavor text.
               </p>
               <div className="mt-8 text-gold text-sm font-bold flex items-center gap-3 uppercase tracking-widest">
-                Create Item <span>&rarr;</span>
+                Forge an Item <span>&rarr;</span>
               </div>
             </Card>
           </Link>

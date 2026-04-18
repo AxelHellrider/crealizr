@@ -32,6 +32,12 @@ export default function ItemsDocsPage() {
         <li>Clear Flavor or Clear Crafting to iterate quickly.</li>
       </ul>
 
+      <h2 className="mt-8 text-xl font-semibold">Mechanics vs Flavor</h2>
+      <p>The forge separates mechanical output (rarity, bonuses, tuned level) from flavor (ingredients, requirements, and lore). This keeps balance adjustments fast while you iterate on story.</p>
+
+      <h2 className="mt-8 text-xl font-semibold">Export preview</h2>
+      <p>The preview panel mirrors the JSON output so you can copy or screenshot it quickly.</p>
+
       <h2 className="mt-8 text-xl font-semibold">Rarity by level</h2>
       <p>Rarity is assigned from player level via a simple curve:</p>
       <ul>

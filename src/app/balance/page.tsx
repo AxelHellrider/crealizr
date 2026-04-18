@@ -82,6 +82,8 @@ export default function CombatBalancerPage() {
         if (fit > 1.05) return { label: "Over budget", color: "text-crimson" };
         return { label: "Under budget", color: "text-amber-400" };
     };
+    const primaryFit = mode === "solo" ? primarySolo?.fit : primaryGroup?.fit;
+    const primaryStatus = primaryFit !== undefined ? budgetStatus(primaryFit) : null;
 
     const scrollToResults = () => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -95,6 +97,7 @@ export default function CombatBalancerPage() {
                     <p className="text-muted mt-2 font-light italic">
                         Create balanced encounters based on your party&apos;s level and size.
                     </p>
+                    <p className="text-xs text-muted mt-2">2014/2024 toggles threshold and per-CR XP tables.</p>
                     <WhyDifferent className="mt-3" />
                 </div>
                 <Link href="/balance/docs" className="ui-link text-sm italic hidden sm:inline-flex">
@@ -204,8 +207,15 @@ export default function CombatBalancerPage() {
             <Card className="p-6" ref={resultsRef}>
                 <div className="flex flex-col sm:flex-row sm:justify-between mb-8 border-b border-gold/10 pb-4">
                     <h2 className="font-serif text-2xl accent-gold uppercase tracking-wide">Suggested Encounters</h2>
-                    <div className="text-sm font-medium mt-2 sm:mt-0 uppercase tracking-widest">
-                        Total XP Budget: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span>
+                    <div className="text-sm font-medium mt-2 sm:mt-0 uppercase tracking-widest flex flex-col sm:items-end gap-2">
+                        <span>
+                            Total XP Budget: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span>
+                        </span>
+                        {primaryStatus && (
+                            <span className={`text-[10px] px-3 py-1 rounded-sm uppercase font-bold tracking-widest border border-gold/20 ${primaryStatus.color}`}>
+                                Budget Status: {primaryStatus.label}
+                            </span>
+                        )}
                     </div>
                 </div>
 
@@ -217,8 +227,13 @@ export default function CombatBalancerPage() {
                     <span className="border border-gold/20 px-3 py-1">{budgetMode} budget</span>
                 </div>
 
+                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">
+                    <span>Export Preview</span>
+                    <span className="text-muted normal-case tracking-normal">Snapshot for quick screenshot or print.</span>
+                </div>
+
                 {mode === "solo" && primarySolo && (
-                    <div className="mb-6 rounded-sm border border-gold/20 bg-gold/5 p-4">
+                    <div className="mb-6 rounded-sm border-2 border-gold/30 bg-gold/5 p-4">
                         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Recommended Mix</div>
                         <div className="mt-2 font-serif text-lg accent-gold">
                             {`${primarySolo.count} × CR ${formatCR(primarySolo.cr)}`}
@@ -229,7 +244,7 @@ export default function CombatBalancerPage() {
                     </div>
                 )}
                 {mode === "group" && primaryGroup && (
-                    <div className="mb-6 rounded-sm border border-gold/20 bg-gold/5 p-4">
+                    <div className="mb-6 rounded-sm border-2 border-gold/30 bg-gold/5 p-4">
                         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Recommended Mix</div>
                         <div className="mt-2 font-serif text-lg accent-gold">
                             {formatGroupMembers(primaryGroup.members)}

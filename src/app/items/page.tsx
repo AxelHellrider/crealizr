@@ -222,6 +222,9 @@ export default function ItemCreatorPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
+        <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
+          Mechanics
+        </div>
         <FormField label="Item Name">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Sunspear of Pelor" />
         </FormField>
@@ -265,6 +268,9 @@ export default function ItemCreatorPage() {
           </div>
         </FormField>
 
+        <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
+          Flavor & Crafting
+        </div>
         <FormField label="Crafting Ingredients" sublabel="Optional">
           <div className="grid gap-2 sm:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
             <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder="Ingredient name" />
@@ -344,6 +350,22 @@ export default function ItemCreatorPage() {
 
       <Card className="p-8 border-gold/10" ref={outputRef}>
         <h2 className="mb-6 font-serif text-2xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Item Properties</h2>
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">
+          <span>Export Preview</span>
+          <span className="text-muted normal-case tracking-normal">Matches JSON output.</span>
+        </div>
+        <div className="rounded-sm border border-gold/20 bg-gold/5 p-4 mb-6 text-sm">
+          <div className="font-serif text-lg accent-gold">{item.name || "Unnamed Artifact"}</div>
+          <div className="text-xs text-muted mt-1">
+            {item.rarity} · {item.type} · Level {item.levelTuned} · {item.attunement ? "Attunement" : "No Attunement"}
+          </div>
+          <div className="mt-2 text-xs text-muted">
+            {item.bonusToHit !== undefined && `+${item.bonusToHit} to hit`}
+            {item.bonusAC !== undefined && `${item.bonusToHit !== undefined ? " · " : ""}+${item.bonusAC} AC`}
+            {item.bonusSaveDC !== undefined && `${item.bonusToHit !== undefined || item.bonusAC !== undefined ? " · " : ""}DC ${item.bonusSaveDC}`}
+            {item.avgDamageBonus !== undefined && `${item.bonusToHit !== undefined || item.bonusAC !== undefined || item.bonusSaveDC !== undefined ? " · " : ""}+${item.avgDamageBonus} avg dmg`}
+          </div>
+        </div>
         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">Mechanical Summary</div>
         <CardContent className="grid gap-4 text-sm sm:grid-cols-2">
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">

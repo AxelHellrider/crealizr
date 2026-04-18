@@ -11,7 +11,7 @@ export default function BalanceDocsPage() {
   return (
     <section className="prose prose-invert max-w-3xl px-4 py-8">
       <h1 className="mb-2 text-3xl font-semibold">Encounter Builder – How it works</h1>
-      <p className="text-zinc-400">This page documents the simple 2014 DMG encounter math used to generate suggestions.</p>
+      <p className="text-zinc-400">This page documents the encounter math used to generate suggestions. Toggle 2014 or 2024 to swap tables without changing the inputs.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Inputs</h2>
       <ul>
@@ -42,6 +42,11 @@ export default function BalanceDocsPage() {
       <p>For N identical creatures of CR C with base XP <Code>xpEach</Code>:</p>
       <p><Code>adjustedXP = round(xpEach × N × multiplier(N))</Code></p>
 
+      <h2 className="mt-8 text-xl font-semibold">Budget Fit</h2>
+      <p>We compute a simple ratio to show how close a suggestion is to the target:</p>
+      <p><Code>fit = min(budget, adjustedXP) / max(budget, adjustedXP)</Code></p>
+      <p>Example: if budget is 2,000 XP and adjusted XP is 1,920, Budget Fit is <Code>0.96</Code> (96%).</p>
+
       <h2 className="mt-8 text-xl font-semibold">Suggestion search</h2>
       <ul>
         <li>Enumerate CR values and counts N from 1 to 8.</li>
@@ -51,7 +56,7 @@ export default function BalanceDocsPage() {
       </ul>
 
       <h2 className="mt-8 text-xl font-semibold">Ruleset and Modes</h2>
-      <p>The page includes a Ruleset toggle to switch between the 2014 and 2024 guidelines. XP thresholds, per‑CR XP, and multipliers come from the selected ruleset.</p>
+      <p>The Ruleset toggle switches the tables used for thresholds and per‑CR XP. The math stays the same.</p>
       <p className="text-zinc-400 text-sm">Note: For initial 2024 support, values align closely to 2014 to provide parity; you can still tune outcomes at your table.</p>
       <h3 className="mt-4 font-semibold">Solo vs Groups</h3>
       <p>The UI lets you toggle between two suggestion modes:</p>

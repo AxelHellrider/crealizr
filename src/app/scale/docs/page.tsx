@@ -145,10 +145,9 @@ export default function ScaleDocsPage() {
 
     return (
         <section className="prose prose-invert max-w-3xl px-4 py-8">
-            <h1 className="mb-2 text-3xl font-semibold">Monster CR Scaler (2014) – How it works</h1>
-            <p className="text-zinc-400">This page documents the exact steps and formulas used by the Monster CR Scaler
-                for the 2014 ruleset. The goal is transparency so you can understand, audit, and adapt the results at
-                your table.</p>
+            <h1 className="mb-2 text-3xl font-semibold">Monster Scaler – How it works</h1>
+            <p className="text-zinc-400">This page documents the exact steps and formulas used by the Monster Scaler.
+                Toggle 2014 or 2024 to swap the matrix data while keeping the same workflow.</p>
 
             <h2 className="mt-8 text-xl font-semibold">Inputs</h2>
             <ul>
