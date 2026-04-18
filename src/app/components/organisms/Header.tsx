@@ -33,16 +33,16 @@ export default function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/balance">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounter-builder">
                         ENCOUNTER BUILDER
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/scale">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/monster-scaler">
                         MONSTER SCALER
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounters-en-route">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/travel-encounters">
                         TRAVEL ENCOUNTERS
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/items">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/artifact-forge">
                         ARTIFACT FORGE
                     </Link>
 
@@ -108,28 +108,28 @@ export default function Header() {
                 <div id="mobile-menu" className="md:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
                     <nav className="flex flex-col gap-2 px-4 py-4 text-sm font-semibold tracking-widest" aria-label="Mobile Navigation">
                         <Link
-                            href="/balance"
+                            href="/encounter-builder"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             ENCOUNTER BUILDER
                         </Link>
                         <Link
-                            href="/scale"
+                            href="/monster-scaler"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             MONSTER SCALER
                         </Link>
                         <Link
-                            href="/encounters-en-route"
+                            href="/travel-encounters"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             TRAVEL ENCOUNTERS
                         </Link>
                         <Link
-                            href="/items"
+                            href="/artifact-forge"
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >

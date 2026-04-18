@@ -7,7 +7,20 @@ import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export const metadata: Metadata = {
     title: "CRealizr | Dungeons & Dragons Toolkit",
-    description: "For a better TTRPG experience",
+    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts fast. Clear outputs, export-ready previews, 2014/2024 rules support.",
+    keywords: [
+      "D&D encounter builder",
+      "monster scaler",
+      "5e encounter balance",
+      "DM tools",
+      "D&D 2014 rules",
+      "D&D 2024 rules",
+      "magic item generator",
+      "statblock export",
+    ],
+    alternates: {
+      canonical: "/",
+    },
 };
 
 export const viewport: Viewport = {
@@ -38,17 +51,17 @@ export default function Home() {
           </p>
           <WhyDifferent className="mt-6" />
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link href="/balance">
+            <Link href="/encounter-builder">
               <Button variant="primary" className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Build an Encounter
               </Button>
             </Link>
-            <Link href="/scale">
+            <Link href="/monster-scaler">
               <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Scale a Monster
               </Button>
             </Link>
-            <Link href="/items">
+            <Link href="/artifact-forge">
               <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Forge an Item
               </Button>
@@ -152,7 +165,7 @@ export default function Home() {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-3">
-          <Link href="/scale" className="group">
+          <Link href="/monster-scaler" className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
                 <span className="text-3xl">⚖️</span>
@@ -167,7 +180,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/balance" className="group">
+          <Link href="/encounter-builder" className="group">
             <Card className="p-10 border-silver/10 hover:border-silver/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-silver/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-silver transition-all shadow-glow bg-bg">
                 <span className="text-3xl">⚔️</span>
@@ -182,7 +195,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/items" className="group">
+          <Link href="/artifact-forge" className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
                 <span className="text-3xl">✨</span>

@@ -22,32 +22,32 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Key routes:
 
-- `/scale` — Monster CR Scaler UI
-- `/scale/docs` — How the CR Scaler works (formulas and methods)
-- `/balance` — Combat Balancer UI
-- `/items` — Magic Item Creator UI
- - `/balance/docs` — How the Combat Balancer works
- - `/items/docs` — How the Item Creator works
+- `/monster-scaler` — Monster Scaler UI
+- `/monster-scaler/docs` — How the Monster Scaler works (formulas and methods)
+- `/encounter-builder` — Encounter Builder UI
+- `/artifact-forge` — Artifact Forge UI
+ - `/encounter-builder/docs` — How the Encounter Builder works
+ - `/artifact-forge/docs` — How the Artifact Forge works
 
 ## Monster CR Scaler documentation (2014)
 
 Detailed, transparent description of the scaler’s workflow and equations is available at:
 
-- In‑app: http://localhost:3000/scale/docs
+- In‑app: http://localhost:3000/monster-scaler/docs
 - Code: `src/app/utils/scaler.ts` (core), `src/app/data/constants.ts` (CR matrix)
 
 ## Combat Balancer documentation
 
 Learn how encounter budgets, multipliers, and suggestions are computed:
 
-- In‑app: http://localhost:3000/balance/docs
+- In‑app: http://localhost:3000/encounter-builder/docs
 - Code: `src/app/utils/encounter.ts`
 
 ## Magic Item Creator documentation
 
 Read about rarity by level and suggested bonus curves:
 
-- In‑app: http://localhost:3000/items/docs
+- In‑app: http://localhost:3000/artifact-forge/docs
 - Code: `src/app/utils/items.ts`
 
 ## Deploy on Vercel

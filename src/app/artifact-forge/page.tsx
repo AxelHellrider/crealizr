@@ -182,7 +182,7 @@ export default function ItemCreatorPage() {
           </p>
           <WhyDifferent className="mt-3" />
         </div>
-        <a href="/items/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
       </header>
 
       <Card className="p-6 border-gold/10">
@@ -461,7 +461,7 @@ export default function ItemCreatorPage() {
       <p className="text-xs text-muted italic text-center">These suggestions provide a balanced baseline; adjust properties to fit your campaign&apos;s power level.</p>
 
       <div className="sm:hidden pt-4">
-        <a href="/items/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
       </div>
     </section>
   );

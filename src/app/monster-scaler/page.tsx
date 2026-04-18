@@ -160,7 +160,7 @@ export default function ScalePage() {
                             </p>
                             <WhyDifferent className="mt-3" />
                         </div>
-                        <a href="/scale/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
+                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
                     </header>
 
                     <Card className="p-6 border-gold/10">
@@ -394,7 +394,7 @@ export default function ScalePage() {
             )}
 
             <div className="sm:hidden pt-4">
-                <a href="/scale/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+                <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
             </div>
         </section>
     );

@@ -7,6 +7,7 @@ import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 import { MobileBackToToolkit } from "@/app/components/atoms/MobileBackToToolkit";
+import { SeoJsonLd } from "@/app/components/atoms/SeoJsonLd";
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
@@ -23,9 +24,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "CRealizr | Dungeons & Dragons Toolkit",
-  description: "Advanced TTRPG encounter tools with high-fantasy precision",
+  description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
+  applicationName: "CRealizr",
+  category: "Game",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: "CRealizr | Dungeons & Dragons Toolkit",
+    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
+    images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr Toolkit" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CRealizr | Dungeons & Dragons Toolkit",
+    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
+    images: ["/og-default.svg"],
+  },
 };
 
 export default function RootLayout({
@@ -37,6 +59,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
         <ThemeProvider>
+            <SeoJsonLd />
             {/* Top route change progress bar */}
             <Suspense>
                 <RouteProgress />

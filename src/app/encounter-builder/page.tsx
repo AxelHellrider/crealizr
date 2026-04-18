@@ -100,7 +100,7 @@ export default function CombatBalancerPage() {
                     <p className="text-xs text-muted mt-2">2014/2024 toggles threshold and per-CR XP tables.</p>
                     <WhyDifferent className="mt-3" />
                 </div>
-                <Link href="/balance/docs" className="ui-link text-sm italic hidden sm:inline-flex">
+                <Link href="/encounter-builder/docs" className="ui-link text-sm italic hidden sm:inline-flex">
                     View Documentation
                 </Link>
             </header>
@@ -316,7 +316,7 @@ export default function CombatBalancerPage() {
             </p>
 
             <div className="sm:hidden pt-4">
-                <Link href="/balance/docs" className="ui-link text-sm italic inline-flex justify-center w-full">
+                <Link href="/encounter-builder/docs" className="ui-link text-sm italic inline-flex justify-center w-full">
                     View Documentation
                 </Link>
             </div>
