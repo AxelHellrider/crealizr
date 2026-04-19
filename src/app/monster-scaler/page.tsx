@@ -192,7 +192,7 @@ export default function ScalePage() {
                             </FormField>
                         </div>
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
-                            <FormField label="Ruleset" sublabel="2014 DMG or 2024 update bands">
+                            <FormField label="Ruleset">
                                 <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
                                     <option value="2014">2014 Ruleset</option>
                                     <option value="2024">2024 Ruleset</option>

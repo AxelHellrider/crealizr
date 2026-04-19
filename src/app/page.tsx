@@ -6,8 +6,8 @@ import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export const metadata: Metadata = {
-    title: "CRealizr | Dungeons & Dragons Toolkit",
-    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts fast. Clear outputs, export-ready previews, 2014/2024 rules support.",
+    title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
+    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
     keywords: [
       "D&D encounter builder",
       "monster scaler",
@@ -20,6 +20,19 @@ export const metadata: Metadata = {
     ],
     alternates: {
       canonical: "/",
+    },
+    openGraph: {
+      title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
+      description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
+      url: "/",
+      type: "website",
+      images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr D&D toolkit preview" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
+      description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
+      images: ["/og-default.svg"],
     },
 };
 

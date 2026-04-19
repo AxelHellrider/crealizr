@@ -139,7 +139,7 @@ export default function CombatBalancerPage() {
             </Card>
 
             {/* Controls */}
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 <FormField label="Party Size">
                     <Input type="number" min={1} max={8}
                            value={partySize}
@@ -156,7 +156,7 @@ export default function CombatBalancerPage() {
                     />
                 </FormField>
 
-                <FormField label="Ruleset" sublabel="2014 DMG or 2024 update">
+                <FormField label="Ruleset">
                     <Select value={ruleset}
                             onChange={(e) => setRuleset(e.target.value as Ruleset)}
                             aria-label="Ruleset version">
