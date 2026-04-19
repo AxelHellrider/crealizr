@@ -76,11 +76,6 @@ export default function RootLayout({
             </div>
             <MobileBackToToolkit/>
         </ThemeProvider>
-        <script
-            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-            async
-            defer
-        ></script>
         </body>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!}/>
         </html>

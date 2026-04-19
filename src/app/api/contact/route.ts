@@ -119,17 +119,14 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
     throw new Error("TURNSTILE_SECRET_KEY is missing.");
   }
 
+  const formData = new FormData();
+  formData.append("secret", secret);
+  formData.append("response", token);
+  if (ip) formData.append("remoteip", ip);
+
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      secret,
-      response: token,
-      remoteip: ip || undefined,
-      idempotency_key: crypto.randomUUID(),
-    }),
+    body: formData,
     signal: AbortSignal.timeout(5000),
   });
 
