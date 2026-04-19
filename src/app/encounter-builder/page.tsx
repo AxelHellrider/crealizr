@@ -27,6 +27,7 @@ export default function CombatBalancerPage() {
     const [mode, setMode] = useState<Mode>("solo");
     const [ruleset, setRuleset] = useState<Ruleset>("2014");
     const [budgetMode, setBudgetMode] = useState<BudgetMode>("encounter");
+    const [groupTypes, setGroupTypes] = useState(2);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     const budget = useMemo(() => {
@@ -56,8 +57,9 @@ export default function CombatBalancerPage() {
             difficulty,
             ruleset,
             budget,
+            maxTypes: groupTypes,
         });
-    }, [avgLevel, partySize, difficulty, ruleset, budget]);
+    }, [avgLevel, partySize, difficulty, ruleset, budget, groupTypes]);
 
     const partyPresets = [
         { label: "3 PCs", size: 3 },
@@ -193,6 +195,21 @@ export default function CombatBalancerPage() {
                         <option value="group">Horde / Group</option>
                     </Select>
                 </FormField>
+
+                {mode === "group" && (
+                    <FormField label="Mix Types">
+                        <Select
+                            value={groupTypes}
+                            onChange={(e) => setGroupTypes(Number(e.target.value))}
+                            aria-label="Maximum CR types in a group"
+                        >
+                            <option value={2}>2 Types</option>
+                            <option value={3}>3 Types</option>
+                            <option value={4}>4 Types</option>
+                            <option value={5}>5 Types</option>
+                        </Select>
+                    </FormField>
+                )}
             </div>
 
             <Button
@@ -225,6 +242,9 @@ export default function CombatBalancerPage() {
                     <span className="border border-gold/20 px-3 py-1">{difficulty}</span>
                     <span className="border border-gold/20 px-3 py-1">{ruleset} ruleset</span>
                     <span className="border border-gold/20 px-3 py-1">{budgetMode} budget</span>
+                    {mode === "group" && (
+                        <span className="border border-gold/20 px-3 py-1">up to {groupTypes} types</span>
+                    )}
                 </div>
 
                 <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">

@@ -133,7 +133,9 @@ export function suggestEncounters(opts: {
         }
     }
 
-    return results.sort((a, b) => b.fit - a.fit).slice(0, 12);
+    return results
+        .sort((a, b) => (b.fit - a.fit) || (a.adjustedXP - b.adjustedXP))
+        .slice(0, 12);
 }
 
 export type GroupMember = { cr: number; count: number; xpEach: number };
@@ -150,6 +152,7 @@ export function suggestGroupEncounters(opts: {
     difficulty: Difficulty;
     ruleset: Ruleset;
     budget: number;
+    maxTypes?: number;
 }): GroupSuggestion[] {
     const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
     const crs = Object.entries(rulesetXP)
@@ -157,29 +160,69 @@ export function suggestGroupEncounters(opts: {
 
     const results: GroupSuggestion[] = [];
     const seen = new Set<string>();
+    const maxTypes = Math.min(5, Math.max(2, opts.maxTypes ?? 2));
+
+    const buildCompositions = (total: number, parts: number, min: number = 1): number[][] => {
+        if (parts === 1) {
+            return total >= min ? [[total]] : [];
+        }
+        const combos: number[][] = [];
+        for (let i = min; i <= total - (parts - 1) * min; i += 1) {
+            const tails = buildCompositions(total - i, parts - 1, min);
+            tails.forEach((tail) => combos.push([i, ...tail]));
+        }
+        return combos;
+    };
+
+    const buildCombinations = <T>(arr: T[], size: number, start = 0, path: T[] = [], out: T[][] = []) => {
+        if (path.length === size) {
+            out.push([...path]);
+            return out;
+        }
+        for (let i = start; i <= arr.length - (size - path.length); i += 1) {
+            path.push(arr[i]);
+            buildCombinations(arr, size, i + 1, path, out);
+            path.pop();
+        }
+        return out;
+    };
 
     for (let n = 2; n <= 8; n++) {
-        for (const a of crs) {
-            for (const b of crs) {
-                const members = [
-                    { cr: a.cr, count: Math.floor(n / 2), xpEach: a.xp },
-                    { cr: b.cr, count: n - Math.floor(n / 2), xpEach: b.xp },
-                ];
+        const multiplier = encounterMultiplier(n);
+        const targetPer = opts.budget / (multiplier * n);
+        const candidates = [...crs]
+            .sort((a, b) => Math.abs(a.xp - targetPer) - Math.abs(b.xp - targetPer))
+            .slice(0, 8);
 
-                const key = members.map(m => `${m.cr}x${m.count}`).join("|");
-                if (seen.has(key)) continue;
+        for (let typeCount = 2; typeCount <= Math.min(maxTypes, n, candidates.length); typeCount += 1) {
+            const crCombos = buildCombinations(candidates, typeCount);
+            const compositions = buildCompositions(n, typeCount);
 
-                const totalXP = members.reduce((s, m) => s + m.count * m.xpEach, 0);
-                const adj = Math.round(totalXP * encounterMultiplier(n));
-                const fit = Math.min(opts.budget, adj) / Math.max(opts.budget, adj);
+            for (const combo of crCombos) {
+                for (const counts of compositions) {
+                    const members = combo.map((entry, idx) => ({
+                        cr: entry.cr,
+                        count: counts[idx],
+                        xpEach: entry.xp,
+                    }));
 
-                if (fit >= 0.7) {
-                    seen.add(key);
-                    results.push({ members, totalCount: n, adjustedXP: adj, fit });
+                    const key = members.map((m) => `${m.cr}x${m.count}`).join("|");
+                    if (seen.has(key)) continue;
+
+                    const totalXP = members.reduce((s, m) => s + m.count * m.xpEach, 0);
+                    const adj = Math.round(totalXP * multiplier);
+                    const fit = Math.min(opts.budget, adj) / Math.max(opts.budget, adj);
+
+                    if (fit >= 0.7) {
+                        seen.add(key);
+                        results.push({ members, totalCount: n, adjustedXP: adj, fit });
+                    }
                 }
             }
         }
     }
 
-    return results.sort((a, b) => b.fit - a.fit).slice(0, 12);
+    return results
+        .sort((a, b) => (b.fit - a.fit) || (a.adjustedXP - b.adjustedXP))
+        .slice(0, 12);
 }

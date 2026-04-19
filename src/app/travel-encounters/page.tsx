@@ -4,10 +4,11 @@ import { useState } from "react";
 import {
   Terrain,
   getTravelEncounter,
-  rollD200,
+  rollD500,
   TRAVEL_ENCOUNTER_TABLES,
   EncounterOutcome,
-  EncounterType
+  EncounterType,
+  TERRAINS
 } from "@/app/utils/travelEncounter";
 import { Select } from "@/app/components/atoms/Select";
 import { Input } from "@/app/components/atoms/Input";
@@ -30,9 +31,10 @@ export default function EncountersEnRoutePage() {
   const [partySize, setPartySize] = useState(4);
   const [avgLevel, setAvgLevel] = useState(5);
   const [difficulty] = useState<Difficulty>("medium");
+  const [showTables, setShowTables] = useState(false);
 
   const handleRoll = () => {
-    const roll = rollD200();
+    const roll = rollD500();
     const outcome = getTravelEncounter(terrain, roll, typeFilter);
     setResult({ roll, outcome });
     setShowBalancer(false);
@@ -72,7 +74,7 @@ export default function EncountersEnRoutePage() {
     budget,
   });
 
-  const terrains: Terrain[] = Object.keys(TRAVEL_ENCOUNTER_TABLES) as Terrain[];
+  const terrains: Terrain[] = TERRAINS;
 
   return (
     <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
@@ -236,39 +238,52 @@ export default function EncountersEnRoutePage() {
         </Card>
       )}
 
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-6 border-b border-gold/10 pb-3">
-          <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">
-            Table Preview: {terrain}
-          </h3>
-          {typeFilter !== "all" && (
-            <span className="text-[10px] px-3 py-1 bg-gold/5 text-gold rounded-sm border border-gold/20 uppercase font-bold tracking-widest shadow-glow">
-              Filter: {typeFilter}
-            </span>
-          )}
-        </div>
-        <div className="grid gap-3 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-          {TRAVEL_ENCOUNTER_TABLES[terrain]
-            .filter((item) => typeFilter === "all" || item.type === typeFilter)
-            .map((item, idx) => (
-            <div key={idx} className="flex gap-4 p-4 rounded-sm bg-card border border-gold/5 hover:border-gold/20 transition-all">
-              <span className={`font-mono w-20 flex-shrink-0 text-center rounded-sm border border-gold/20 bg-gold/5 py-1 text-gold font-bold`}>
-                {item.range[0] === item.range[1] ? item.range[0] : `${item.range[0]}-${item.range[1]}`}
-              </span>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-foreground font-light">{item.description}</span>
-                <span className={`text-[9px] uppercase font-bold tracking-[0.1em] ${
-                  item.type === 'combat' ? 'text-crimson' :
-                  item.type === 'survival' ? 'text-amber-500' :
-                  item.type === 'benefit' ? 'text-green-500' :
-                  'text-blue-400'
-                }`}>
-                  {item.type}
+      <div className="mt-6 flex flex-col gap-4">
+        <Button
+          onClick={() => setShowTables((prev) => !prev)}
+          variant="secondary"
+          className="w-full uppercase tracking-[0.2em] text-[11px]"
+          aria-expanded={showTables}
+        >
+          {showTables ? "Hide DM Tables" : "Show DM Tables"}
+        </Button>
+
+        {showTables && (
+          <div className="mt-2">
+            <div className="flex justify-between items-center mb-6 border-b border-gold/10 pb-3">
+              <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">
+                DM Tables: {terrain}
+              </h3>
+              {typeFilter !== "all" && (
+                <span className="text-[10px] px-3 py-1 bg-gold/5 text-gold rounded-sm border border-gold/20 uppercase font-bold tracking-widest shadow-glow">
+                  Filter: {typeFilter}
                 </span>
-              </div>
+              )}
             </div>
-          ))}
-        </div>
+            <div className="grid gap-3 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+              {TRAVEL_ENCOUNTER_TABLES[terrain]
+                .filter((item) => typeFilter === "all" || item.type === typeFilter)
+                .map((item, idx) => (
+                  <div key={idx} className="flex gap-4 p-4 rounded-sm bg-card border border-gold/5 hover:border-gold/20 transition-all">
+                    <span className="font-mono w-20 flex-shrink-0 text-center rounded-sm border border-gold/20 bg-gold/5 py-1 text-gold font-bold">
+                      {item.range[0] === item.range[1] ? item.range[0] : `${item.range[0]}-${item.range[1]}`}
+                    </span>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-foreground font-light">{item.description}</span>
+                      <span className={`text-[9px] uppercase font-bold tracking-[0.1em] ${
+                        item.type === 'combat' ? 'text-crimson' :
+                        item.type === 'survival' ? 'text-amber-500' :
+                        item.type === 'benefit' ? 'text-green-500' :
+                        'text-blue-400'
+                      }`}>
+                        {item.type}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

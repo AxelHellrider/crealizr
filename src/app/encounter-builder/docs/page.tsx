@@ -70,10 +70,10 @@ export default function BalanceDocsPage() {
       </ul>
       <p>In Groups mode, for a total count N we estimate a target per-creature base XP as:</p>
       <p><Code>targetPer = budget / (multiplier(N) × N)</Code></p>
-      <p>We then pick a handful of CRs whose base XP is closest to <Code>targetPer</Code> and enumerate compact mixes:</p>
+      <p>We then pick a handful of CRs whose base XP is closest to <Code>targetPer</Code> and enumerate compact mixes, up to a max number of distinct CR types:</p>
       <ul>
         <li>Two-type mixes: <Code>k</Code> of CR A and <Code>N − k</Code> of CR B, for 1 ≤ k ≤ N−1.</li>
-        <li>Three-type mixes for small N (≤5) to add variety, splitting N into x+y+z.</li>
+        <li>Three+ type mixes (up to the configured max), splitting N into x+y+z (and beyond).</li>
       </ul>
       <p>For each mix, adjusted XP is:</p>
       <p><Code>adjustedXP = round((Σ countᵢ × xpEachᵢ) × multiplier(N))</Code></p>
