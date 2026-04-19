@@ -31,6 +31,7 @@ export default function Footer() {
                             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60 border-b border-gold/10 pb-2">Project</h3>
                             <nav className="flex flex-col gap-2 text-sm font-semibold tracking-widest">
                                 <a href="https://github.com/AxelHellrider" target="_blank" rel="noreferrer" className="ui-link transition uppercase hover:text-gold">GitHub</a>
+                                <Link href="/contact" className="ui-link transition uppercase hover:text-gold">Contact</Link>
                                 <Link href="/docs" className="ui-link transition uppercase hover:text-gold">Docs</Link>
                             </nav>
                         </div>

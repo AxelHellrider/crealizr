@@ -12,5 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `https://crealizr.net/artifact-forge`, lastModified: now },
     { url: `https://crealizr.net/artifact-forge/docs`, lastModified: now },
     { url: `https://crealizr.net/travel-encounters`, lastModified: now },
+    { url: `https://crealizr.net/contact`, lastModified: now },
   ];
 }

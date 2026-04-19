@@ -32,7 +32,7 @@ export default function Header() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
+                <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
                     <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounter-builder">
                         ENCOUNTER BUILDER
                     </Link>
@@ -47,6 +47,12 @@ export default function Header() {
                     </Link>
 
                     <div className="flex items-center gap-4 ml-4">
+                        <Link
+                            href="/contact"
+                            className="ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                        >
+                            Contact
+                        </Link>
                         {mounted && (
                             <button
                                 onClick={toggleTheme}
@@ -72,7 +78,7 @@ export default function Header() {
                 </nav>
 
                 {/* Mobile Menu Button + Theme Toggle */}
-                <div className="flex items-center gap-4 md:hidden">
+                <div className="flex items-center gap-4 lg:hidden">
                     {mounted && (
                         <button
                             onClick={toggleTheme}
@@ -105,7 +111,7 @@ export default function Header() {
 
             {/* Mobile Menu Panel */}
             {open && (
-                <div id="mobile-menu" className="md:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div id="mobile-menu" className="lg:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
                     <nav className="flex flex-col gap-2 px-4 py-4 text-sm font-semibold tracking-widest" aria-label="Mobile Navigation">
                         <Link
                             href="/encounter-builder"
@@ -134,6 +140,14 @@ export default function Header() {
                             onClick={() => setOpen(false)}
                         >
                             ARTIFACT FORGE
+                        </Link>
+
+                        <Link
+                            href="/contact"
+                            className="ui-button mt-4 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                            onClick={() => setOpen(false)}
+                        >
+                            Contact
                         </Link>
 
                         <a
