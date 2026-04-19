@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -25,27 +25,25 @@ declare global {
 }
 
 export function ContactForm() {
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+  const turnstileEnabled = Boolean(turnstileSiteKey);
+
   const [state, setState] = useState<SubmitState>("idle");
   const [error, setError] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
-  const [turnstileReady, setTurnstileReady] = useState(false);
+  const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
+  const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
 
   const startedAt = useMemo(() => Date.now(), []);
   const widgetRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
 
-  function renderTurnstile() {
+  const renderTurnstile = useCallback(() => {
+    if (!turnstileEnabled || !turnstileScriptLoaded) return;
     if (!window.turnstile || !widgetRef.current || widgetIdRef.current) return;
 
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    if (!siteKey) {
-      setError("Turnstile site key is missing.");
-      setState("error");
-      return;
-    }
-
     widgetIdRef.current = window.turnstile.render(widgetRef.current, {
-      sitekey: siteKey,
+      sitekey: turnstileSiteKey,
       theme: "auto",
       callback: (token: string) => {
         setTurnstileToken(token);
@@ -63,15 +61,20 @@ export function ContactForm() {
         setState("error");
       },
     });
-  }
+  }, [turnstileEnabled, turnstileScriptLoaded, turnstileSiteKey]);
 
   function resetTurnstile() {
+    if (!turnstileEnabled) return;
     if (window.turnstile && widgetIdRef.current) {
       window.turnstile.reset(widgetIdRef.current);
     }
     setTurnstileToken("");
     setTurnstileReady(false);
   }
+
+  useEffect(() => {
+    renderTurnstile();
+  }, [renderTurnstile]);
 
   useEffect(() => {
     return () => {
@@ -84,7 +87,7 @@ export function ContactForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!turnstileToken) {
+    if (turnstileEnabled && !turnstileToken) {
       setState("error");
       setError("Please complete the captcha before sending.");
       return;
@@ -132,11 +135,13 @@ export function ContactForm() {
 
   return (
       <>
-        <Script
-            src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-            strategy="afterInteractive"
-            onLoad={renderTurnstile}
-        />
+        {turnstileEnabled && (
+          <Script
+              src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+              strategy="afterInteractive"
+              onLoad={() => setTurnstileScriptLoaded(true)}
+          />
+        )}
 
         <form onSubmit={onSubmit} className="mt-6 grid gap-4" noValidate>
           <p className="hidden" aria-hidden="true">
@@ -180,17 +185,23 @@ export function ContactForm() {
             />
           </label>
 
-          <div className="grid gap-2">
-            <span className="text-xs uppercase tracking-widest text-muted">Verification</span>
-            <div ref={widgetRef} />
-          </div>
+          {turnstileEnabled && (
+            <div className="grid gap-2">
+              <span className="text-xs uppercase tracking-widest text-muted">Verification</span>
+              <div ref={widgetRef} />
+            </div>
+          )}
 
           <button
               type="submit"
-              disabled={state === "submitting" || !turnstileReady}
+              disabled={state === "submitting" || (turnstileEnabled && !turnstileReady)}
               className="ui-button ui-button-primary mt-2 w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {state === "submitting" ? "Sending..." : !turnstileReady ? "Complete Verification" : "Send Message"}
+            {state === "submitting"
+              ? "Sending..."
+              : turnstileEnabled && !turnstileReady
+                ? "Complete Verification"
+                : "Send Message"}
           </button>
 
           {state === "success" && (

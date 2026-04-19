@@ -9,6 +9,7 @@ import {Suspense} from "react";
 import {ThemeProvider} from "@/app/context/ThemeContext";
 import {MobileBackToToolkit} from "@/app/components/atoms/MobileBackToToolkit";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
+import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 
 const cinzel = Cinzel({
     variable: "--font-cinzel",
@@ -56,6 +57,8 @@ export default function RootLayout({
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    runStartupEnvCheck();
+
     return (
         <html lang="en" suppressHydrationWarning>
         <body

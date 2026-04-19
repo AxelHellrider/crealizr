@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
+import nodemailer from "nodemailer";
 import { POST } from "@/app/api/contact/route";
 
 type ContactPayload = {
@@ -28,22 +29,38 @@ async function responseBody(response: Response) {
 }
 
 describe("contact api validation and credibility", () => {
-  const originalWebhook = process.env.CONTACT_WEBHOOK_URL;
+  const originalTurnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+  const originalSmtpHost = process.env.SMTP_HOST;
+  const originalSmtpUser = process.env.SMTP_USER;
+  const originalSmtpPass = process.env.SMTP_PASS;
+  const originalMailFrom = process.env.MAIL_FROM;
+  const originalMailTo = process.env.MAIL_TO;
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    process.env.CONTACT_WEBHOOK_URL = "https://example.test/webhook";
+    process.env.TURNSTILE_SECRET_KEY = "";
+    process.env.SMTP_HOST = "smtp.example.com";
+    process.env.SMTP_USER = "mailer@example.com";
+    process.env.SMTP_PASS = "secret";
+    process.env.MAIL_FROM = "mailer@example.com";
+    process.env.MAIL_TO = "contact@crealizr.net";
+    vi.spyOn(nodemailer, "createTransport").mockReturnValue({
+      sendMail: vi.fn().mockResolvedValue({}),
+    } as unknown as ReturnType<typeof nodemailer.createTransport>);
     (globalThis as { __contactRateBuckets?: Map<string, { count: number; resetAt: number }> }).__contactRateBuckets?.clear();
   });
 
   afterEach(() => {
-    process.env.CONTACT_WEBHOOK_URL = originalWebhook;
+    process.env.TURNSTILE_SECRET_KEY = originalTurnstileSecret;
+    process.env.SMTP_HOST = originalSmtpHost;
+    process.env.SMTP_USER = originalSmtpUser;
+    process.env.SMTP_PASS = originalSmtpPass;
+    process.env.MAIL_FROM = originalMailFrom;
+    process.env.MAIL_TO = originalMailTo;
   });
 
-  it("accepts a credible valid payload and forwards it", async () => {
+  it("accepts a credible valid payload and sends email", async () => {
     vi.spyOn(Date, "now").mockReturnValue(10_000);
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal("fetch", fetchMock);
 
     const payload: ContactPayload = {
       name: "Alice DM",
@@ -57,13 +74,10 @@ describe("contact api validation and credibility", () => {
 
     expect(response.status).toBe(200);
     expect(body.ok).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("accepts max-length boundary values", async () => {
     vi.spyOn(Date, "now").mockReturnValue(20_000);
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal("fetch", fetchMock);
 
     const payload: ContactPayload = {
       name: "A".repeat(100),
@@ -127,8 +141,6 @@ describe("contact api validation and credibility", () => {
 
   it("rate-limits bursts after five attempts per client key", async () => {
     vi.spyOn(Date, "now").mockReturnValue(10_000);
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal("fetch", fetchMock);
 
     const payload: ContactPayload = {
       name: "Alice DM",

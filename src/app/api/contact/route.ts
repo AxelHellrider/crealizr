@@ -84,6 +84,7 @@ function validatePayload(payload: ContactPayload): string | null {
   const company = sanitizeInput(payload.company || "");
   const startedAt = Number(payload.startedAt || 0);
   const turnstileToken = sanitizeInput(payload.turnstileToken || "");
+  const turnstileEnabled = Boolean(process.env.TURNSTILE_SECRET_KEY);
 
   if (company.length > 0) {
     return "Invalid submission.";
@@ -105,7 +106,7 @@ function validatePayload(payload: ContactPayload): string | null {
     return "Submission completed too quickly. Please try again.";
   }
 
-  if (!turnstileToken) {
+  if (turnstileEnabled && !turnstileToken) {
     return "Captcha verification is required.";
   }
 
@@ -124,11 +125,19 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
   body.append("response", token);
   if (ip) body.append("remoteip", ip);
 
-  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    body,
-    signal: AbortSignal.timeout(5000),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
+  let response: Response;
+  try {
+    response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     throw new Error("Turnstile verification request failed.");
@@ -145,7 +154,7 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
 async function sendContactEmail(payload: Required<Pick<ContactPayload, "name" | "email" | "message">>) {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 465);
-  const secure = process.env.SMTP_SECURE === "true";
+  const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   const from = process.env.MAIL_FROM || user;
@@ -217,15 +226,18 @@ export async function POST(request: NextRequest) {
   const message = sanitizeInput(payload.message || "");
   const turnstileToken = sanitizeInput(payload.turnstileToken || "");
   const ip = getClientIp(request);
+  const turnstileEnabled = Boolean(process.env.TURNSTILE_SECRET_KEY);
 
   try {
-    const isHuman = await verifyTurnstile(turnstileToken, ip);
+    if (turnstileEnabled) {
+      const isHuman = await verifyTurnstile(turnstileToken, ip);
 
-    if (!isHuman) {
-      return NextResponse.json(
+      if (!isHuman) {
+        return NextResponse.json(
           { error: "Captcha verification failed. Please try again." },
           { status: 400 }
-      );
+        );
+      }
     }
 
     await sendContactEmail({ name, email, message });

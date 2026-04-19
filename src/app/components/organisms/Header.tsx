@@ -79,6 +79,12 @@ export default function Header() {
 
                 {/* Mobile Menu Button + Theme Toggle */}
                 <div className="flex items-center gap-4 lg:hidden">
+                    <Link
+                        href="/contact"
+                        className="ui-button px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                    >
+                        Contact
+                    </Link>
                     {mounted && (
                         <button
                             onClick={toggleTheme}
