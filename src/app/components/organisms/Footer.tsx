@@ -51,8 +51,7 @@ export default function Footer() {
             </div>
 
             {/* Decorative strip */}
-            <div className="relative w-full border-t border-gold/10 bg-card/10">
-                <div className="absolute top-1/2 -translate-y-1/2 left-1 cf-turnstile" data-sitekey="0x4AAAAAAC_zOoHrqEjDG26R"></div>
+            <div className="w-full border-t border-gold/10 bg-card/10">
                 <div className="flex justify-center py-8 accent-gold text-lg tracking-[1.5em] select-none opacity-10">
                     ✦ ✧ ✦ ✧ ✦
                 </div>
