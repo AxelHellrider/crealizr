@@ -119,14 +119,14 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
     throw new Error("TURNSTILE_SECRET_KEY is missing.");
   }
 
-  const formData = new FormData();
-  formData.append("secret", secret);
-  formData.append("response", token);
-  if (ip) formData.append("remoteip", ip);
+  const body = new URLSearchParams();
+  body.append("secret", secret);
+  body.append("response", token);
+  if (ip) body.append("remoteip", ip);
 
   const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
-    body: formData,
+    body,
     signal: AbortSignal.timeout(5000),
   });
 
@@ -135,7 +135,11 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
   }
 
   const result = (await response.json()) as TurnstileVerifyResponse;
-  return result.success === true;
+  if (!result.success) {
+    console.error("Turnstile error codes:", result["error-codes"]);
+  }
+
+  return result.success;
 }
 
 async function sendContactEmail(payload: Required<Pick<ContactPayload, "name" | "email" | "message">>) {
@@ -228,8 +232,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error(error);
-
+    console.error("Contact form error:", error);
     return NextResponse.json(
         { error: "Message accepted but delivery failed. Please email contact@crealizr.net directly." },
         { status: 502 }
