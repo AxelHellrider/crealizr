@@ -33,9 +33,6 @@ export default function ContactPage() {
 
         <div className="rounded border border-gold/20 bg-card/40 p-6">
           <h2 className="text-xl font-serif uppercase tracking-wide">Quick Contact Form</h2>
-          <p className="text-muted mt-2">
-            Uses provider-agnostic spam defenses: honeypot, timing checks, validation, and rate limiting.
-          </p>
           <ContactForm />
         </div>
       </section>
