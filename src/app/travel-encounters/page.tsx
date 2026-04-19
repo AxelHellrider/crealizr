@@ -74,7 +74,7 @@ export default function EncountersEnRoutePage() {
     budget,
   });
 
-  const terrains: Terrain[] = TERRAINS;
+  const terrains: readonly Terrain[] = TERRAINS;
 
   return (
     <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
