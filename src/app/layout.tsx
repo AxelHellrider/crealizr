@@ -60,7 +60,6 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning>
         <body
             className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
-        <div className="cf-turnstile" data-sitekey="0x4AAAAAAC_zOoHrqEjDG26R"></div>
         <ThemeProvider>
             <SeoJsonLd/>
             {/* Top route change progress bar */}
