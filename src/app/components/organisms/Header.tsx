@@ -49,7 +49,7 @@ export default function Header() {
                     <div className="flex items-center gap-4 ml-4">
                         <Link
                             href="/contact"
-                            className="ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                            className="lg:hidden ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                         >
                             Contact
                         </Link>
