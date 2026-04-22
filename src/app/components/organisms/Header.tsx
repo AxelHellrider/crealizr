@@ -32,7 +32,7 @@ export default function Header() {
                 </Link>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
+                <nav className="hidden xl:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
                     <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounter-builder">
                         ENCOUNTER BUILDER
                     </Link>
@@ -78,7 +78,7 @@ export default function Header() {
                 </nav>
 
                 {/* Mobile Menu Button + Theme Toggle */}
-                <div className="flex items-center gap-4 lg:hidden">
+                <div className="flex items-center gap-4 xl:hidden">
                     <Link
                         href="/contact"
                         className="ui-button px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"

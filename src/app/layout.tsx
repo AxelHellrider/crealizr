@@ -79,8 +79,8 @@ export default function RootLayout({
             </div>
             <MobileBackToToolkit/>
         </ThemeProvider>
-        </body>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!}/>
+        </body>
         </html>
     );
 }

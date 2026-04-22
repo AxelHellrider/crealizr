@@ -153,12 +153,12 @@ async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
 
 async function sendContactEmail(payload: Required<Pick<ContactPayload, "name" | "email" | "message">>) {
   const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 465);
-  const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
+  const port = Number(process.env.SMTP_PORT);
+  const secure = Boolean(process.env.SMTP_SECURE);
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  const from = process.env.MAIL_FROM || user;
-  const to = process.env.MAIL_TO || "contact@crealizr.net";
+  const from = process.env.MAIL_FROM;
+  const to = process.env.MAIL_TO;
 
   if (!host || !user || !pass || !from || !to) {
     throw new Error("Email configuration is missing.");
