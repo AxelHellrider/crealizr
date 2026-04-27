@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ContactForm } from "@/app/contact/ContactForm";
+import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact | CRealizr",

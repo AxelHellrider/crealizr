@@ -1,25 +1,27 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "light" | "dark";
+import { getSeason, getThemeForSeason, type Season } from "@/app/lib/seasonalThemes";
 
 interface ThemeContextType {
-    theme: Theme;
-    toggleTheme: () => void;
+    season: Season;
+    setSeason: (season: Season) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setTheme] = useState<Theme>(() => {
+    const [season, setSeason] = useState<Season>(() => {
         if (typeof window !== "undefined") {
-            const savedTheme = localStorage.getItem("theme") as Theme | null;
-            if (savedTheme) return savedTheme;
-            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            const savedSeason = localStorage.getItem("theme-season") as Season | null;
+            if (savedSeason && ['spring', 'summer', 'autumn', 'winter'].includes(savedSeason)) {
+                return savedSeason;
+            }
+            return getSeason();
         }
-        return "dark";
+        return getSeason();
     });
+    
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -28,33 +30,36 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        if (!mounted) return;
-        const mql = window.matchMedia("(prefers-color-scheme: dark)");
-        const handler = (e: MediaQueryListEvent) => {
-            if (!localStorage.getItem("theme")) {
-                setTheme(e.matches ? "dark" : "light");
-            }
-        };
-        mql.addEventListener("change", handler);
-        return () => mql.removeEventListener("change", handler);
-    }, [mounted]);
-
-    useEffect(() => {
         if (mounted) {
-            document.documentElement.setAttribute("data-theme", theme);
+            document.documentElement.setAttribute("data-season", season);
+            
+            // Apply CSS variables for the current seasonal theme
+            const colors = getThemeForSeason(season);
+            const root = document.documentElement;
+            
+            root.style.setProperty('--bg', colors.bg);
+            root.style.setProperty('--bg-elev', colors.bgElev);
+            root.style.setProperty('--card', colors.card);
+            root.style.setProperty('--muted', colors.muted);
+            root.style.setProperty('--text', colors.text);
+            root.style.setProperty('--accent-gold', colors.accentPrimary);
+            root.style.setProperty('--accent-silver', colors.accentSecondary);
+            root.style.setProperty('--accent-crimson', colors.accentTertiary);
+            root.style.setProperty('--accent-blue-ishgard', colors.accentQuaternary);
+            root.style.setProperty('--border-gold', `1px solid ${colors.borderPrimary}`);
+            root.style.setProperty('--border-silver', `1px solid ${colors.borderSecondary}`);
+            root.style.setProperty('--glass-border', colors.glassBorder);
+            root.style.setProperty('--glass-bg', colors.glassBg);
         }
-    }, [theme, mounted]);
+    }, [season, mounted]);
 
-    const toggleTheme = () => {
-        setTheme((prev) => {
-            const next = prev === "light" ? "dark" : "light";
-            localStorage.setItem("theme", next);
-            return next;
-        });
+    const setSeasonHandler = (newSeason: Season) => {
+        setSeason(newSeason);
+        localStorage.setItem("theme-season", newSeason);
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ season, setSeason: setSeasonHandler }}>
             {children}
         </ThemeContext.Provider>
     );
