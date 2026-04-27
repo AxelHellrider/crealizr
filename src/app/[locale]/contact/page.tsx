@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
+    <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
       <header className="border-b border-gold/20 pb-6">
         <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Contact</h1>
         <p className="text-muted mt-2 font-light italic">

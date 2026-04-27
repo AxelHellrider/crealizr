@@ -4,15 +4,17 @@ import {GoogleAnalytics} from "@next/third-parties/google";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import "../globals.css";
-import Header from "@/app/components/organisms/Header";
+import Sidebar from "@/app/components/organisms/Sidebar";
 import Footer from "@/app/components/organisms/Footer";
 import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import {ThemeProvider} from "@/app/context/ThemeContext";
-import {MobileBackToToolkit} from "@/app/components/atoms/MobileBackToToolkit";
+import {SidebarProvider} from "@/app/context/SidebarContext";
+import SidebarToggle from "@/app/components/atoms/SidebarToggle";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 import {Locale} from "@/i18n/config";
+import MainContent from "@/app/components/organisms/MainContent";
 
 const cinzel = Cinzel({
     variable: "--font-cinzel",
@@ -57,11 +59,12 @@ export const metadata: Metadata = {
 
 export default async function LocaleLayout({
     children,
-    params: {locale}
+    params
 }: Readonly<{
     children: React.ReactNode;
-    params: {locale: Locale};
+    params: Promise<{locale: Locale}>;
 }>) {
+    const {locale} = await params;
     const messages = await getMessages();
     runStartupEnvCheck();
 
@@ -76,15 +79,14 @@ export default async function LocaleLayout({
                 <Suspense>
                     <RouteProgress/>
                 </Suspense>
-                {/* Isolated scroll container prevents viewport rubber-band bounce */}
-                <div className="scroll-container">
-                    <Header/>
-                    <main className="page-wrap">
+                <SidebarProvider>
+                    <SidebarToggle/>
+                    <Sidebar/>
+                    <MainContent>
                         {children}
-                    </main>
-                    <Footer/>
-                </div>
-                <MobileBackToToolkit/>
+                        <Footer/>
+                    </MainContent>
+                </SidebarProvider>
             </ThemeProvider>
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!}/>
         </NextIntlClientProvider>

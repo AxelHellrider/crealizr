@@ -9,7 +9,7 @@ export default function Footer() {
     return (
         <footer className="w-full mt-24">
             <div className="w-full bg-card/30 border-t border-gold/20 backdrop-blur-sm">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 px-8 py-20">
+                <div className="max-w-[calc(100svw - 2rem)] mx-auto flex flex-col md:flex-row justify-between gap-12 px-8 py-20">
                     {/* Brand */}
                     <div className="space-y-6">
                         <div className="inline-block px-4 py-1 border border-gold/30 bg-gold/5 rounded-sm">

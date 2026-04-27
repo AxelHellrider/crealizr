@@ -94,7 +94,7 @@ export default function CombatBalancerPage() {
     };
 
     return (
-        <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border">
+        <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
             <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                 <div>
                     <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Encounter Builder</h1>

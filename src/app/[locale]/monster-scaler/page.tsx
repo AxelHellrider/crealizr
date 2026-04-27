@@ -149,7 +149,7 @@ export default function ScalePage() {
     };
 
     return (
-        <section className="glass-panel p-8 sm:p-12 fantasy-border">
+        <section className="glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
             {step === 1 && (
                 <div className="grid gap-8">
                     <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
