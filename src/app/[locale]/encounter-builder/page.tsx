@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import {useLocale} from 'next-intl';
 import {
     partyBudget,
     suggestEncounters,
@@ -21,6 +22,7 @@ type Ruleset = "2014" | "2024";
 type BudgetMode = "encounter" | "daily";
 
 export default function CombatBalancerPage() {
+    const locale = useLocale();
     const [partySize, setPartySize] = useState(4);
     const [avgLevel, setAvgLevel] = useState(5);
     const [difficulty, setDifficulty] = useState<Difficulty>("medium");
@@ -102,7 +104,7 @@ export default function CombatBalancerPage() {
                     <p className="text-xs text-muted mt-2">2014/2024 toggles threshold and per-CR XP tables.</p>
                     <WhyDifferent className="mt-3" />
                 </div>
-                <Link href="/encounter-builder/docs" className="ui-link text-sm italic hidden sm:inline-flex">
+                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic hidden sm:inline-flex">
                     View Documentation
                 </Link>
             </header>
@@ -336,7 +338,7 @@ export default function CombatBalancerPage() {
             </p>
 
             <div className="sm:hidden pt-4">
-                <Link href="/encounter-builder/docs" className="ui-link text-sm italic inline-flex justify-center w-full">
+                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic inline-flex justify-center w-full">
                     View Documentation
                 </Link>
             </div>

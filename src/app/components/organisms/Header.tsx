@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "@/app/context/ThemeContext";
+import LanguageSwitcher from "@/app/components/atoms/LanguageSwitcher";
+import {useLocale} from 'next-intl';
 
 export default function Header() {
     const [open, setOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const locale = useLocale();
 
     useEffect(() => {
         const t = window.setTimeout(() => setMounted(true), 0);
@@ -27,28 +30,29 @@ export default function Header() {
         <header className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-md border-b border-gold/20">
             <div className="w-full flex items-center justify-between px-6 py-4">
                 {/* Logo */}
-                <Link href="/" className="text-2xl font-serif accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm">
+                <Link href={`/${locale}`} className="text-2xl font-serif accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm">
                     CRealizr
                 </Link>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden xl:flex items-center gap-8 text-sm font-semibold tracking-widest" aria-label="Main Navigation">
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/encounter-builder">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href={`/${locale}/encounter-builder`}>
                         ENCOUNTER BUILDER
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/monster-scaler">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href={`/${locale}/monster-scaler`}>
                         MONSTER SCALER
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/travel-encounters">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href={`/${locale}/travel-encounters`}>
                         TRAVEL ENCOUNTERS
                     </Link>
-                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href="/artifact-forge">
+                    <Link className="ui-link transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm" href={`/${locale}/artifact-forge`}>
                         ARTIFACT FORGE
                     </Link>
 
                     <div className="flex items-center gap-4 ml-4">
+                        <LanguageSwitcher />
                         <Link
-                            href="/contact"
+                            href={`/${locale}/contact`}
                             className="lg:block hidden ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                         >
                             Contact
@@ -79,8 +83,9 @@ export default function Header() {
 
                 {/* Mobile Menu Button + Theme Toggle */}
                 <div className="flex items-center gap-4 xl:hidden">
+                    <LanguageSwitcher />
                     <Link
-                        href="/contact"
+                        href={`/${locale}/contact`}
                         className="ui-button px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                     >
                         Contact
@@ -120,28 +125,28 @@ export default function Header() {
                 <div id="mobile-menu" className="lg:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
                     <nav className="flex flex-col gap-2 px-4 py-4 text-sm font-semibold tracking-widest" aria-label="Mobile Navigation">
                         <Link
-                            href="/encounter-builder"
+                            href={`/${locale}/encounter-builder`}
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             ENCOUNTER BUILDER
                         </Link>
                         <Link
-                            href="/monster-scaler"
+                            href={`/${locale}/monster-scaler`}
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             MONSTER SCALER
                         </Link>
                         <Link
-                            href="/travel-encounters"
+                            href={`/${locale}/travel-encounters`}
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
                             TRAVEL ENCOUNTERS
                         </Link>
                         <Link
-                            href="/artifact-forge"
+                            href={`/${locale}/artifact-forge`}
                             className="ui-link p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm"
                             onClick={() => setOpen(false)}
                         >
@@ -149,7 +154,7 @@ export default function Header() {
                         </Link>
 
                         <Link
-                            href="/contact"
+                            href={`/${locale}/contact`}
                             className="ui-button mt-4 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                             onClick={() => setOpen(false)}
                         >

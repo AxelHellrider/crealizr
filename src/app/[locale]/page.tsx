@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
+import {Locale} from "@/i18n/config";
 
 export const metadata: Metadata = {
     title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
@@ -44,7 +45,7 @@ export const viewport: Viewport = {
     viewportFit: "cover",
 };
 
-export default function Home() {
+export default function Home({params: {locale}}: {params: {locale: Locale}}) {
   return (
     <div className="flex flex-col gap-16 sm:gap-20 -mt-4">
       {/* Hero Section */}
@@ -64,17 +65,17 @@ export default function Home() {
           </p>
           <WhyDifferent className="mt-6" />
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link href="/encounter-builder">
+            <Link href={`/${locale}/encounter-builder`}>
               <Button variant="primary" className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Build an Encounter
               </Button>
             </Link>
-            <Link href="/monster-scaler">
+            <Link href={`/${locale}/monster-scaler`}>
               <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Scale a Monster
               </Button>
             </Link>
-            <Link href="/artifact-forge">
+            <Link href={`/${locale}/artifact-forge`}>
               <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
                 Forge an Item
               </Button>
@@ -178,7 +179,7 @@ export default function Home() {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-3">
-          <Link href="/monster-scaler" className="group">
+          <Link href={`/${locale}/monster-scaler`} className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
                 <span className="text-3xl">⚖️</span>
@@ -193,7 +194,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/encounter-builder" className="group">
+          <Link href={`/${locale}/encounter-builder`} className="group">
             <Card className="p-10 border-silver/10 hover:border-silver/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-silver/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-silver transition-all shadow-glow bg-bg">
                 <span className="text-3xl">⚔️</span>
@@ -208,7 +209,7 @@ export default function Home() {
             </Card>
           </Link>
 
-          <Link href="/artifact-forge" className="group">
+          <Link href={`/${locale}/artifact-forge`} className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
               <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
                 <span className="text-3xl">✨</span>

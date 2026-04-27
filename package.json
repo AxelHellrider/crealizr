@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@next/third-parties": "16.2.4",
+    "next-intl": "^4.9.2",
     "nodemailer": "8.0.5"
   }
 }

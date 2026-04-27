@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import {useLocale} from 'next-intl';
 
 export default function Footer() {
+    const locale = useLocale();
+
     return (
         <footer className="w-full mt-24">
             <div className="w-full bg-card/30 border-t border-gold/20 backdrop-blur-sm">
@@ -21,18 +26,18 @@ export default function Footer() {
                         <div className="space-y-4">
                             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60 border-b border-gold/10 pb-2">Utilities</h3>
                             <nav className="flex flex-col gap-2 text-sm font-semibold tracking-widest">
-                                <Link href="/encounter-builder" className="ui-link transition uppercase hover:text-gold">Encounter Builder</Link>
-                                <Link href="/monster-scaler" className="ui-link transition uppercase hover:text-gold">Monster Scaler</Link>
-                                <Link href="/travel-encounters" className="ui-link transition uppercase hover:text-gold">Travel Encounters</Link>
-                                <Link href="/artifact-forge" className="ui-link transition uppercase hover:text-gold">Artifact Forge</Link>
+                                <Link href={`/${locale}/encounter-builder`} className="ui-link transition uppercase hover:text-gold">Encounter Builder</Link>
+                                <Link href={`/${locale}/monster-scaler`} className="ui-link transition uppercase hover:text-gold">Monster Scaler</Link>
+                                <Link href={`/${locale}/travel-encounters`} className="ui-link transition uppercase hover:text-gold">Travel Encounters</Link>
+                                <Link href={`/${locale}/artifact-forge`} className="ui-link transition uppercase hover:text-gold">Artifact Forge</Link>
                             </nav>
                         </div>
                         <div className="space-y-4">
                             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60 border-b border-gold/10 pb-2">Project</h3>
                             <nav className="flex flex-col gap-2 text-sm font-semibold tracking-widest">
                                 <a href="https://github.com/AxelHellrider" target="_blank" rel="noreferrer" className="ui-link transition uppercase hover:text-gold">GitHub</a>
-                                <Link href="/contact" className="ui-link transition uppercase hover:text-gold">Contact</Link>
-                                <Link href="/docs" className="ui-link transition uppercase hover:text-gold">Docs</Link>
+                                <Link href={`/${locale}/contact`} className="ui-link transition uppercase hover:text-gold">Contact</Link>
+                                <Link href={`/${locale}/docs`} className="ui-link transition uppercase hover:text-gold">Docs</Link>
                             </nav>
                         </div>
                     </div>
