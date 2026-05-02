@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { buildItem, ItemType } from "@/app/utils/items";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
@@ -61,6 +62,7 @@ const EXAMPLE_ITEMS = [
 ];
 
 export default function ItemCreatorPage() {
+  const t = useTranslations("artifactForge");
   const [name, setName] = useState("");
   const [type, setType] = useState<ItemType>("Weapon");
   const [attunement, setAttunement] = useState(false);
@@ -176,23 +178,23 @@ export default function ItemCreatorPage() {
     <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
       <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
         <div>
-          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Artifact Forge</h1>
+          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
           <p className="text-muted mt-2 font-light italic">
-            Craft items with balanced mechanical bonuses and a clear crafting story.
+            {t("description")}
           </p>
           <WhyDifferent className="mt-3" />
         </div>
-        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden sm:inline-flex">{t("viewDocs")}</a>
       </header>
 
       <Card className="p-6 border-gold/10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Quick actions</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("quickActions")}</div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button onClick={applyExample} className="px-4 text-xs font-bold uppercase tracking-widest">Use Example</Button>
-              <Button onClick={clearFlavor} className="px-4 text-xs font-bold uppercase tracking-widest">Clear Flavor</Button>
-              <Button onClick={clearCrafting} className="px-4 text-xs font-bold uppercase tracking-widest">Clear Crafting</Button>
+              <Button onClick={applyExample} className="px-4 text-xs font-bold uppercase tracking-widest">{t("useExample")}</Button>
+              <Button onClick={clearFlavor} className="px-4 text-xs font-bold uppercase tracking-widest">{t("clearFlavor")}</Button>
+              <Button onClick={clearCrafting} className="px-4 text-xs font-bold uppercase tracking-widest">{t("clearCrafting")}</Button>
             </div>
           </div>
           <label className="flex items-center gap-3 cursor-pointer group">
@@ -202,18 +204,18 @@ export default function ItemCreatorPage() {
               checked={lockMechanics}
               onChange={(e) => setLockMechanics(e.target.checked)}
             />
-            <span className="text-xs font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">Lock Mechanics</span>
+            <span className="text-xs font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">{t("lockMechanics")}</span>
           </label>
         </div>
         <p className="mt-4 text-sm text-muted">
-          Mechanical bonuses are tuned by rarity band; adjust up or down to match your table&apos;s power curve.
+          {t("mechanicsNote")}
         </p>
       </Card>
 
       <div className="grid gap-4 sm:grid-cols-3">
         {EXAMPLE_ITEMS.slice(0, 3).map((example) => (
           <Card key={example.name} className="p-5 border-gold/10 bg-card">
-            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Example</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("example")}</div>
             <h3 className="mt-2 font-serif text-lg accent-gold">{example.name}</h3>
             <p className="text-xs text-muted mt-1">{example.type} · Level {example.level}</p>
             <p className="text-sm text-muted mt-3 italic">&quot;{example.lore}&quot;</p>
@@ -223,13 +225,13 @@ export default function ItemCreatorPage() {
 
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-          Mechanics
+          {t("mechanics")}
         </div>
-        <FormField label="Item Name">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Sunspear of Pelor" />
+        <FormField label={t("itemName")}>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("itemNamePlaceholder")} />
         </FormField>
 
-        <FormField label="Item Type">
+        <FormField label={t("itemType")}>
           <Select value={type} onChange={(e) => setType(e.target.value as ItemType)}>
             {TYPES.map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -237,14 +239,14 @@ export default function ItemCreatorPage() {
           </Select>
         </FormField>
 
-        <FormField label="Recommended Level">
+        <FormField label={t("recommendedLevel")}>
           <Input type="number" value={level} onChange={(e) => setLevel(Number(e.target.value))} />
         </FormField>
 
-        <FormField label="Effective Against" sublabel="Optional">
+        <FormField label={t("effectiveAgainst")} sublabel={t("optional")}>
           <div className="flex gap-2">
-            <Input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder="e.g., undead, dragon" />
-            <Button onClick={addTag} className="px-4 text-xs font-bold">ADD</Button>
+            <Input value={tagInput} onChange={(e) => setTagInput(e.target.value)} placeholder={t("effectiveAgainstPlaceholder")} />
+            <Button onClick={addTag} className="px-4 text-xs font-bold">{t("add")}</Button>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {COMMON_TARGETS.map((target) => (
@@ -269,14 +271,14 @@ export default function ItemCreatorPage() {
         </FormField>
 
         <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-          Flavor & Crafting
+          {t("flavorCrafting")}
         </div>
-        <FormField label="Crafting Ingredients" sublabel="Optional">
+        <FormField label={t("craftingIngredients")} sublabel={t("optional")}>
           <div className="grid gap-2 sm:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
-            <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder="Ingredient name" />
-            <Input type="number" value={ingredientQty} onChange={(e) => setIngredientQty(e.target.value === "" ? "" : Number(e.target.value))} placeholder="Qty" />
-            <Input value={ingredientUnit} onChange={(e) => setIngredientUnit(e.target.value)} placeholder="Unit (optional)" />
-            <Button onClick={addIngredient} className="px-4 text-xs font-bold">ADD</Button>
+            <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder={t("ingredientNamePlaceholder")} />
+            <Input type="number" value={ingredientQty} onChange={(e) => setIngredientQty(e.target.value === "" ? "" : Number(e.target.value))} placeholder={t("qtyPlaceholder")} />
+            <Input value={ingredientUnit} onChange={(e) => setIngredientUnit(e.target.value)} placeholder={t("unitPlaceholder")} />
+            <Button onClick={addIngredient} className="px-4 text-xs font-bold">{t("add")}</Button>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {QUICK_INGREDIENTS.map((ingredient) => (
@@ -300,30 +302,30 @@ export default function ItemCreatorPage() {
           </div>
         </FormField>
 
-        <FormField label="Crafting Cost (gp)" sublabel="Optional">
-          <Input type="number" value={craftingCost} onChange={(e) => setCraftingCost(e.target.value === "" ? "" : Number(e.target.value))} placeholder="e.g., 100" />
+        <FormField label={t("craftingCost")} sublabel={t("optional")}>
+          <Input type="number" value={craftingCost} onChange={(e) => setCraftingCost(e.target.value === "" ? "" : Number(e.target.value))} placeholder={t("craftingCostPlaceholder")} />
         </FormField>
 
-        <FormField label="Crafting Time" sublabel="Optional">
+        <FormField label={t("craftingTime")} sublabel={t("optional")}>
           <div className="grid gap-2 sm:grid-cols-[1fr_1fr]">
-            <Input type="number" value={craftingTime} onChange={(e) => setCraftingTime(e.target.value === "" ? "" : Number(e.target.value))} placeholder="e.g., 2" />
+            <Input type="number" value={craftingTime} onChange={(e) => setCraftingTime(e.target.value === "" ? "" : Number(e.target.value))} placeholder={t("craftingTimePlaceholder")} />
             <Select value={craftingTimeUnit} onChange={(e) => setCraftingTimeUnit(e.target.value as "hours" | "days" | "weeks")}>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
+              <option value="hours">{t("hours")}</option>
+              <option value="days">{t("days")}</option>
+              <option value="weeks">{t("weeks")}</option>
             </Select>
           </div>
         </FormField>
 
-        <FormField label="Crafting Requirement" sublabel="Optional">
-          <Input value={craftingRequirement} onChange={(e) => setCraftingRequirement(e.target.value)} placeholder="e.g., must be crafted in Neverwinter or by an artificer" />
+        <FormField label={t("craftingRequirement")} sublabel={t("optional")}>
+          <Input value={craftingRequirement} onChange={(e) => setCraftingRequirement(e.target.value)} placeholder={t("craftingRequirementPlaceholder")} />
         </FormField>
 
-        <FormField label="Item Lore" sublabel={`Optional · ${loreWordCount}/100 words`}>
+        <FormField label={t("itemLore")} sublabel={t("loreWordCount").replace("{count}", String(loreWordCount))}>
           <textarea
             value={lore}
             onChange={(e) => handleLoreChange(e.target.value)}
-            placeholder="Short lore or legend behind the item."
+            placeholder={t("lorePlaceholder")}
             rows={4}
             className="ui-input w-full min-h-[120px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold bg-bg-elev border-silver/30 text-foreground"
           />
@@ -336,7 +338,7 @@ export default function ItemCreatorPage() {
             checked={attunement}
             onChange={(e) => setAttunement(e.target.checked)}
           />
-          <span className="text-sm font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">Requires Attunement</span>
+          <span className="text-sm font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">{t("requiresAttunement")}</span>
         </label>
       </div>
 
@@ -345,104 +347,104 @@ export default function ItemCreatorPage() {
         onClick={scrollToOutput}
         className="w-full sm:w-auto px-10 py-3 uppercase tracking-widest font-serif"
       >
-        View Item Blueprint
+        {t("viewItemBlueprint")}
       </Button>
 
       <Card className="p-8 border-gold/10" ref={outputRef}>
-        <h2 className="mb-6 font-serif text-2xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Item Properties</h2>
+        <h2 className="mb-6 font-serif text-2xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("itemProperties")}</h2>
         <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">
-          <span>Export Preview</span>
-          <span className="text-muted normal-case tracking-normal">Matches JSON output.</span>
+          <span>{t("exportPreview")}</span>
+          <span className="text-muted normal-case tracking-normal">{t("matchesJsonOutput")}</span>
         </div>
         <div className="rounded-sm border border-gold/20 bg-gold/5 p-4 mb-6 text-sm">
-          <div className="font-serif text-lg accent-gold">{item.name || "Unnamed Artifact"}</div>
+          <div className="font-serif text-lg accent-gold">{item.name || t("unnamedArtifact")}</div>
           <div className="text-xs text-muted mt-1">
-            {item.rarity} · {item.type} · Level {item.levelTuned} · {item.attunement ? "Attunement" : "No Attunement"}
+            {item.rarity} · {item.type} · Level {item.levelTuned} · {item.attunement ? t("attunement") : t("noAttunement")}
           </div>
           <div className="mt-2 text-xs text-muted">
-            {item.bonusToHit !== undefined && `+${item.bonusToHit} to hit`}
-            {item.bonusAC !== undefined && `${item.bonusToHit !== undefined ? " · " : ""}+${item.bonusAC} AC`}
-            {item.bonusSaveDC !== undefined && `${item.bonusToHit !== undefined || item.bonusAC !== undefined ? " · " : ""}DC ${item.bonusSaveDC}`}
-            {item.avgDamageBonus !== undefined && `${item.bonusToHit !== undefined || item.bonusAC !== undefined || item.bonusSaveDC !== undefined ? " · " : ""}+${item.avgDamageBonus} avg dmg`}
+            {item.bonusToHit !== undefined && t("toHit").replace("{value}", String(item.bonusToHit))}
+            {item.bonusAC !== undefined && t("acBonus").replace("{value}", String(item.bonusAC))}
+            {item.bonusSaveDC !== undefined && t("saveDC").replace("{value}", String(item.bonusSaveDC))}
+            {item.avgDamageBonus !== undefined && t("avgDmg").replace("{value}", String(item.avgDamageBonus))}
           </div>
         </div>
-        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">Mechanical Summary</div>
+        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("mechanicalSummary")}</div>
         <CardContent className="grid gap-4 text-sm sm:grid-cols-2">
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Name:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("name")}:</span>
             <span className="font-serif accent-gold break-words sm:text-right">{item.name || "—"}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Type:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("type")}:</span>
             <span className="font-medium break-words sm:text-right">{item.type}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Rarity:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("rarity")}:</span>
             <span className="font-bold text-blue-400 uppercase tracking-widest break-words sm:text-right">{item.rarity}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Attunement:</span>
-            <span className="font-medium break-words sm:text-right">{item.attunement ? 'Required' : 'None'}</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("attunement")}:</span>
+            <span className="font-medium break-words sm:text-right">{item.attunement ? t("required") : t("none")}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Power Band:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("powerBand")}:</span>
             <span className="font-medium italic break-words sm:text-right">Level {item.levelTuned}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Special:</span>
-            <span className="font-medium text-silver break-words sm:text-right">{item.targetTags.join(", ") || "None"}</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("special")}:</span>
+            <span className="font-medium text-silver break-words sm:text-right">{item.targetTags.join(", ") || t("none")}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Craft Cost:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftCost")}:</span>
             <span className="font-medium break-words sm:text-right">{item.craftingCost !== undefined ? `${item.craftingCost} gp` : "—"}</span>
           </div>
           <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Craft Time:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftTime")}:</span>
             <span className="font-medium break-words sm:text-right">{item.craftingTime !== undefined ? `${item.craftingTime} ${item.craftingTimeUnit ?? "days"}` : "—"}</span>
           </div>
           {item.bonusToHit !== undefined && (
             <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">To Hit:</span>
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("toHitLabel")}:</span>
               <span className="font-bold text-gold break-words sm:text-right">+{item.bonusToHit}</span>
             </div>
           )}
           {item.bonusAC !== undefined && (
             <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">AC Bonus:</span>
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("acBonusLabel")}:</span>
               <span className="font-bold text-blue-300 break-words sm:text-right">+{item.bonusAC}</span>
             </div>
           )}
           {item.bonusSaveDC !== undefined && (
             <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Save DC:</span>
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("saveDCLabel")}:</span>
               <span className="font-bold text-purple-400 break-words sm:text-right">DC {item.bonusSaveDC}</span>
             </div>
           )}
           {item.avgDamageBonus !== undefined && (
             <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Damage Bonus:</span>
-              <span className="font-bold text-red-400 break-words sm:text-right">+{item.avgDamageBonus} avg</span>
+              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("damageBonus")}:</span>
+              <span className="font-bold text-red-400 break-words sm:text-right">+{item.avgDamageBonus} {t("avg")}</span>
             </div>
           )}
         </CardContent>
 
-        <div className="mt-8 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">Lore & Crafting</div>
+        <div className="mt-8 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("loreCrafting")}</div>
         <div className="grid gap-4 text-sm sm:grid-cols-2">
           <div className="flex flex-col gap-2 border-b border-gold/5 pb-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Ingredients:</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("ingredients")}:</span>
             <span className="font-medium text-silver break-words">
               {item.ingredients.length
                 ? item.ingredients.map((ingredient) => `${ingredient.quantity}${ingredient.unit ? ` ${ingredient.unit}` : ""} ${ingredient.name}`).join(", ")
-                : "None"}
+                : t("none")}
             </span>
           </div>
           <div className="flex flex-col gap-2 border-b border-gold/5 pb-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Crafting Requirement:</span>
-            <span className="font-medium text-silver break-words">{item.craftingRequirement || "None"}</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftingRequirementLabel")}:</span>
+            <span className="font-medium text-silver break-words">{item.craftingRequirement || t("none")}</span>
           </div>
           <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 sm:col-span-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">Lore:</span>
-            <span className="font-medium text-silver break-words">{item.lore || "None"}</span>
+            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("lore")}:</span>
+            <span className="font-medium text-silver break-words">{item.lore || t("none")}</span>
           </div>
         </div>
         
@@ -453,15 +455,15 @@ export default function ItemCreatorPage() {
         )}
 
         <details className="mt-8 neo-card bg-background/40 border-gold/10 overflow-hidden">
-          <summary className="cursor-pointer p-4 text-[10px] text-muted hover:text-gold transition-colors uppercase tracking-[0.2em] font-bold">Item Metadata (JSON)</summary>
+          <summary className="cursor-pointer p-4 text-[10px] text-muted hover:text-gold transition-colors uppercase tracking-[0.2em] font-bold">{t("itemMetadata")}</summary>
           <pre className="p-6 overflow-x-auto text-[10px] text-blue-400/80 leading-relaxed">{JSON.stringify(item, null, 2)}</pre>
         </details>
       </Card>
 
-      <p className="text-xs text-muted italic text-center">These suggestions provide a balanced baseline; adjust properties to fit your campaign&apos;s power level.</p>
+      <p className="text-xs text-muted italic text-center">{t("baselineNote")}</p>
 
       <div className="sm:hidden pt-4">
-        <a href="/artifact-forge/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
       </div>
     </section>
   );

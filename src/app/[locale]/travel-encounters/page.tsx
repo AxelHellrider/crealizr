@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Terrain,
   getTravelEncounter,
@@ -20,6 +21,7 @@ import { formatCR } from "@/app/lib/format";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export default function EncountersEnRoutePage() {
+  const t = useTranslations("travelEncounters");
   const [terrain, setTerrain] = useState<Terrain>("Forest");
   const [typeFilter, setTypeFilter] = useState<EncounterType | "all">("all");
   const [result, setResult] = useState<{
@@ -80,16 +82,16 @@ export default function EncountersEnRoutePage() {
     <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
       <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
         <div>
-          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Encounters en route</h1>
+          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
           <p className="text-muted mt-2 font-light italic">
-            Plan encounters for long journeys based on terrain.
+            {t("description")}
           </p>
           <WhyDifferent className="mt-3" />
         </div>
       </header>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <FormField label="Travelling Terrain">
+        <FormField label={t("travellingTerrain")}>
           <Select
             value={terrain}
             onChange={(e) => setTerrain(e.target.value as Terrain)}
@@ -103,18 +105,18 @@ export default function EncountersEnRoutePage() {
           </Select>
         </FormField>
 
-        <FormField label="Encounter Type">
+        <FormField label={t("encounterType")}>
           <Select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as EncounterType | "all")}
             aria-label="Filter by encounter type"
           >
-            <option value="all">All Types</option>
-            <option value="combat">Combat</option>
-            <option value="survival">Survival</option>
-            <option value="social">Social</option>
-            <option value="hazard">Hazard</option>
-            <option value="benefit">Benefit</option>
+            <option value="all">{t("allTypes")}</option>
+            <option value="combat">{t("combat")}</option>
+            <option value="survival">{t("survival")}</option>
+            <option value="social">{t("social")}</option>
+            <option value="hazard">{t("hazard")}</option>
+            <option value="benefit">{t("benefit")}</option>
           </Select>
         </FormField>
       </div>
@@ -124,7 +126,7 @@ export default function EncountersEnRoutePage() {
         variant="primary"
         className="w-full py-4 text-xl font-serif tracking-widest uppercase"
       >
-        Roll for Encounter
+        {t("rollForEncounter")}
       </Button>
 
       {/* SR-only live region for rolling results */}
@@ -134,7 +136,7 @@ export default function EncountersEnRoutePage() {
         <Card className="p-8 border-gold/10">
           <div className="flex justify-between items-center border-b border-gold/20 pb-4 mb-4">
             <div className="flex items-center gap-3">
-              <h2 id="outcome-heading" className="text-2xl font-serif accent-gold uppercase tracking-wide">Outcome</h2>
+              <h2 id="outcome-heading" className="text-2xl font-serif accent-gold uppercase tracking-wide">{t("outcome")}</h2>
               <span className={`text-[10px] px-3 py-1 rounded-sm uppercase font-bold tracking-widest shadow-glow ${
                 result.outcome.type === 'combat' ? 'bg-crimson/10 text-crimson border border-crimson/20' :
                 result.outcome.type === 'survival' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' :
@@ -145,7 +147,7 @@ export default function EncountersEnRoutePage() {
               </span>
             </div>
             <div className="text-sm font-medium uppercase tracking-widest">
-              Roll: <span className="accent-gold font-bold">{result.roll}</span>
+              {t("roll")}: <span className="accent-gold font-bold">{result.roll}</span>
             </div>
           </div>
           <p className="text-muted text-xl leading-relaxed italic font-serif py-4">
@@ -159,22 +161,22 @@ export default function EncountersEnRoutePage() {
                   onClick={() => setShowBalancer(true)}
                   className="px-6 text-sm font-bold uppercase tracking-widest"
                 >
-                  Balance this Encounter
+                  {t("balanceThisEncounter")}
                 </Button>
               ) : (
                 <div className="grid gap-6">
                   <div className="flex justify-between items-center border-b border-gold/10 pb-3">
-                    <h3 className="font-serif text-lg accent-gold uppercase tracking-wide">Encounter Balancer</h3>
+                    <h3 className="font-serif text-lg accent-gold uppercase tracking-wide">{t("encounterBalancer")}</h3>
                     <button 
                       onClick={() => setShowBalancer(false)}
                       className="text-[10px] text-muted hover:text-gold transition-colors uppercase tracking-widest font-bold"
                     >
-                      Close
+                      {t("close")}
                     </button>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-6">
-                    <FormField label="Party size">
+                    <FormField label={t("partySize")}>
                       <Input 
                         type="number" 
                         min={1} 
@@ -183,7 +185,7 @@ export default function EncountersEnRoutePage() {
                         aria-label="Party size"
                       />
                     </FormField>
-                    <FormField label="Avg Level">
+                    <FormField label={t("avgLevel")}>
                       <Input 
                         type="number" 
                         min={1} 
@@ -196,11 +198,11 @@ export default function EncountersEnRoutePage() {
                   </div>
 
                   <div className="text-sm font-medium uppercase tracking-widest">
-                    Target Budget: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span> <span className="text-muted font-normal italic">({difficulty})</span>
+                    {t("targetBudget")}: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span> <span className="text-muted font-normal italic">({difficulty})</span>
                   </div>
 
                   <div className="grid gap-4">
-                    <h4 className="text-[10px] uppercase text-gold/60 font-bold tracking-[0.2em]">Solo Suggestions</h4>
+                    <h4 className="text-[10px] uppercase text-gold/60 font-bold tracking-[0.2em]">{t("soloSuggestions")}</h4>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                       {soloSuggestions.slice(0, 4).map((s, i) => (
                         <Card key={i} className="p-4 border border-gold/10 bg-bg/50">
@@ -212,7 +214,7 @@ export default function EncountersEnRoutePage() {
                   </div>
 
                   <div className="grid gap-4">
-                    <h4 className="text-[10px] uppercase text-silver/60 font-bold tracking-[0.2em]">Group Suggestions</h4>
+                    <h4 className="text-[10px] uppercase text-silver/60 font-bold tracking-[0.2em]">{t("groupSuggestions")}</h4>
                     <div className="grid gap-3">
                       {groupSuggestions.slice(0, 2).map((g, i) => (
                         <Card key={i} className="p-4 border border-silver/10 bg-bg/50 flex justify-between items-center">
@@ -245,18 +247,18 @@ export default function EncountersEnRoutePage() {
           className="w-full uppercase tracking-[0.2em] text-[11px]"
           aria-expanded={showTables}
         >
-          {showTables ? "Hide DM Tables" : "Show DM Tables"}
+          {showTables ? t("hideDmTables") : t("showDmTables")}
         </Button>
 
         {showTables && (
           <div className="mt-2">
             <div className="flex justify-between items-center mb-6 border-b border-gold/10 pb-3">
               <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">
-                DM Tables: {terrain}
+                {t("dmTables")}: {terrain}
               </h3>
               {typeFilter !== "all" && (
                 <span className="text-[10px] px-3 py-1 bg-gold/5 text-gold rounded-sm border border-gold/20 uppercase font-bold tracking-widest shadow-glow">
-                  Filter: {typeFilter}
+                  {t("filter")}: {typeFilter}
                 </span>
               )}
             </div>

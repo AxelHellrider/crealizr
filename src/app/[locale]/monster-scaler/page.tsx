@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import { MonsterBase } from "@/app/types/monsters_schema";
 import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
@@ -15,6 +16,7 @@ import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export default function ScalePage() {
+    const t = useTranslations("monsterScaler");
     const [step, setStep] = useState<1 | 2>(1);
     const [monster, setMonster] = useState<MonsterBase>({
         name: "",
@@ -154,60 +156,60 @@ export default function ScalePage() {
                 <div className="grid gap-8">
                     <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                         <div>
-                            <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">Monster Scaler</h1>
+                            <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
                             <p className="text-muted mt-2 font-light italic">
-                                Scale HP, AC, DPR, and stat targets to a new CR while keeping the creature recognizable.
+                                {t("description")}
                             </p>
                             <WhyDifferent className="mt-3" />
                         </div>
-                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden sm:inline-flex">View Documentation</a>
+                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden sm:inline-flex">{t("viewDocs")}</a>
                     </header>
 
                     <Card className="p-6 border-gold/10">
                         <div className="grid gap-4 sm:grid-cols-3 text-sm">
                             <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">What scales</div>
-                                <p className="text-muted mt-2">AC, HP, DPR targets, and ability modifiers.</p>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("whatScales")}</div>
+                                <p className="text-muted mt-2">{t("whatScalesDesc")}</p>
                             </div>
                             <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Ruleset notes</div>
-                                <p className="text-muted mt-2">2014 uses DMG tables. 2024 uses updated bands with softened ranges.</p>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("rulesetNotes")}</div>
+                                <p className="text-muted mt-2">{t("rulesetNotesDesc")}</p>
                             </div>
                             <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Guardrails</div>
-                                <p className="text-muted mt-2">Verify action economy, legendary actions, and unique traits after scaling.</p>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("guardrails")}</div>
+                                <p className="text-muted mt-2">{t("guardrailsDesc")}</p>
                             </div>
                         </div>
                     </Card>
 
                     {/* --- Basic Info --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">General Information</h2>
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("generalInfo")}</h2>
                         <div className="grid gap-6 sm:grid-cols-2">
-                            <FormField label="Name">
-                                <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder="e.g. Ancient Red Dragon" />
+                            <FormField label={t("name")}>
+                                <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder={t("namePlaceholder")} />
                             </FormField>
-                            <FormField label="Creature Type">
-                                <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder="e.g. Dragon" />
+                            <FormField label={t("creatureType")}>
+                                <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder={t("typePlaceholder")} />
                             </FormField>
                         </div>
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
-                            <FormField label="Ruleset">
+                            <FormField label={t("ruleset")}>
                                 <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
                                     <option value="2014">2014 Ruleset</option>
                                     <option value="2024">2024 Ruleset</option>
                                 </Select>
                             </FormField>
-                            <FormField label="Current CR">
+                            <FormField label={t("currentCR")}>
                                 <Select value={monster.challenge_rating} onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
                                 </Select>
                             </FormField>
-                            <FormField label="Target CR">
+                            <FormField label={t("targetCR")}>
                                 <Select value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))}>
-                                    <option value="" disabled>Select target CR</option>
+                                    <option value="" disabled>{t("selectTargetCR")}</option>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
@@ -218,7 +220,7 @@ export default function ScalePage() {
 
                     {/* --- Base Stats --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Base Attributes</h2>
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("baseAttributes")}</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
                             {Object.entries(monster.stats).map(([key, value]) => (
                                 <FormField key={key} label={key}>
@@ -234,18 +236,18 @@ export default function ScalePage() {
 
                     {/* --- Additional Bonuses --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">Defense & Ability Adjustments</h2>
+                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("defenseAdjustments")}</h2>
 
                         <div className="grid gap-4 sm:grid-cols-2">
-                            <FormField label="Equipment AC Bonus">
+                            <FormField label={t("equipmentACBonus")}>
                                 <Input type="number" value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
                             </FormField>
-                            <FormField label="Natural Armor Bonus">
+                            <FormField label={t("naturalArmorBonus")}>
                                 <Input type="number" value={acRace} onChange={(e) => setAcRace(Number(e.target.value))} />
                             </FormField>
                         </div>
 
-                        <h3 className="mt-8 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60">Ability Score Bonuses</h3>
+                        <h3 className="mt-8 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60">{t("abilityScoreBonuses")}</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                             {["str", "dex", "con", "int", "wis", "cha"].map((ab) => (
                                 <FormField key={ab} label={ab}>
@@ -260,7 +262,7 @@ export default function ScalePage() {
                     </Card>
 
                     <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full sm:w-auto self-start">
-                        {isScaling ? "SCALING..." : "SCALE A MONSTER"}
+                        {isScaling ? t("scaling") : t("scaleMonster")}
                     </Button>
                 </div>
             )}
@@ -275,16 +277,16 @@ export default function ScalePage() {
                         return (
                             <Card className="p-6 border-gold/10">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
-                                    <h2 className="font-serif text-xl uppercase tracking-wide">Tuning Notes</h2>
-                                    <span className="text-xs text-muted italic">Derived from the CR matrix.</span>
+                                    <h2 className="font-serif text-xl uppercase tracking-wide">{t("tuningNotes")}</h2>
+                                    <span className="text-xs text-muted italic">{t("derivedFromMatrix")}</span>
                                 </div>
                                 <div className="grid gap-3 sm:grid-cols-2 text-sm">
                                     <div className="flex justify-between border-b border-gold/5 pb-2">
-                                        <span className="text-muted">Suggested Attack Bonus</span>
+                                        <span className="text-muted">{t("suggestedAttackBonus")}</span>
                                         <span className="font-medium">{suggestedAttackBonus ?? "—"}</span>
                                     </div>
                                     <div className="flex justify-between border-b border-gold/5 pb-2">
-                                        <span className="text-muted">Suggested Save DC</span>
+                                        <span className="text-muted">{t("suggestedSaveDC")}</span>
                                         <span className="font-medium">{suggestedSaveDC ?? "—"}</span>
                                     </div>
                                 </div>
@@ -293,44 +295,44 @@ export default function ScalePage() {
                     })()}
                     <Card className="p-6 border-gold/10">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
-                            <h2 className="font-serif text-xl uppercase tracking-wide">Before / After</h2>
-                            <span className="text-xs text-muted italic">Snapshot of the exact export output.</span>
+                            <h2 className="font-serif text-xl uppercase tracking-wide">{t("beforeAfter")}</h2>
+                            <span className="text-xs text-muted italic">{t("snapshotOutput")}</span>
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2 text-sm">
                             <div className="space-y-2">
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Original</div>
-                                <div className="flex justify-between"><span className="text-muted">AC</span><span className="font-medium">{monster.stats.ac}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">HP</span><span className="font-medium">{monster.stats.hp}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">DPR</span><span className="font-medium">{monster.dpr.range}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">CR</span><span className="font-medium">{formatCR(monster.challenge_rating)}</span></div>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("original")}</div>
+                                <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{monster.stats.ac}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{monster.stats.hp}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{monster.dpr.range}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(monster.challenge_rating)}</span></div>
                             </div>
                             <div className="space-y-2">
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Scaled</div>
-                                <div className="flex justify-between"><span className="text-muted">AC</span><span className="font-medium">{scaledMonster.stats.ac}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">HP</span><span className="font-medium">{scaledMonster.stats.hp}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">DPR</span><span className="font-medium">{scaledMonster.dpr?.range ?? "—"}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">CR</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
+                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("scaled")}</div>
+                                <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{scaledMonster.stats.ac}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{scaledMonster.stats.hp}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{scaledMonster.dpr?.range ?? "—"}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
                             </div>
                         </div>
                         <div className="mt-4 grid gap-3 sm:grid-cols-3 text-xs">
                             <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">AC Change</span>
+                                <span className="text-muted">{t("acChange")}</span>
                                 <span className="font-medium">{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</span>
                             </div>
                             <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">HP Change</span>
+                                <span className="text-muted">{t("hpChange")}</span>
                                 <span className="font-medium">{scaledMonster.stats.hp - monster.stats.hp >= 0 ? "+" : ""}{scaledMonster.stats.hp - monster.stats.hp}</span>
                             </div>
                             <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">CR Shift</span>
+                                <span className="text-muted">{t("crShift")}</span>
                                 <span className="font-medium">{formatCR(monster.challenge_rating)} → {formatCR(scaledMonster.challenge_rating)}</span>
                             </div>
                         </div>
                     </Card>
 
                     <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-                        <span>Export Preview</span>
-                        <span className="text-muted normal-case tracking-normal">PNG/PDF uses this exact layout.</span>
+                        <span>{t("exportPreview")}</span>
+                        <span className="text-muted normal-case tracking-normal">{t("pngPdfLayout")}</span>
                     </div>
                     <div
                         ref={statBlockRef}
@@ -339,16 +341,16 @@ export default function ScalePage() {
                     >
                         <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
                         <h1 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
-                            {scaledMonster.name || "Scaled Monster"}
+                            {scaledMonster.name || t("scaledMonster")}
                         </h1>
                         <div className="grid gap-1 mb-6 italic text-muted font-serif">
                             <div>{scaledMonster.size} {scaledMonster.type}, {scaledMonster.alignment}</div>
                         </div>
 
                         <div className="grid gap-3 border-y border-gold/20 py-6 mb-8">
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Armor Class</span> <span className="text-xl font-bold">{scaledMonster.stats.ac}</span></div>
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Hit Points</span> <span className="text-xl font-bold">{scaledMonster.stats.hp}</span></div>
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Speed</span> <span className="text-xl font-bold">{scaledMonster.stats.speed}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("armorClass")}</span> <span className="text-xl font-bold">{scaledMonster.stats.ac}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("hitPoints")}</span> <span className="text-xl font-bold">{scaledMonster.stats.hp}</span></div>
+                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("speed")}</span> <span className="text-xl font-bold">{scaledMonster.stats.speed}</span></div>
                         </div>
 
                         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-10">
@@ -363,38 +365,38 @@ export default function ScalePage() {
 
                         <div className="grid gap-3">
                              <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
-                                <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Challenge Rating</span>
+                                <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("challengeRating")}</span>
                                 <span className="text-lg font-bold">{formatCR(scaledMonster.challenge_rating)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
                             </div>
                             {scaledMonster.dpr && (
                                 <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
-                                    <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">Suggested Damage Per Round</span>
+                                    <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("suggestedDamagePerRound")}</span>
                                     <span className="text-lg font-bold">{scaledMonster.dpr.range}</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">Export Options</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("exportOptions")}</div>
                     <div className="flex flex-col sm:flex-row gap-4 mt-2">
                         <button onClick={() => setStep(1)} className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs">
-                            ← ADJUST STATS
+                            {t("adjustStats")}
                         </button>
                         <button onClick={downloadImage} className="ui-button ui-button-primary flex-1">
-                            DOWNLOAD PNG
+                            {t("downloadPng")}
                         </button>
                         <button onClick={downloadPDF} className="ui-button ui-button-primary flex-1">
-                            DOWNLOAD PDF
+                            {t("downloadPdf")}
                         </button>
                     </div>
                     <div className="text-xs text-muted italic text-center">
-                        PNG is optimized for VTT use. PDF is print-friendly. Files use the monster name for easy sorting. Outputs are advisory—review special actions and traits.
+                        {t("exportNote")}
                     </div>
                 </div>
             )}
 
             <div className="sm:hidden pt-4">
-                <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">View Documentation</a>
+                <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
             </div>
         </section>
     );

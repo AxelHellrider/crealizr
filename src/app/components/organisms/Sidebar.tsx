@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/app/context/ThemeContext";
 import { useSidebar } from "@/app/context/SidebarContext";
 import LanguageSwitcher from "@/app/components/atoms/LanguageSwitcher";
@@ -12,6 +12,7 @@ export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar();
   const { season, setSeason } = useTheme();
   const locale = useLocale();
+  const t = useTranslations();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,12 +20,12 @@ export default function Sidebar() {
   }, []);
 
   const navItems = [
-    { href: `/${locale}`, label: "Home", icon: "🏠" },
-    { href: `/${locale}/encounter-builder`, label: "Encounter Builder", icon: "⚔️" },
-    { href: `/${locale}/monster-scaler`, label: "Monster Scaler", icon: "⚖️" },
-    { href: `/${locale}/travel-encounters`, label: "Travel Encounters", icon: "🗺️" },
-    { href: `/${locale}/artifact-forge`, label: "Artifact Forge", icon: "✨" },
-    { href: `/${locale}/contact`, label: "Contact", icon: "📧" },
+    { href: `/${locale}`, label: t("nav.home"), icon: "🏠" },
+    { href: `/${locale}/encounter-builder`, label: t("nav.encounterBuilder"), icon: "⚔️" },
+    { href: `/${locale}/monster-scaler`, label: t("nav.monsterScaler"), icon: "⚖️" },
+    { href: `/${locale}/travel-encounters`, label: t("nav.travelEncounters"), icon: "🗺️" },
+    { href: `/${locale}/artifact-forge`, label: t("nav.artifactForge"), icon: "✨" },
+    { href: `/${locale}/contact`, label: t("nav.contact"), icon: "📧" },
   ];
 
   return (
@@ -79,7 +80,7 @@ export default function Sidebar() {
           {/* Language Switcher */}
           <div>
             <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
-              Language
+              {t("sidebar.language")}
             </label>
             <LanguageSwitcher />
           </div>
@@ -87,7 +88,7 @@ export default function Sidebar() {
           {/* Season Selector */}
           <div>
             <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
-              Season
+              {t("sidebar.season")}
             </label>
             {mounted && (
               <div className="grid grid-cols-2 gap-2">
@@ -115,7 +116,7 @@ export default function Sidebar() {
             rel="noreferrer"
             className="ui-button w-full text-center text-xs uppercase tracking-widest"
           >
-            GitHub
+            {t("sidebar.github")}
           </a>
         </div>
       </aside>

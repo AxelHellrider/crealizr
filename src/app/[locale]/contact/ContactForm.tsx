@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { useTranslations } from "next-intl";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
@@ -25,6 +26,7 @@ declare global {
 }
 
 export function ContactForm() {
+  const t = useTranslations("contact.form");
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
   const turnstileEnabled = Boolean(turnstileSiteKey);
 
@@ -57,7 +59,7 @@ export function ContactForm() {
       "error-callback": () => {
         setTurnstileToken("");
         setTurnstileReady(false);
-        setError("Captcha failed to load. Please refresh and try again.");
+        setError(t("captchaError"));
         setState("error");
       },
     });
@@ -89,7 +91,7 @@ export function ContactForm() {
 
     if (turnstileEnabled && !turnstileToken) {
       setState("error");
-      setError("Please complete the captcha before sending.");
+      setError(t("captchaRequired"));
       return;
     }
 
@@ -119,7 +121,7 @@ export function ContactForm() {
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error || "Unable to send message right now.");
+        throw new Error(body.error || t("submitError"));
       }
 
       setState("success");
@@ -152,7 +154,7 @@ export function ContactForm() {
           </p>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-widest text-muted">Name</span>
+            <span className="text-xs uppercase tracking-widest text-muted">{t("name")}</span>
             <input
                 className="ui-input"
                 type="text"
@@ -164,7 +166,7 @@ export function ContactForm() {
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-widest text-muted">Email</span>
+            <span className="text-xs uppercase tracking-widest text-muted">{t("email")}</span>
             <input
                 className="ui-input"
                 type="email"
@@ -176,7 +178,7 @@ export function ContactForm() {
           </label>
 
           <label className="grid gap-2">
-            <span className="text-xs uppercase tracking-widest text-muted">Message</span>
+            <span className="text-xs uppercase tracking-widest text-muted">{t("message")}</span>
             <textarea
                 className="ui-input min-h-40"
                 name="message"
@@ -187,7 +189,7 @@ export function ContactForm() {
 
           {turnstileEnabled && (
             <div className="grid gap-2">
-              <span className="text-xs uppercase tracking-widest text-muted">Verification</span>
+              <span className="text-xs uppercase tracking-widest text-muted">{t("verification")}</span>
               <div ref={widgetRef} />
             </div>
           )}
@@ -198,15 +200,15 @@ export function ContactForm() {
               className="ui-button ui-button-primary mt-2 w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {state === "submitting"
-              ? "Sending..."
+              ? t("sending")
               : turnstileEnabled && !turnstileReady
-                ? "Complete Verification"
-                : "Send Message"}
+                ? t("completeVerification")
+                : t("sendMessage")}
           </button>
 
           {state === "success" && (
               <p className="text-sm text-green-700 dark:text-green-300">
-                Message sent successfully.
+                {t("success")}
               </p>
           )}
 
