@@ -321,7 +321,10 @@ export default function ItemCreatorPage() {
           <Input value={craftingRequirement} onChange={(e) => setCraftingRequirement(e.target.value)} placeholder={t("craftingRequirementPlaceholder")} />
         </FormField>
 
-        <FormField label={t("itemLore")} sublabel={t("loreWordCount").replace("{count}", String(loreWordCount))}>
+        <FormField
+            label={t("itemLore")}
+            sublabel={t("loreWordCount", { count: loreWordCount })}
+        >
           <textarea
             value={lore}
             onChange={(e) => handleLoreChange(e.target.value)}
@@ -362,10 +365,10 @@ export default function ItemCreatorPage() {
             {item.rarity} · {item.type} · Level {item.levelTuned} · {item.attunement ? t("attunement") : t("noAttunement")}
           </div>
           <div className="mt-2 text-xs text-muted">
-            {item.bonusToHit !== undefined && t("toHit").replace("{value}", String(item.bonusToHit))}
-            {item.bonusAC !== undefined && t("acBonus").replace("{value}", String(item.bonusAC))}
-            {item.bonusSaveDC !== undefined && t("saveDC").replace("{value}", String(item.bonusSaveDC))}
-            {item.avgDamageBonus !== undefined && t("avgDmg").replace("{value}", String(item.avgDamageBonus))}
+            {item.bonusToHit !== undefined && t("toHit", { value: item.bonusToHit })}
+            {item.bonusAC !== undefined && t("acBonus", { value: item.bonusAC })}
+            {item.bonusSaveDC !== undefined && t("saveDC", { value: item.bonusSaveDC })}
+            {item.avgDamageBonus !== undefined && t("avgDmg", { value: item.avgDamageBonus })}
           </div>
         </div>
         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("mechanicalSummary")}</div>
