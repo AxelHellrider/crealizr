@@ -2,12 +2,15 @@
 
 import {useLocale} from 'next-intl';
 import {useRouter, usePathname} from 'next/navigation';
-import {locales, localeNames, type Locale} from '@/i18n/config';
+import {locales, localeNames, defaultLocale, type Locale} from '@/i18n/config';
 
 export default function LanguageSwitcher() {
-  const locale = useLocale() as Locale;
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Validate that the locale is one of our supported locales
+  const validLocale = locales.includes(locale as Locale) ? locale as Locale : defaultLocale;
 
   const handleChange = (newLocale: Locale) => {
     const segments = pathname.split('/');
@@ -17,7 +20,7 @@ export default function LanguageSwitcher() {
 
   return (
     <select
-      value={locale}
+      value={validLocale}
       onChange={(e) => handleChange(e.target.value as Locale)}
       className="px-3 py-2 text-sm border border-gold/20 rounded-sm bg-card text-foreground focus:outline-none focus:border-gold/50 cursor-pointer"
     >
