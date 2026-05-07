@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "version": "node scripts/version-manager.js",
+    "version:patch": "node scripts/version-manager.js patch",
+    "version:minor": "node scripts/version-manager.js minor",
+    "version:major": "node scripts/version-manager.js major",
+    "pre-deploy": "node scripts/pre-deploy.js",
+    "deploy": "node scripts/deploy.js",
+    "release": "npm run build && npm run version && git push origin main --tags"
   },
   "engines": {
     "node": ">=20 <=22.x"

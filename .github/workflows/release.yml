@@ -1,0 +1,130 @@
+name: Release and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version increment type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+      deploy_to_hostinger:
+        description: 'Deploy to Hostinger after release'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build project
+      run: npm run build
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Create release
+      run: |
+        VERSION_TYPE="${{ github.event.inputs.version_type || 'patch' }}"
+        node scripts/version-manager.js $VERSION_TYPE
+
+    - name: Push changes and tags
+      run: |
+        git push origin main --follow-tags
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.tag }}
+        name: Release ${{ steps.version.outputs.tag }}
+        body: |
+          ## Changes in this release
+          
+          Check the [CHANGELOG.md](https://github.com/AxelHellrider/crializr/blob/main/CHANGELOG.md) for detailed changes.
+          
+          ### Installation
+          ```bash
+          npm install
+          npm run build
+          npm start
+          ```
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy_to_hostinger != 'false'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Deploy to Hostinger via FTP
+      if: secrets.HOSTINGER_FTP_HOST != ''
+      env:
+        HOSTINGER_FTP_HOST: ${{ secrets.HOSTINGER_FTP_HOST }}
+        HOSTINGER_FTP_USER: ${{ secrets.HOSTINGER_FTP_USER }}
+        HOSTINGER_FTP_PASS: ${{ secrets.HOSTINGER_FTP_PASS }}
+        HOSTINGER_FTP_PATH: ${{ secrets.HOSTINGER_FTP_PATH }}
+      run: |
+        echo "🚀 Deploying to Hostinger via FTP..."
+        npm run deploy
+
+    - name: Deploy to Hostinger via Git
+      if: secrets.HOSTINGER_GIT_REPO != ''
+      env:
+        HOSTINGER_GIT_REPO: ${{ secrets.HOSTINGER_GIT_REPO }}
+      run: |
+        echo "🚀 Deploying to Hostinger via Git..."
+        npm run deploy
+
+    - name: Deployment Summary
+      run: |
+        echo "🎉 Deployment completed!"
+        echo "📦 Version: $(node -p "require('./package.json').version")"
+        echo "🌐 Live at: https://crealizr.net"
