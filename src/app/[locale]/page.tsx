@@ -5,7 +5,6 @@ import { getTranslations } from "next-intl/server";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
-import {Locale} from "@/i18n/config";
 
 export const metadata: Metadata = {
     title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",

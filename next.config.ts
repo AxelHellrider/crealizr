@@ -4,8 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  // Keep config minimal for broad platform compatibility. Netlify plugin will handle output/SSR.
-  // Gate React Compiler behind an env var to avoid unsupported deployments on some hosts.
+  output: 'standalone', // ← add this for Hostinger/PM2
   reactCompiler: process.env.REACT_COMPILER === "true",
   async redirects() {
     return [
