@@ -316,7 +316,7 @@ export default function CombatBalancerPage() {
                                                 </span>
                                             ))}
                                         </div>
-                                        <div className="text-muted text-xs font-bold uppercase whitespace-nowrap ml-4">{g.adjustedXP} XP</div>
+                                        <div className="text-muted text-xs font-bold uppercase ml-4">{g.adjustedXP} XP</div>
                                     </div>
                                     <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(g.fit).color}`}>
                                         {budgetStatus(g.fit).label}

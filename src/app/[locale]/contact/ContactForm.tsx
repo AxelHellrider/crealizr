@@ -145,7 +145,7 @@ export function ContactForm() {
           />
         )}
 
-        <form onSubmit={onSubmit} className="mt-6 grid gap-4" noValidate>
+        <form onSubmit={onSubmit} className="mt-6 grid gap-4 overflow-x-hidden" noValidate>
           <p className="hidden" aria-hidden="true">
             <label>
               Company
@@ -190,7 +190,7 @@ export function ContactForm() {
           {turnstileEnabled && (
             <div className="grid gap-2">
               <span className="text-xs uppercase tracking-widest text-muted">{t("verification")}</span>
-              <div ref={widgetRef} />
+              <div ref={widgetRef} className="overflow-x-hidden max-w-full" />
             </div>
           )}
 

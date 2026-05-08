@@ -267,7 +267,7 @@ export default function EncountersEnRoutePage() {
                 .filter((item) => typeFilter === "all" || item.type === typeFilter)
                 .map((item, idx) => (
                   <div key={idx} className="flex gap-4 p-4 rounded-sm bg-card border border-gold/5 hover:border-gold/20 transition-all">
-                    <span className="font-mono w-20 flex-shrink-0 text-center rounded-sm border border-gold/20 bg-gold/5 py-1 text-gold font-bold">
+                    <span className="font-mono w-16 flex-shrink-0 text-center rounded-sm border border-gold/20 bg-gold/5 py-1 text-gold font-bold">
                       {item.range[0] === item.range[1] ? item.range[0] : `${item.range[0]}-${item.range[1]}`}
                     </span>
                     <div className="flex flex-col gap-1.5">
