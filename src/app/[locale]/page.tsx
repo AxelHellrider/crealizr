@@ -46,7 +46,7 @@ export const viewport: Viewport = {
     viewportFit: "cover",
 };
 
-export default async function Home({params}: {params: Promise<{locale: Locale}>}) {
+export default async function Home({params}: {params: Promise<{locale: string}>}) {
   const {locale} = await params;
   const t = await getTranslations();
   return (
