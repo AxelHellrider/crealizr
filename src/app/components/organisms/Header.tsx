@@ -2,20 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useTheme } from "@/app/context/ThemeContext";
 import LanguageSwitcher from "@/app/components/atoms/LanguageSwitcher";
 import {useLocale} from 'next-intl';
 
 export default function Header() {
     const [open, setOpen] = useState(false);
-    const { theme, toggleTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
     const locale = useLocale();
-
-    useEffect(() => {
-        const t = window.setTimeout(() => setMounted(true), 0);
-        return () => window.clearTimeout(t);
-    }, []);
 
     // Close on ESC
     useEffect(() => {
@@ -57,19 +49,6 @@ export default function Header() {
                         >
                             Contact
                         </Link>
-                        {mounted && (
-                            <button
-                                onClick={toggleTheme}
-                                className="p-2 rounded border border-gold/20 hover:bg-gold/10 transition-colors text-gold"
-                                aria-label="Toggle Theme"
-                            >
-                                {theme === "light" ? (
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                                ) : (
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                                )}
-                            </button>
-                        )}
                         <a
                             href="https://github.com/AxelHellrider"
                             target="_blank"
@@ -90,19 +69,6 @@ export default function Header() {
                     >
                         Contact
                     </Link>
-                    {mounted && (
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-full border border-gold/20 text-gold"
-                            aria-label="Toggle Theme"
-                        >
-                            {theme === "light" ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                            )}
-                        </button>
-                    )}
                     <button
                         className="inline-flex ui-button px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                         aria-label={open ? "Close menu" : "Open menu"}

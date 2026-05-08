@@ -58,18 +58,18 @@ export const metadata: Metadata = {
 };
 
 export default async function LocaleLayout({
-    children,
-    params
-}: Readonly<{
+                                               children,
+                                               params
+                                           }: Readonly<{
     children: React.ReactNode;
-    params: Promise<{locale: Locale}>;
+    params: Promise<{locale: string}>;
 }>) {
     const {locale} = await params;
     const messages = await getMessages();
     runStartupEnvCheck();
 
     return (
-        <html lang={locale} suppressHydrationWarning>
+        <html lang={locale as Locale} suppressHydrationWarning>
         <body
             className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
         <NextIntlClientProvider messages={messages}>
