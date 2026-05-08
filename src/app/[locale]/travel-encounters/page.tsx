@@ -79,8 +79,8 @@ export default function EncountersEnRoutePage() {
   const terrains: readonly Terrain[] = TERRAINS;
 
   return (
-    <div className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-      <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+    <div className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+      <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
         <div>
           <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
           <p className="text-muted mt-2 font-light italic">
@@ -90,7 +90,7 @@ export default function EncountersEnRoutePage() {
         </div>
       </header>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <FormField label={t("travellingTerrain")}>
           <Select
             value={terrain}
@@ -203,7 +203,7 @@ export default function EncountersEnRoutePage() {
 
                   <div className="grid gap-4">
                     <h4 className="text-[10px] uppercase text-gold/60 font-bold tracking-[0.2em]">{t("soloSuggestions")}</h4>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
                       {soloSuggestions.slice(0, 4).map((s, i) => (
                         <Card key={i} className="p-4 border border-gold/10 bg-bg/50">
                           <div className="font-serif text-lg accent-gold">{s.count} × CR {formatCR(s.cr)}</div>

@@ -175,8 +175,8 @@ export default function ItemCreatorPage() {
   };
 
   return (
-    <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-      <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+    <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+      <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
         <div>
           <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
           <p className="text-muted mt-2 font-light italic">
@@ -184,11 +184,11 @@ export default function ItemCreatorPage() {
           </p>
           <WhyDifferent className="mt-3" />
         </div>
-        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden sm:inline-flex">{t("viewDocs")}</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
       </header>
 
       <Card className="p-6 border-gold/10">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("quickActions")}</div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -212,7 +212,7 @@ export default function ItemCreatorPage() {
         </p>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         {EXAMPLE_ITEMS.slice(0, 3).map((example) => (
           <Card key={example.name} className="p-5 border-gold/10 bg-card">
             <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("example")}</div>
@@ -223,8 +223,8 @@ export default function ItemCreatorPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <div className="lg:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
           {t("mechanics")}
         </div>
         <FormField label={t("itemName")}>
@@ -270,11 +270,11 @@ export default function ItemCreatorPage() {
           </div>
         </FormField>
 
-        <div className="sm:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
+        <div className="lg:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
           {t("flavorCrafting")}
         </div>
         <FormField label={t("craftingIngredients")} sublabel={t("optional")}>
-          <div className="grid gap-2 sm:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
+          <div className="grid gap-2 grid-cols-1 lg:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
             <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder={t("ingredientNamePlaceholder")} />
             <Input type="number" value={ingredientQty} onChange={(e) => setIngredientQty(e.target.value === "" ? "" : Number(e.target.value))} placeholder={t("qtyPlaceholder")} />
             <Input value={ingredientUnit} onChange={(e) => setIngredientUnit(e.target.value)} placeholder={t("unitPlaceholder")} />
@@ -307,7 +307,7 @@ export default function ItemCreatorPage() {
         </FormField>
 
         <FormField label={t("craftingTime")} sublabel={t("optional")}>
-          <div className="grid gap-2 sm:grid-cols-[1fr_1fr]">
+          <div className="grid gap-2 grid-cols-1 lg:grid-cols-[1fr_1fr]">
             <Input type="number" value={craftingTime} onChange={(e) => setCraftingTime(e.target.value === "" ? "" : Number(e.target.value))} placeholder={t("craftingTimePlaceholder")} />
             <Select value={craftingTimeUnit} onChange={(e) => setCraftingTimeUnit(e.target.value as "hours" | "days" | "weeks")}>
               <option value="hours">{t("hours")}</option>
@@ -348,7 +348,7 @@ export default function ItemCreatorPage() {
       <Button
         variant="primary"
         onClick={scrollToOutput}
-        className="w-full sm:w-auto px-10 py-3 uppercase tracking-widest font-serif"
+        className="w-full lg:w-auto px-10 py-3 uppercase tracking-widest font-serif"
       >
         {t("viewItemBlueprint")}
       </Button>
@@ -372,67 +372,67 @@ export default function ItemCreatorPage() {
           </div>
         </div>
         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("mechanicalSummary")}</div>
-        <CardContent className="grid gap-4 text-sm sm:grid-cols-2">
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+        <CardContent className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("name")}:</span>
-            <span className="font-serif accent-gold break-words sm:text-right">{item.name || "—"}</span>
+            <span className="font-serif accent-gold break-words lg:text-right">{item.name || "—"}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("type")}:</span>
-            <span className="font-medium break-words sm:text-right">{item.type}</span>
+            <span className="font-medium break-words lg:text-right">{item.type}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("rarity")}:</span>
-            <span className="font-bold text-blue-400 uppercase tracking-widest break-words sm:text-right">{item.rarity}</span>
+            <span className="font-bold text-blue-400 uppercase tracking-widest break-words lg:text-right">{item.rarity}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("attunement")}:</span>
-            <span className="font-medium break-words sm:text-right">{item.attunement ? t("required") : t("none")}</span>
+            <span className="font-medium break-words lg:text-right">{item.attunement ? t("required") : t("none")}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("powerBand")}:</span>
-            <span className="font-medium italic break-words sm:text-right">Level {item.levelTuned}</span>
+            <span className="font-medium italic break-words lg:text-right">Level {item.levelTuned}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("special")}:</span>
             <span className="font-medium text-silver break-words sm:text-right">{item.targetTags.join(", ") || t("none")}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftCost")}:</span>
-            <span className="font-medium break-words sm:text-right">{item.craftingCost !== undefined ? `${item.craftingCost} gp` : "—"}</span>
+            <span className="font-medium break-words lg:text-right">{item.craftingCost !== undefined ? `${item.craftingCost} gp` : "—"}</span>
           </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftTime")}:</span>
-            <span className="font-medium break-words sm:text-right">{item.craftingTime !== undefined ? `${item.craftingTime} ${item.craftingTimeUnit ?? "days"}` : "—"}</span>
+            <span className="font-medium break-words lg:text-right">{item.craftingTime !== undefined ? `${item.craftingTime} ${item.craftingTimeUnit ?? "days"}` : "—"}</span>
           </div>
           {item.bonusToHit !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
               <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("toHitLabel")}:</span>
-              <span className="font-bold text-gold break-words sm:text-right">+{item.bonusToHit}</span>
+              <span className="font-bold text-gold break-words lg:text-right">+{item.bonusToHit}</span>
             </div>
           )}
           {item.bonusAC !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
               <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("acBonusLabel")}:</span>
-              <span className="font-bold text-blue-300 break-words sm:text-right">+{item.bonusAC}</span>
+              <span className="font-bold text-blue-300 break-words lg:text-right">+{item.bonusAC}</span>
             </div>
           )}
           {item.bonusSaveDC !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
               <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("saveDCLabel")}:</span>
-              <span className="font-bold text-purple-400 break-words sm:text-right">DC {item.bonusSaveDC}</span>
+              <span className="font-bold text-purple-400 break-words lg:text-right">DC {item.bonusSaveDC}</span>
             </div>
           )}
           {item.avgDamageBonus !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
               <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("damageBonus")}:</span>
-              <span className="font-bold text-red-400 break-words sm:text-right">+{item.avgDamageBonus} {t("avg")}</span>
+              <span className="font-bold text-red-400 break-words lg:text-right">+{item.avgDamageBonus} {t("avg")}</span>
             </div>
           )}
         </CardContent>
 
         <div className="mt-8 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("loreCrafting")}</div>
-        <div className="grid gap-4 text-sm sm:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           <div className="flex flex-col gap-2 border-b border-gold/5 pb-2">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("ingredients")}:</span>
             <span className="font-medium text-silver break-words">
@@ -445,7 +445,7 @@ export default function ItemCreatorPage() {
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftingRequirementLabel")}:</span>
             <span className="font-medium text-silver break-words">{item.craftingRequirement || t("none")}</span>
           </div>
-          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 sm:col-span-2">
+          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 lg:col-span-2">
             <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("lore")}:</span>
             <span className="font-medium text-silver break-words">{item.lore || t("none")}</span>
           </div>
@@ -465,7 +465,7 @@ export default function ItemCreatorPage() {
 
       <p className="text-xs text-muted italic text-center">{t("baselineNote")}</p>
 
-      <div className="sm:hidden pt-4">
+      <div className="hidden lg:block pt-4">
         <a href="/artifact-forge/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
       </div>
     </section>

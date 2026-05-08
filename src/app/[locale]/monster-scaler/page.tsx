@@ -151,10 +151,10 @@ export default function ScalePage() {
     };
 
     return (
-        <section className="glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+        <section className="glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
             {step === 1 && (
                 <div className="grid gap-8">
-                    <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+                    <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                         <div>
                             <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
                             <p className="text-muted mt-2 font-light italic">
@@ -162,11 +162,11 @@ export default function ScalePage() {
                             </p>
                             <WhyDifferent className="mt-3" />
                         </div>
-                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden sm:inline-flex">{t("viewDocs")}</a>
+                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
                     </header>
 
                     <Card className="p-6 border-gold/10">
-                        <div className="grid gap-4 sm:grid-cols-3 text-sm">
+                        <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 text-sm">
                             <div>
                                 <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("whatScales")}</div>
                                 <p className="text-muted mt-2">{t("whatScalesDesc")}</p>
@@ -185,7 +185,7 @@ export default function ScalePage() {
                     {/* --- Basic Info --- */}
                     <Card className="p-6">
                         <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("generalInfo")}</h2>
-                        <div className="grid gap-6 sm:grid-cols-2">
+                        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("name")}>
                                 <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder={t("namePlaceholder")} />
                             </FormField>
@@ -193,7 +193,7 @@ export default function ScalePage() {
                                 <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder={t("typePlaceholder")} />
                             </FormField>
                         </div>
-                        <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
+                        <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-3">
                             <FormField label={t("ruleset")}>
                                 <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
                                     <option value="2014">2014 Ruleset</option>
@@ -221,7 +221,7 @@ export default function ScalePage() {
                     {/* --- Base Stats --- */}
                     <Card className="p-6">
                         <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("baseAttributes")}</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
                             {Object.entries(monster.stats).map(([key, value]) => (
                                 <FormField key={key} label={key}>
                                     <Input
@@ -238,7 +238,7 @@ export default function ScalePage() {
                     <Card className="p-6">
                         <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("defenseAdjustments")}</h2>
 
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("equipmentACBonus")}>
                                 <Input type="number" value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
                             </FormField>
@@ -248,7 +248,7 @@ export default function ScalePage() {
                         </div>
 
                         <h3 className="mt-8 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60">{t("abilityScoreBonuses")}</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                             {["str", "dex", "con", "int", "wis", "cha"].map((ab) => (
                                 <FormField key={ab} label={ab}>
                                     <Input
@@ -261,7 +261,7 @@ export default function ScalePage() {
                         </div>
                     </Card>
 
-                    <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full sm:w-auto self-start">
+                    <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full lg:w-auto self-start">
                         {isScaling ? t("scaling") : t("scaleMonster")}
                     </Button>
                 </div>
@@ -276,11 +276,11 @@ export default function ScalePage() {
 
                         return (
                             <Card className="p-6 border-gold/10">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
+                                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 border-b border-gold/10 pb-3 mb-4">
                                     <h2 className="font-serif text-xl uppercase tracking-wide">{t("tuningNotes")}</h2>
                                     <span className="text-xs text-muted italic">{t("derivedFromMatrix")}</span>
                                 </div>
-                                <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                                <div className="grid gap-3 grid-cols-1 lg:grid-cols-2 text-sm">
                                     <div className="flex justify-between border-b border-gold/5 pb-2">
                                         <span className="text-muted">{t("suggestedAttackBonus")}</span>
                                         <span className="font-medium">{suggestedAttackBonus ?? "—"}</span>
@@ -314,7 +314,7 @@ export default function ScalePage() {
                                 <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
                             </div>
                         </div>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-3 text-xs">
+                        <div className="mt-4 grid gap-3 grid-cols-1 lg:grid-cols-3 text-xs">
                             <div className="flex justify-between border-b border-gold/5 pb-2">
                                 <span className="text-muted">{t("acChange")}</span>
                                 <span className="font-medium">{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</span>
@@ -353,7 +353,7 @@ export default function ScalePage() {
                             <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("speed")}</span> <span className="text-xl font-bold">{scaledMonster.stats.speed}</span></div>
                         </div>
 
-                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-10">
+                        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
                             {["str", "dex", "con", "int", "wis", "cha"].map((key) => (
                                 <div key={key} className="text-center p-3 border border-gold/10 bg-gold/5 rounded-sm">
                                     <div className="text-[10px] uppercase text-gold font-bold tracking-widest mb-1">{key}</div>
@@ -378,7 +378,7 @@ export default function ScalePage() {
                     </div>
 
                     <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("exportOptions")}</div>
-                    <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                    <div className="flex flex-col lg:flex-row gap-4 mt-2">
                         <button onClick={() => setStep(1)} className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs">
                             {t("adjustStats")}
                         </button>
@@ -395,7 +395,7 @@ export default function ScalePage() {
                 </div>
             )}
 
-            <div className="sm:hidden pt-4">
+            <div className="hidden lg:block pt-4">
                 <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
             </div>
         </section>

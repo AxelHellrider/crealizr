@@ -95,8 +95,8 @@ export default function CombatBalancerPage() {
     };
 
     return (
-        <section className="grid gap-8 glass-panel p-8 sm:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-            <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+        <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+            <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
                 <div>
                     <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
                     <p className="text-muted mt-2 font-light italic">
@@ -105,13 +105,13 @@ export default function CombatBalancerPage() {
                     <p className="text-xs text-muted mt-2">{t("rulesetNote")}</p>
                     <WhyDifferent className="mt-3" />
                 </div>
-                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic hidden sm:inline-flex">
+                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic hidden lg:inline-flex">
                     {t("viewDocs")}
                 </Link>
             </header>
 
             <Card className="p-6 border-gold/10">
-                <div className="grid gap-4 md:grid-cols-[1.2fr_1fr] items-center">
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.2fr_1fr] items-center">
                     <div>
                         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("quickPresets")}</div>
                         <div className="mt-3 flex flex-wrap gap-2">
@@ -218,16 +218,16 @@ export default function CombatBalancerPage() {
             <Button
                 variant="primary"
                 onClick={scrollToResults}
-                className="w-full sm:w-auto px-10 py-3 uppercase tracking-widest font-serif"
+                className="w-full lg:w-auto px-10 py-3 uppercase tracking-widest font-serif"
             >
                 {t("showSuggestions")}
             </Button>
 
             {/* Results */}
             <Card className="p-6" ref={resultsRef}>
-                <div className="flex flex-col sm:flex-row sm:justify-between mb-8 border-b border-gold/10 pb-4">
+                <div className="flex flex-col lg:flex-row lg:justify-between mb-8 border-b border-gold/10 pb-4">
                     <h2 className="font-serif text-2xl accent-gold uppercase tracking-wide">{t("suggestedEncounters")}</h2>
-                    <div className="text-sm font-medium mt-2 sm:mt-0 uppercase tracking-widest flex flex-col sm:items-end gap-2">
+                    <div className="text-sm font-medium mt-2 lg:mt-0 uppercase tracking-widest flex flex-col lg:items-end gap-2">
                         <span>
                             {t("totalXPBudget")}: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span>
                         </span>
@@ -279,7 +279,7 @@ export default function CombatBalancerPage() {
                 )}
 
                 {mode === "solo" ? (
-                    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                         {soloSuggestions.map((s, i) => (
                             <li key={i}>
                                 <Card className="p-6 border border-gold/10 hover:border-gold/30 transition-all hover:shadow-glow bg-bg/50">
@@ -301,7 +301,7 @@ export default function CombatBalancerPage() {
                         ))}
                     </ul>
                 ) : (
-                    <ul className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+                    <ul className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                         {groupSuggestions.map((g, i) => (
                             <li key={i}>
                                 <Card className="p-6 border border-silver/10 hover:border-silver/30 transition-all hover:shadow-glow bg-bg/50">
@@ -338,7 +338,7 @@ export default function CombatBalancerPage() {
                 {t("calculationsNote")}
             </p>
 
-            <div className="sm:hidden pt-4">
+            <div className="hidden lg:block pt-4">
                 <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic inline-flex justify-center w-full">
                     {t("viewDocs")}
                 </Link>

@@ -63,7 +63,7 @@ export default function Sidebar() {
                 <Link
                   href={item.href}
                   onClick={() => {
-                    if (window.innerWidth < 1024) setIsOpen(false);
+                    if (window.innerWidth < 1280) setIsOpen(false);
                   }}
                   className="flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-semibold tracking-widest ui-link transition hover:bg-gold/10"
                 >

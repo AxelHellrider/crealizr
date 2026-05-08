@@ -197,7 +197,7 @@ export function ContactForm() {
           <button
               type="submit"
               disabled={state === "submitting" || (turnstileEnabled && !turnstileReady)}
-              className="ui-button ui-button-primary mt-2 w-full sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="ui-button ui-button-primary mt-2 w-full lg:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {state === "submitting"
               ? t("sending")

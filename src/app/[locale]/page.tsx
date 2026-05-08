@@ -49,35 +49,35 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
   const {locale} = await params;
   const t = await getTranslations();
   return (
-    <div className="flex flex-col gap-16 sm:gap-20">
+    <div className="flex flex-col gap-16 lg:gap-20">
       {/* Hero Section */}
-      <section className="relative glass-panel p-8 sm:p-24 flex flex-col items-center text-center overflow-hidden min-h-[60vh] justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+      <section className="relative glass-panel p-5 lg:p-24 flex flex-col items-center text-center overflow-hidden min-h-[60vh] justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
         <div className="pointer-events-none absolute inset-0 opacity-20">
           <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(197,160,89,0.3), transparent 70%)"}} />
           <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full blur-[120px]" style={{background:"radial-gradient(circle, rgba(44,62,80,0.4), transparent 70%)"}} />
         </div>
 
-        <div className="relative z-10 max-w-4xl">
-          <h1 className="text-5xl sm:text-7xl font-serif tracking-tight text-foreground drop-shadow-sm">
+        <div className="relative z-10 max-w-4xl lg:max-w-5xl">
+          <h1 className="text-2xl lg:text-5xl font-serif tracking-tight text-foreground drop-shadow-sm">
             {t("home.hero.title")}
           </h1>
-          <p className="mt-6 text-lg sm:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="mt-6 text-base lg:text-2xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-light">
             {t("home.hero.description")}
           </p>
           <WhyDifferent className="mt-6" />
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link href={`/${locale}/encounter-builder`}>
-              <Button variant="primary" className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
+              <Button variant="primary" className="px-10 py-4 text-base lg:text-lg uppercase font-serif tracking-widest">
                 {t("home.hero.buildEncounter")}
               </Button>
             </Link>
             <Link href={`/${locale}/monster-scaler`}>
-              <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
+              <Button className="px-10 py-4 text-base lg:text-lg uppercase font-serif tracking-widest">
                 {t("home.hero.scaleMonster")}
               </Button>
             </Link>
             <Link href={`/${locale}/artifact-forge`}>
-              <Button className="px-10 py-4 text-base sm:text-lg uppercase font-serif tracking-widest">
+              <Button className="px-10 py-4 text-base lg:text-lg uppercase font-serif tracking-widest">
                 {t("home.hero.forgeItem")}
               </Button>
             </Link>
@@ -87,13 +87,13 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
       <section className="grid gap-8">
         <div className="flex flex-col items-center text-center">
-          <h2 className="text-3xl sm:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.exampleOutput.title")}</h2>
-          <p className="text-muted mt-3 max-w-2xl text-base italic">
+          <h2 className="text-2xl lg:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.exampleOutput.title")}</h2>
+          <p className="text-muted mt-3 lg:max-w-2xl text-base italic">
             {t("home.exampleOutput.description")}
           </p>
         </div>
         <Card className="p-8 border-gold/10 bg-card">
-          <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] items-center">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-[1.2fr_1fr] items-center">
             <div className="space-y-4">
               <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("home.exampleOutput.inputs")}</div>
               <div className="grid gap-2 text-sm">
@@ -118,12 +118,12 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
       <section className="grid gap-10">
         <div className="flex flex-col items-center text-center">
-          <h2 className="text-3xl sm:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.sampleOutputs.title")}</h2>
+          <h2 className="text-2xl lg:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.sampleOutputs.title")}</h2>
           <p className="text-muted mt-3 max-w-2xl text-base italic">
             {t("home.sampleOutputs.description")}
           </p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
           <Card className="p-6 border-gold/10 bg-card">
             <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("home.sampleOutputs.encounterBuilder")}</div>
             <div className="mt-3 text-lg font-serif accent-gold">{t("home.sampleOutputs.encounterValue")}</div>
@@ -150,10 +150,10 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
       <section className="grid gap-10">
         <div className="flex flex-col items-center text-center">
-          <h2 className="text-3xl sm:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.howItWorks.title")}</h2>
+          <h2 className="text-2xl lg:text-4xl font-serif accent-gold uppercase tracking-widest">{t("home.howItWorks.title")}</h2>
           <p className="text-muted mt-3 max-w-xl text-base italic">{t("home.howItWorks.description")}</p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
           <Card className="p-6 border-gold/10 bg-card">
             <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("home.howItWorks.step1")}</div>
             <h3 className="mt-3 font-serif text-xl uppercase tracking-wide">{t("home.howItWorks.step1Title")}</h3>
@@ -229,7 +229,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
       {/* Brief about services / why us */}
       <Card className="p-12 bg-card fantasy-border">
-        <div className="grid gap-16 md:grid-cols-2 items-center">
+        <div className="grid gap-16 grid-cols-1 lg:grid-cols-2 items-center">
           <div>
             <h2 className="text-4xl font-serif mb-8 accent-gold uppercase tracking-tight">{t("home.reliability.title")}</h2>
             <div className="space-y-8">

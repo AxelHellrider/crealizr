@@ -45,7 +45,7 @@ export default function Header() {
                         <LanguageSwitcher />
                         <Link
                             href={`/${locale}/contact`}
-                            className="lg:block hidden ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                            className="hidden lg:block ui-button px-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
                         >
                             Contact
                         </Link>
@@ -88,7 +88,7 @@ export default function Header() {
 
             {/* Mobile Menu Panel */}
             {open && (
-                <div id="mobile-menu" className="lg:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div id="mobile-menu" className="xl:hidden glass-panel border-t border-gold/10 animate-in fade-in slide-in-from-top-2 duration-200">
                     <nav className="flex flex-col gap-2 px-4 py-4 text-sm font-semibold tracking-widest" aria-label="Mobile Navigation">
                         <Link
                             href={`/${locale}/encounter-builder`}

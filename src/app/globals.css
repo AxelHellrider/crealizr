@@ -92,7 +92,6 @@ body::before {
   display: flex;
   flex-direction: column;
   padding: 2rem 1.5rem;
-  max-width: calc(100svw - 2rem);
   margin: 0 auto;
   width: 100%;
   contain: layout style;
@@ -274,7 +273,10 @@ h1, h2, h3, h4, .font-serif {
 .page-wrap { width: 100%; margin: 0 auto; padding: 1.5rem; }
 
 @media (min-width: 1024px) {
-  .page-wrap { padding: 2rem 4rem; }
+  .page-wrap {
+    padding: 2rem 4rem;
+    max-width: calc(100svw - 2rem);
+  }
 }
 
 /* Top route progress bar */

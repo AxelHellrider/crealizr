@@ -10,7 +10,7 @@ export function MobileBackToToolkit() {
   if (pathname === `/${locale}`) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 sm:hidden">
+    <div className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 lg:hidden">
       <Link
         href={`/${locale}`}
         className="ui-button ui-button-primary w-full justify-center text-center uppercase tracking-widest text-xs"

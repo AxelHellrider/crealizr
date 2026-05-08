@@ -9,7 +9,7 @@ export default function Footer() {
     return (
         <footer className="w-full mt-24 border-t border-gold/20 bg-card/30 backdrop-blur-sm">
             <div className="max-w-[calc(100svw - 2rem)] mx-auto px-8 py-12">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     {/* Brand */}
                     <div className="space-y-2">
                         <h2 className="text-xl font-serif accent-gold uppercase tracking-[0.2em]">CRealizr</h2>
@@ -28,7 +28,7 @@ export default function Footer() {
                     </nav>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-gold/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="mt-8 pt-8 border-t border-gold/10 flex flex-col lg:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-muted">
                         Version 0.9 · Validated for 2014 & 2024 SRD
                     </p>
