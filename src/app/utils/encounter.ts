@@ -554,7 +554,7 @@ export function getRelatedMonsters(
 ): MonsterManualCatalogEntry[] {
     const catalog = ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG;
     if (criteria === "any") {
-        return catalog;
+        return [...catalog];
     }
 
     return catalog.filter((monster) => {
