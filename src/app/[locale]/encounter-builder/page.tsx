@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useCallback } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -24,6 +24,22 @@ type BudgetMode = "encounter" | "daily";
 type RelationCriteria = "terrain" | "affiliation" | "genus" | "any";
 type MonsterRecommendationMember = { count: number; name: string; cr: number };
 
+function BudgetBar({ fit, budgetFitLabel, accent = "gold" }: { fit: number; budgetFitLabel: string; accent?: "gold" | "silver" }) {
+    return (
+        <>
+            <div className={`mt-4 h-px w-full ${accent === "silver" ? "bg-silver/10" : "bg-gold/10"} rounded-full overflow-hidden`}>
+                <div
+                    className={`h-full ${accent === "silver" ? "bg-silver shadow-[0_0_8px_rgba(148,163,184,0.5)]" : "bg-gold shadow-[0_0_8px_rgba(197,160,89,0.5)]"}`}
+                    style={{ width: `${Math.min(fit * 100, 100)}%` }}
+                />
+            </div>
+            <div className={`mt-2 text-right text-[10px] ${accent === "silver" ? "text-silver/60" : "text-gold/60"} uppercase tracking-widest font-bold`}>
+                {budgetFitLabel} {(fit * 100).toFixed(0)}%
+            </div>
+        </>
+    );
+}
+
 export default function CombatBalancerPage() {
     const locale = useLocale();
     const t = useTranslations("encounterBuilder");
@@ -36,7 +52,6 @@ export default function CombatBalancerPage() {
     const [groupTypes, setGroupTypes] = useState(2);
     const [includeMinions, setIncludeMinions] = useState(false);
     const [relationCriteria, setRelationCriteria] = useState<RelationCriteria>("any");
-    const [isExporting, setIsExporting] = useState(false);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     const budget = useMemo(() => {
@@ -99,119 +114,6 @@ export default function CombatBalancerPage() {
     const scrollToResults = () => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
-
-    // ── Export helpers ──────────────────────────────────────────────────────
-
-    const buildExportMeta = useCallback(() => ({
-        generatedAt: new Date().toISOString(),
-        party: { size: partySize, level: avgLevel },
-        encounter: { difficulty, ruleset, budgetMode, mode, budget },
-        filters: {
-            includeMinions: mode === "solo" ? includeMinions : undefined,
-            relationCriteria: mode === "solo" && includeMinions ? relationCriteria : mode === "group" ? relationCriteria : undefined,
-            groupTypes: mode === "group" ? groupTypes : undefined,
-        },
-        monsterRecommendations: monsterRecommendations.map((r) => ({
-            members: r.members.map((m: MonsterRecommendationMember) => ({ name: m.name, count: m.count, cr: m.cr })),
-            adjustedXP: r.adjustedXP,
-            fit: parseFloat((r.fit * 100).toFixed(1)),
-            budgetStatus: budgetStatus(r.fit).label,
-        })),
-        crMixOptions: mode === "solo"
-            ? soloSuggestions.map((s) => ({
-                mix: formatBossMinions(s),
-                adjustedXP: s.adjustedXP,
-                fit: parseFloat((s.fit * 100).toFixed(1)),
-            }))
-            : groupSuggestions.map((g) => ({
-                mix: formatGroupMembers(g.members),
-                adjustedXP: g.adjustedXP,
-                fit: parseFloat((g.fit * 100).toFixed(1)),
-            })),
-    }), [partySize, avgLevel, difficulty, ruleset, budgetMode, mode, budget, includeMinions, relationCriteria, groupTypes, monsterRecommendations, soloSuggestions, groupSuggestions]);
-
-    const handleExportJSON = useCallback(() => {
-        const data = buildExportMeta();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `encounter-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    }, [buildExportMeta]);
-
-    const handleExportPNG = useCallback(async () => {
-        if (!resultsRef.current) return;
-        setIsExporting(true);
-        try {
-            const { default: html2canvas } = await import("html2canvas");
-            const canvas = await html2canvas(resultsRef.current, {
-                backgroundColor: null,
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                removeContainer: true,
-                onclone: (doc) => {
-                    doc.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
-                        el.style.color = "";
-                        el.style.backgroundColor = "";
-                    });
-                },
-            });
-            const url = canvas.toDataURL("image/png");
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `encounter-${Date.now()}.png`;
-            a.click();
-        } finally {
-            setIsExporting(false);
-        }
-    }, []);
-
-    const handleExportPDF = useCallback(async () => {
-        if (!resultsRef.current) return;
-        setIsExporting(true);
-        try {
-            const { default: html2canvas } = await import("html2canvas");
-            const { default: jsPDF } = await import("jspdf");
-            const canvas = await html2canvas(resultsRef.current, {
-                backgroundColor: null,
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                removeContainer: true,
-                onclone: (doc) => {
-                    doc.querySelectorAll<HTMLElement>("[style]").forEach((el) => {
-                        el.style.color = "";
-                        el.style.backgroundColor = "";
-                    });
-                },
-            });
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvas.width / 2, canvas.height / 2] });
-            pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
-            pdf.save(`encounter-${Date.now()}.pdf`);
-        } finally {
-            setIsExporting(false);
-        }
-    }, []);
-
-    // ── Shared card renderer ────────────────────────────────────────────────
-
-    const BudgetBar = ({ fit, accent = "gold" }: { fit: number; accent?: "gold" | "silver" }) => (
-        <>
-            <div className={`mt-4 h-px w-full ${accent === "silver" ? "bg-silver/10" : "bg-gold/10"} rounded-full overflow-hidden`}>
-                <div
-                    className={`h-full ${accent === "silver" ? "bg-silver shadow-[0_0_8px_rgba(148,163,184,0.5)]" : "bg-gold shadow-[0_0_8px_rgba(197,160,89,0.5)]"}`}
-                    style={{ width: `${Math.min(fit * 100, 100)}%` }}
-                />
-            </div>
-            <div className={`mt-2 text-right text-[10px] ${accent === "silver" ? "text-silver/60" : "text-gold/60"} uppercase tracking-widest font-bold`}>
-                {t("budgetFit")} {(fit * 100).toFixed(0)}%
-            </div>
-        </>
-    );
 
     return (
         <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
@@ -385,44 +287,6 @@ export default function CombatBalancerPage() {
                     </div>
                 </div>
 
-                {/* Export toolbar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-8 pb-5 border-b border-gold/10">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-gold/50 font-bold">Export</span>
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={handleExportJSON}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-widest font-bold border border-gold/20 text-gold/70 hover:border-gold/50 hover:text-gold transition-colors rounded-sm"
-                            title="Download encounter as JSON metadata"
-                        >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M4 2h6l3 3v9H4V2z" /><path d="M10 2v3h3" /><path d="M6 9l2 2 2-2" /><path d="M8 7v4" />
-                            </svg>
-                            JSON
-                        </button>
-                        <button
-                            onClick={handleExportPNG}
-                            disabled={isExporting}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-widest font-bold border border-gold/20 text-gold/70 hover:border-gold/50 hover:text-gold transition-colors rounded-sm disabled:opacity-40"
-                            title="Save results as PNG image"
-                        >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <rect x="1" y="3" width="14" height="10" rx="1" /><circle cx="5.5" cy="7" r="1.5" /><path d="M1 11l4-3 3 3 3-4 4 4" />
-                            </svg>
-                            {isExporting ? "…" : "PNG"}
-                        </button>
-                        <button
-                            onClick={handleExportPDF}
-                            disabled={isExporting}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-widest font-bold border border-gold/20 text-gold/70 hover:border-gold/50 hover:text-gold transition-colors rounded-sm disabled:opacity-40"
-                            title="Save results as PDF"
-                        >
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M4 2h6l3 3v9H4V2z" /><path d="M10 2v3h3" /><path d="M5 9h2c.6 0 1-.4 1-1s-.4-1-1-1H5v4" /><path d="M10 7h1c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1h-1V7z" /><path d="M13.5 9h-1" />
-                            </svg>
-                            {isExporting ? "…" : "PDF"}
-                        </button>
-                    </div>
-                </div>
 
                 {/* Recommended mix highlight */}
                 {mode === "solo" && primarySolo && (
@@ -471,7 +335,7 @@ export default function CombatBalancerPage() {
                                         <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(recommendation.fit).color}`}>
                                             {budgetStatus(recommendation.fit).label}
                                         </div>
-                                        <BudgetBar fit={recommendation.fit} />
+                                        <BudgetBar fit={recommendation.fit} budgetFitLabel={t("budgetFit")} />
                                     </Card>
                                 </li>
                             ))}
@@ -498,7 +362,7 @@ export default function CombatBalancerPage() {
                                         <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(s.fit).color}`}>
                                             {budgetStatus(s.fit).label}
                                         </div>
-                                        <BudgetBar fit={s.fit} />
+                                        <BudgetBar fit={s.fit} budgetFitLabel={t("budgetFit")} />
                                     </Card>
                                 </li>
                             ))}
@@ -524,7 +388,7 @@ export default function CombatBalancerPage() {
                                         <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(g.fit).color}`}>
                                             {budgetStatus(g.fit).label}
                                         </div>
-                                        <BudgetBar fit={g.fit} accent="silver" />
+                                        <BudgetBar fit={g.fit} budgetFitLabel={t("budgetFit")} accent="silver" />
                                     </Card>
                                 </li>
                             ))}
