@@ -102,7 +102,7 @@ export default function ScalePage() {
             height: scrollHeight,
             windowWidth: scrollWidth,
             windowHeight: scrollHeight,
-            onclone: (doc) => {
+            onclone: (doc: Document) => {
                 const exportRoot = doc.querySelector('[data-export-statblock="true"]');
                 if (!exportRoot) return;
                 exportRoot.setAttribute("data-exporting", "true");
@@ -364,7 +364,7 @@ export default function ScalePage() {
                         </div>
 
                         <div className="grid gap-3">
-                             <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
+                            <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
                                 <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("challengeRating")}</span>
                                 <span className="text-lg font-bold">{formatCR(scaledMonster.challenge_rating)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
                             </div>
