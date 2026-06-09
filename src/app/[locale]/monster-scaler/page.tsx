@@ -140,7 +140,7 @@ export default function ScalePage() {
                 `;
                 doc.head.appendChild(style);
             },
-        });
+        } as Parameters<typeof html2canvas>[1] & { scale?: number });
     };
 
     const getModifier = (score: number) => {
