@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { encounterMultiplier, partyBudget, suggestEncounters, suggestGroupEncounters } from "@/app/utils/encounter";
+import {
+    MONSTER_MANUAL_2014_CATALOG,
+    encounterMultiplier,
+    partyBudget,
+    recommendMonstersForParty,
+    suggestEncounters,
+    suggestGroupEncounters,
+} from "@/app/utils/encounter";
 
 const RULESETS = ["2014", "2024"] as const;
 
@@ -138,6 +145,57 @@ describe("suggestGroupEncounters", () => {
             const sum = r.members.reduce((acc, m) => acc + m.count, 0);
             expect(sum).toBe(r.totalCount);
         });
+    });
+});
+
+describe("recommendMonstersForParty", () => {
+    it("returns 2014 Monster Manual benchmarks matched to the budget suggestions", () => {
+        const budget = partyBudget({
+            level: 5,
+            size: 4,
+            difficulty: "medium",
+            ruleset: "2014",
+            mode: "encounter",
+        });
+        const results = recommendMonstersForParty({
+            level: 5,
+            size: 4,
+            difficulty: "medium",
+            ruleset: "2014",
+            budget,
+        });
+
+        expect(results.length).toBeGreaterThan(0);
+        expect(results.length).toBeLessThanOrEqual(6);
+        results.forEach((monster) => {
+            expect(monster.name).toBeTruthy();
+            expect(monster.benchmarkCr).toBeGreaterThanOrEqual(0);
+            expect(monster.crDelta).toBeGreaterThanOrEqual(0);
+            expect(["exact", "nearest"]).toContain(monster.matchQuality);
+            expect(monster.fit).toBeGreaterThanOrEqual(0.7);
+            expect(monster.count).toBeGreaterThanOrEqual(1);
+        });
+    });
+
+    it("uses 2014 Monster Manual names for comparison", () => {
+        const catalogNames = new Set(MONSTER_MANUAL_2014_CATALOG.map((monster) => monster.name));
+
+        expect(catalogNames.has("Owlbear")).toBe(true);
+        expect(catalogNames.has("Beholder (not in lair)")).toBe(true);
+        expect(catalogNames.has("Tarrasque")).toBe(true);
+    });
+
+    it("honors the requested recommendation limit", () => {
+        const results = recommendMonstersForParty({
+            level: 10,
+            size: 5,
+            difficulty: "hard",
+            ruleset: "2024",
+            budget: 9500,
+            limit: 3,
+        });
+
+        expect(results.length).toBeLessThanOrEqual(3);
     });
 });
 

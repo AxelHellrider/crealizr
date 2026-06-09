@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 const title = "Encounter Builder for D&D 5e | CRealizr";
 const description =
-  "Build balanced D&D encounters fast with Budget Fit guidance, party inputs, and 2014/2024 rules support.";
+    "Build balanced D&D encounters fast with Budget Fit guidance, party inputs, and 2014/2024 rules support.";
 
 export const metadata: Metadata = {
   title,
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
 };
 
 export default function EncounterBuilderLayout({
-  children,
-}: {
+                                                 children,
+                                               }: {
   children: React.ReactNode;
 }) {
   return <>{children}</>;
