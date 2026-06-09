@@ -130,7 +130,7 @@ export type MonsterRecommendation = {
 };
 
 export type Terrain = "dungeon" | "wilderness" | "urban" | "underwater" | "planar" | "any";
-export type Affiliation = "humanoid" | "beast" | "undead" | "construct" | "dragon" | "fiend" | "celestial" | "fey" | "monstrosity" | "giant" | "elemental" | "aberration" | "any";
+export type Affiliation = "humanoid" | "beast" | "undead" | "construct" | "dragon" | "fiend" | "celestial" | "fey" | "monstrosity" | "giant" | "elemental" | "aberration" | "plant" | "any";
 
 type MonsterManualCatalogEntry = {
     name: string;
