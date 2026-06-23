@@ -10,6 +10,7 @@ import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import {ThemeProvider} from "@/app/context/ThemeContext";
 import {SidebarProvider} from "@/app/context/SidebarContext";
+import {CustomMonstersProvider} from "@/app/context/CustomMonstersContext";
 import SidebarToggle from "@/app/components/atoms/SidebarToggle";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
@@ -80,12 +81,14 @@ export default async function LocaleLayout({
                     <RouteProgress/>
                 </Suspense>
                 <SidebarProvider>
-                    <SidebarToggle/>
-                    <Sidebar/>
-                    <MainContent>
-                        {children}
-                        <Footer/>
-                    </MainContent>
+                    <CustomMonstersProvider>
+                        <SidebarToggle/>
+                        <Sidebar/>
+                        <MainContent>
+                            {children}
+                            <Footer/>
+                        </MainContent>
+                    </CustomMonstersProvider>
                 </SidebarProvider>
             </ThemeProvider>
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!}/>

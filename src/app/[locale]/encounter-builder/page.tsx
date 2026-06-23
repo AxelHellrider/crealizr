@@ -10,6 +10,7 @@ import {
     suggestBossWithMinions,
 } from "@/app/utils/encounter";
 import { formatCR } from "@/app/lib/format";
+import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
@@ -53,18 +54,20 @@ export default function CombatBalancerPage() {
     const [includeMinions, setIncludeMinions] = useState(false);
     const [relationCriteria, setRelationCriteria] = useState<RelationCriteria>("any");
     const resultsRef = useRef<HTMLDivElement>(null);
+    const { catalog2014, catalog2024 } = useMergedCatalog();
+    const catalog = ruleset === "2024" ? catalog2024 : catalog2014;
 
     const budget = useMemo(() => {
         return partyBudget({ level: avgLevel, size: partySize, difficulty, ruleset, mode: budgetMode });
     }, [avgLevel, partySize, difficulty, ruleset, budgetMode]);
 
     const soloSuggestions = useMemo(() => {
-        return suggestBossWithMinions({ level: avgLevel, size: partySize, difficulty, ruleset, budget, includeMinions, relationCriteria });
-    }, [avgLevel, partySize, difficulty, ruleset, budget, includeMinions, relationCriteria]);
+        return suggestBossWithMinions({ level: avgLevel, size: partySize, difficulty, ruleset, budget, includeMinions, relationCriteria, catalog });
+    }, [avgLevel, partySize, difficulty, ruleset, budget, includeMinions, relationCriteria, catalog]);
 
     const groupSuggestions = useMemo(() => {
-        return suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty, ruleset, budget, maxTypes: groupTypes, relationCriteria });
-    }, [avgLevel, partySize, difficulty, ruleset, budget, groupTypes, relationCriteria]);
+        return suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty, ruleset, budget, maxTypes: groupTypes, relationCriteria, catalog });
+    }, [avgLevel, partySize, difficulty, ruleset, budget, groupTypes, relationCriteria, catalog]);
 
     const monsterRecommendations = useMemo(() => {
         return recommendMonstersForParty({
@@ -73,8 +76,9 @@ export default function CombatBalancerPage() {
             maxTypes: mode === "group" ? groupTypes : undefined,
             includeMinions: mode === "solo" ? includeMinions : undefined,
             relationCriteria,
+            catalog,
         });
-    }, [avgLevel, partySize, difficulty, ruleset, budget, mode, groupTypes, includeMinions, relationCriteria]);
+    }, [avgLevel, partySize, difficulty, ruleset, budget, mode, groupTypes, includeMinions, relationCriteria, catalog]);
 
     const partyPresets = [
         { label: "3 PCs", size: 3 },

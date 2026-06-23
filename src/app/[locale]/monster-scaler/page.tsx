@@ -13,10 +13,13 @@ import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
+import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export default function ScalePage() {
     const t = useTranslations("monsterScaler");
+    const { addMonster: saveToLibrary } = useCustomMonsters();
+    const [saved, setSaved] = useState(false);
     const [step, setStep] = useState<1 | 2>(1);
     const [monster, setMonster] = useState<MonsterBase>({
         name: "",
@@ -29,7 +32,9 @@ export default function ScalePage() {
             range: ""
         },
         alignment: "Unaligned",
-        challenge_rating: 0.125,
+        cr: 0.125,
+        terrain: ["any"],
+        affiliation: "any",
         xp: 0,
         stats: { ac: 10, hp: 1, str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10, speed: "30 ft" },
         raw_source_ref: "",
@@ -201,7 +206,7 @@ export default function ScalePage() {
                                 </Select>
                             </FormField>
                             <FormField label={t("currentCR")}>
-                                <Select value={monster.challenge_rating} onChange={(e) => setMonster({ ...monster, challenge_rating: Number(e.target.value) })}>
+                                <Select value={monster.cr} onChange={(e) => setMonster({ ...monster, cr: Number(e.target.value) })}>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
@@ -304,14 +309,14 @@ export default function ScalePage() {
                                 <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{monster.stats.ac}</span></div>
                                 <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{monster.stats.hp}</span></div>
                                 <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{monster.dpr.range}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(monster.challenge_rating)}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(monster.cr)}</span></div>
                             </div>
                             <div className="space-y-2">
                                 <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("scaled")}</div>
                                 <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{scaledMonster.stats.ac}</span></div>
                                 <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{scaledMonster.stats.hp}</span></div>
                                 <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{scaledMonster.dpr?.range ?? "—"}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(scaledMonster.challenge_rating)}</span></div>
+                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(scaledMonster.cr)}</span></div>
                             </div>
                         </div>
                         <div className="mt-4 grid gap-3 grid-cols-1 lg:grid-cols-3 text-xs">
@@ -325,7 +330,7 @@ export default function ScalePage() {
                             </div>
                             <div className="flex justify-between border-b border-gold/5 pb-2">
                                 <span className="text-muted">{t("crShift")}</span>
-                                <span className="font-medium">{formatCR(monster.challenge_rating)} → {formatCR(scaledMonster.challenge_rating)}</span>
+                                <span className="font-medium">{formatCR(monster.cr)} → {formatCR(scaledMonster.cr)}</span>
                             </div>
                         </div>
                     </Card>
@@ -366,7 +371,7 @@ export default function ScalePage() {
                         <div className="grid gap-3">
                             <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
                                 <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("challengeRating")}</span>
-                                <span className="text-lg font-bold">{formatCR(scaledMonster.challenge_rating)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
+                                <span className="text-lg font-bold">{formatCR(scaledMonster.cr)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
                             </div>
                             {scaledMonster.dpr && (
                                 <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
@@ -387,6 +392,19 @@ export default function ScalePage() {
                         </button>
                         <button onClick={downloadPDF} className="ui-button ui-button-primary flex-1">
                             {t("downloadPdf")}
+                        </button>
+                        <button
+                            onClick={async () => {
+                                if (scaledMonster) {
+                                    await saveToLibrary({ ...scaledMonster, terrain: ["any"], affiliation: "any" });
+                                    setSaved(true);
+                                    setTimeout(() => setSaved(false), 2000);
+                                }
+                            }}
+                            disabled={!scaledMonster || saved}
+                            className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs disabled:opacity-40"
+                        >
+                            {saved ? "✓ Saved" : "Save to My Monsters"}
                         </button>
                     </div>
                     <div className="text-xs text-muted italic text-center">

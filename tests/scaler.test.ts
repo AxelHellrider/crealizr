@@ -41,7 +41,10 @@ const baseMonster = (): MonsterBase => ({
   size: "Small",
   type: "humanoid",
   alignment: "neutral",
-  challenge_rating: 0.125,
+  cr: 0.125,
+  terrain: ["dungeon", "wilderness"],
+  affiliation: "humanoid",
+  genus: "goblinoid",
   xp: 25,
   dpr: {
     min: 20,
@@ -73,7 +76,7 @@ describe("scaleMonster2014", () => {
 
   it("sets target CR and scales HP exactly to target row HP", () => {
     const scaled = scaleMonster2014(monster, 1);
-    expect(scaled.challenge_rating).toBe(1);
+    expect(scaled.cr).toBe(1);
     // From mock matrix: target CR 1 has hp 80, src hp is 20 so scale x4
     expect(scaled.stats.hp).toBe(80);
   });
@@ -86,7 +89,7 @@ describe("scaleMonster2014", () => {
 
   it("scales ability scores by modifier steps and applies bonuses", () => {
     // Scale from CR 1/8 to CR 5 => diff = 4 -> +2 mod to each numeric stat via nearest score
-    const m: MonsterBase = { ...monster, challenge_rating: 1 }; // start at CR 1 for clarity
+    const m: MonsterBase = { ...monster, cr: 1 }; // start at CR 1 for clarity
     const res = scaleMonster2014(m, 5, { abilityScoreBonus: { str: 1, int: 2 } });
 
     // STR 10 (mod 0) -> +2 mod => nearest score with +2 is 14; +1 bonus => 15
@@ -111,7 +114,7 @@ describe("scaleMonster2014", () => {
 
   it("handles fractional CR targets (1/2)", () => {
     const res = scaleMonster2014(monster, 0.5);
-    expect(res.challenge_rating).toBe(0.5);
+    expect(res.cr).toBe(0.5);
     // target row hp 60 from mock => scale x3
     expect(res.stats.hp).toBe(60);
   });

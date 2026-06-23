@@ -25,6 +25,7 @@ export default function Sidebar() {
     { href: `/${locale}/monster-scaler`, label: t("nav.monsterScaler"), icon: "⚖️" },
     { href: `/${locale}/travel-encounters`, label: t("nav.travelEncounters"), icon: "🗺️" },
     { href: `/${locale}/artifact-forge`, label: t("nav.artifactForge"), icon: "✨" },
+    { href: `/${locale}/my-monsters`, label: t("nav.myMonsters"), icon: "📖" },
     { href: `/${locale}/contact`, label: t("nav.contact"), icon: "📧" },
   ];
 

@@ -47,8 +47,18 @@ function getClientKey(request: NextRequest): string {
   return `${ip}:${userAgent.slice(0, 80)}`;
 }
 
+function evictExpiredBuckets(): void {
+  const now = Date.now();
+  for (const [key, bucket] of globalRateBuckets) {
+    if (now > bucket.resetAt) globalRateBuckets.delete(key);
+  }
+}
+
 function isRateLimited(key: string): boolean {
   const now = Date.now();
+
+  if (globalRateBuckets.size > 10_000) evictExpiredBuckets();
+
   const bucket = globalRateBuckets.get(key);
 
   if (!bucket || now > bucket.resetAt) {
@@ -65,7 +75,7 @@ function isRateLimited(key: string): boolean {
 }
 
 function sanitizeInput(value: string): string {
-  return value.replace(/\0/g, "").trim();
+  return value.replace(/\0/g, "").replace(/[\r\n]/g, " ").trim();
 }
 
 function escapeHtml(value: string): string {

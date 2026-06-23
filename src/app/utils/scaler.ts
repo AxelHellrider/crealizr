@@ -78,7 +78,7 @@ export function scaleMonster2014(
         abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
     }
 ): MonsterBase {
-    const srcCR = monster.challenge_rating ?? 0.125;
+    const srcCR = monster.cr ?? 0.125;
     if (srcCR === targetCR) return { ...monster };
 
     const srcRow = findCRRow2014(srcCR);
@@ -137,7 +137,7 @@ export function scaleMonster2014(
 
     const scaled: MonsterBase & { _advice?: Record<string, number | unknown> } = {
         ...monster,
-        challenge_rating: targetCR,
+        cr: targetCR,
         stats: newStats,
         dpr: finalDPR,
         raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled (2014)`,
@@ -164,7 +164,7 @@ export function scaleMonster2024(
         abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
     }
 ): MonsterBase {
-    const srcCR = monster.challenge_rating ?? 0.125;
+    const srcCR = monster.cr ?? 0.125;
     if (srcCR === targetCR) return { ...monster };
 
     const srcRow = findCRRow2024(srcCR);
@@ -219,7 +219,7 @@ export function scaleMonster2024(
 
     const scaled: MonsterBase & { _advice?: Record<string, number | unknown> } = {
         ...monster,
-        challenge_rating: targetCR,
+        cr: targetCR,
         edition: "2024",
         stats: newStats,
         dpr: finalDPR,

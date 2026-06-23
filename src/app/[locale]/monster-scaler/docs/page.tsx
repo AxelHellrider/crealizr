@@ -151,7 +151,7 @@ export default function ScaleDocsPage() {
 
             <h2 className="mt-8 text-xl font-semibold">Inputs</h2>
             <ul>
-                <li>Source monster stat block: name, size/type, current <Code>challenge_rating</Code>,
+                <li>Source monster stat block: name, size/type, current <Code>cr</Code>,
                     and <Code>stats</Code> (AC, HP, STR/DEX/CON/INT/WIS/CHA).
                 </li>
                 <li>Optional action list used to estimate DPR from damage expressions (e.g., <Code>1d6+2</Code>).</li>
