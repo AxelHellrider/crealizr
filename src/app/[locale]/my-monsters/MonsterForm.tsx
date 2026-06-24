@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Monster, Terrain, Affiliation, Edition, MonsterSize, MonsterAction } from "@/app/types/monster";
 import { Button } from "@/app/components/atoms/Button";
@@ -8,6 +8,8 @@ import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
+import { MONSTER_MANUAL_2014_CATALOG, MONSTER_MANUAL_2024_CATALOG } from "@/app/data/monsters";
+import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
 
 const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar", "any"];
 const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant", "any"];
@@ -21,6 +23,10 @@ function formatCR(cr: number): string {
     return String(cr);
 }
 
+function clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
+}
+
 type Props = {
     initial?: Monster;
     existingNames: Set<string>;
@@ -30,6 +36,12 @@ type Props = {
 
 export default function MonsterForm({ initial, existingNames, onSave, onCancel }: Props) {
     const t = useTranslations("myMonsters");
+    const { customMonsters } = useCustomMonsters();
+
+    const knownGenera = useMemo(() => {
+        const all = [...MONSTER_MANUAL_2014_CATALOG, ...MONSTER_MANUAL_2024_CATALOG, ...customMonsters];
+        return [...new Set(all.map((m) => m.genus).filter(Boolean) as string[])].sort();
+    }, [customMonsters]);
 
     const [name, setName] = useState(initial?.name ?? "");
     const [cr, setCr] = useState(initial?.cr ?? 1);
@@ -106,22 +118,57 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
     return (
         <form onSubmit={handleSubmit} className="grid gap-6">
-            <h2 className="text-2xl font-serif accent-gold uppercase tracking-wide">
-                {initial ? t("editMonster") : t("addMonster")}
-            </h2>
-
             {error && (
                 <div className="p-3 rounded-sm text-sm border border-red-500/20 bg-red-500/5 text-red-400">
                     {error}
                 </div>
             )}
 
-            {/* ── Core fields ── */}
-            <Card className="p-6 border-gold/10">
-                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">Core</div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField label={t("form.name")}>
-                        <Input value={name} onChange={(e) => { setName(e.target.value); setError(""); }} />
+            {/* ── Identity — mirrors top of a D&D stat block ── */}
+            <Card className="p-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
+                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    {initial ? t("editMonster") : t("addMonster")}
+                </h2>
+
+                {/* Name — large, like the stat block title */}
+                <FormField label={t("form.name")}>
+                    <input
+                        value={name}
+                        onChange={(e) => { setName(e.target.value); setError(""); }}
+                        className="ui-input w-full text-2xl font-serif py-3 transition-all duration-200
+                            focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold
+                            bg-bg-elev border-silver/30 text-foreground"
+                        placeholder="e.g. Dire Owlbear"
+                    />
+                </FormField>
+
+                {/* Size / Type / Alignment — italic subtitle line */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField label={t("form.size")}>
+                        <Select value={size} onChange={(e) => { setSize(e.target.value as MonsterSize); if (!showStats) setShowStats(true); }}>
+                            {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
+                        </Select>
+                    </FormField>
+                    <FormField label={t("form.type")}>
+                        <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. monstrosity" />
+                    </FormField>
+                    <FormField label={t("form.alignment")}>
+                        <Input value={alignment} onChange={(e) => setAlignment(e.target.value)} placeholder="e.g. chaotic evil" />
+                    </FormField>
+                </div>
+
+                {/* Edition + CR — key identifiers */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField label={t("form.edition")}>
+                        <div className="flex gap-4 min-h-11 items-center">
+                            {(["2014", "2024"] as Edition[]).map((ed) => (
+                                <label key={ed} className="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="edition" checked={edition === ed} onChange={() => setEdition(ed)} className="accent-gold" />
+                                    <span className="text-sm">{ed}</span>
+                                </label>
+                            ))}
+                        </div>
                     </FormField>
                     <FormField label={t("form.cr")}>
                         <Select value={cr} onChange={(e) => setCr(Number(e.target.value))}>
@@ -130,23 +177,125 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                             ))}
                         </Select>
                     </FormField>
+                    <FormField label={t("form.xp")}>
+                        <Input type="number" min={0} value={xp} onChange={(e) => setXp(Math.max(0, Number(e.target.value)))} />
+                    </FormField>
                 </div>
+            </Card>
 
-                {/* Edition */}
-                <div className="mt-4">
-                    <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("form.edition")}</div>
-                    <div className="flex gap-4">
-                        {(["2014", "2024"] as Edition[]).map((ed) => (
-                            <label key={ed} className="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="edition" checked={edition === ed} onChange={() => setEdition(ed)} className="accent-gold" />
-                                <span className="text-sm">{ed}</span>
-                            </label>
-                        ))}
+            {/* ── Defense — AC / HP / Speed block ── */}
+            <Card className="p-6">
+                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    {t("form.statBlock")}
+                </h2>
+
+                <div className="grid gap-3 border-y border-gold/20 py-4 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="flex items-center gap-4">
+                            <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.ac")}</span>
+                            <Input type="number" min={0} max={20} value={ac} onChange={(e) => { setAc(clamp(Number(e.target.value), 0, 30)); if (!showStats) setShowStats(true); }} />
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.hp")}</span>
+                            <Input type="number" min={0} value={hp} onChange={(e) => { setHp(Math.max(0, Number(e.target.value))); if (!showStats) setShowStats(true); }} />
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.speed")}</span>
+                            <Input value={speed} onChange={(e) => { setSpeed(e.target.value); if (!showStats) setShowStats(true); }} />
+                        </div>
                     </div>
                 </div>
 
+                {/* Ability Scores — 6 boxes like the stat block display */}
+                <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+                    {[
+                        { key: "str", val: str, set: setStr },
+                        { key: "dex", val: dex, set: setDex },
+                        { key: "con", val: con, set: setCon },
+                        { key: "int", val: int, set: setInt },
+                        { key: "wis", val: wis, set: setWis },
+                        { key: "cha", val: cha, set: setCha },
+                    ].map(({ key, val, set }) => (
+                        <div key={key} className="text-center p-3 border border-gold/10 bg-gold/5 rounded-sm">
+                            <div className="text-[10px] uppercase text-gold font-bold tracking-widest mb-2">{t(`form.${key}`)}</div>
+                            <input
+                                type="number"
+                                value={val}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { set(clamp(Number(e.target.value), 0, 30)); if (!showStats) setShowStats(true); }}
+                                className="w-full text-center text-lg font-bold bg-transparent border-0 outline-none focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            />
+                            <div className="text-xs text-muted italic">({val >= 10 ? "+" : ""}{Math.floor((val - 10) / 2)})</div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* DPR */}
+                <div className="grid grid-cols-3 gap-4">
+                    <FormField label={t("form.dprMin")}>
+                        <Input type="number" min={0} value={dprMin} onChange={(e) => setDprMin(Math.max(0, Number(e.target.value)))} />
+                    </FormField>
+                    <FormField label={t("form.dprMax")}>
+                        <Input type="number" min={0} value={dprMax} onChange={(e) => setDprMax(Math.max(0, Number(e.target.value)))} />
+                    </FormField>
+                    <FormField label={t("form.dprRange")}>
+                        <Input value={dprRange} onChange={(e) => setDprRange(e.target.value)} placeholder="e.g. 2d8+4" />
+                    </FormField>
+                </div>
+            </Card>
+
+            {/* ── Actions ── */}
+            <Card className="p-6">
+                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    {t("form.actions")}
+                </h2>
+                <div className="space-y-2">
+                    {actions.map((action, i) => (
+                        <div key={i} className="flex gap-2 items-center">
+                            <Input
+                                value={action.name}
+                                placeholder={t("form.actionName")}
+                                onChange={(e) => {
+                                    const updated = [...actions];
+                                    updated[i] = { ...updated[i], name: e.target.value };
+                                    setActions(updated);
+                                }}
+                            />
+                            <Input
+                                value={action.damage ?? ""}
+                                placeholder={t("form.actionDamage")}
+                                onChange={(e) => {
+                                    const updated = [...actions];
+                                    updated[i] = { ...updated[i], damage: e.target.value || undefined };
+                                    setActions(updated);
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setActions(actions.filter((_, j) => j !== i))}
+                                className="text-red-400/60 hover:text-red-400 px-2 text-lg shrink-0"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setActions([...actions, { name: "" }])}
+                    className="ui-link text-xs uppercase tracking-widest mt-3"
+                >
+                    + {t("form.addAction")}
+                </button>
+            </Card>
+
+            {/* ── Encounter Data — terrain, affiliation, genus ── */}
+            <Card className="p-6">
+                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    Encounter Data
+                </h2>
+
                 {/* Terrain */}
-                <div className="mt-4">
+                <div className="mb-4">
                     <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("form.terrain")}</div>
                     <div className="flex flex-wrap gap-2">
                         {TERRAINS.map((ter) => (
@@ -164,147 +313,61 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     </div>
                 </div>
 
-                {/* Affiliation + Genus */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <FormField label={t("form.affiliation")}>
-                        <Select value={affiliation} onChange={(e) => setAffiliation(e.target.value as Affiliation)}>
-                            {AFFILIATIONS.map((a) => (
-                                <option key={a} value={a}>{a}</option>
-                            ))}
-                        </Select>
-                    </FormField>
-                    <FormField label={t("form.genus")}>
-                        <Input value={genus} onChange={(e) => setGenus(e.target.value)} />
-                    </FormField>
-                </div>
-            </Card>
-
-            {/* ── Stat block (collapsible) ── */}
-            <Card className="p-6 border-gold/10">
-                <button
-                    type="button"
-                    onClick={() => setShowStats(!showStats)}
-                    className="w-full flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold hover:text-gold transition-colors"
-                >
-                    <span>{t("form.statBlock")}</span>
-                    <span className="text-lg">{showStats ? "−" : "+"}</span>
-                </button>
-
-                {showStats && (
-                    <div className="mt-6 grid gap-6">
-                        {/* Identity */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <FormField label={t("form.size")}>
-                                <Select value={size} onChange={(e) => setSize(e.target.value as MonsterSize)}>
-                                    {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
-                                </Select>
-                            </FormField>
-                            <FormField label={t("form.type")}>
-                                <Input value={type} onChange={(e) => setType(e.target.value)} />
-                            </FormField>
-                            <FormField label={t("form.alignment")}>
-                                <Input value={alignment} onChange={(e) => setAlignment(e.target.value)} />
-                            </FormField>
-                            <FormField label={t("form.xp")}>
-                                <Input type="number" value={xp} onChange={(e) => setXp(Number(e.target.value))} />
-                            </FormField>
-                        </div>
-
-                        {/* Defense */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <FormField label={t("form.ac")}>
-                                <Input type="number" value={ac} onChange={(e) => setAc(Number(e.target.value))} />
-                            </FormField>
-                            <FormField label={t("form.hp")}>
-                                <Input type="number" value={hp} onChange={(e) => setHp(Number(e.target.value))} />
-                            </FormField>
-                            <FormField label={t("form.speed")} className="col-span-2">
-                                <Input value={speed} onChange={(e) => setSpeed(e.target.value)} />
-                            </FormField>
-                        </div>
-
-                        {/* Ability scores */}
-                        <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-3">Ability Scores</div>
-                            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                                {[
-                                    { key: "str", val: str, set: setStr },
-                                    { key: "dex", val: dex, set: setDex },
-                                    { key: "con", val: con, set: setCon },
-                                    { key: "int", val: int, set: setInt },
-                                    { key: "wis", val: wis, set: setWis },
-                                    { key: "cha", val: cha, set: setCha },
-                                ].map(({ key, val, set }) => (
-                                    <FormField key={key} label={t(`form.${key}`)}>
-                                        <Input type="number" value={val} onChange={(e: React.ChangeEvent<HTMLInputElement>) => set(Number(e.target.value))} />
-                                    </FormField>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* DPR */}
-                        <div className="grid grid-cols-3 gap-4">
-                            <FormField label={t("form.dprMin")}>
-                                <Input type="number" value={dprMin} onChange={(e) => setDprMin(Number(e.target.value))} />
-                            </FormField>
-                            <FormField label={t("form.dprMax")}>
-                                <Input type="number" value={dprMax} onChange={(e) => setDprMax(Number(e.target.value))} />
-                            </FormField>
-                            <FormField label={t("form.dprRange")}>
-                                <Input value={dprRange} onChange={(e) => setDprRange(e.target.value)} />
-                            </FormField>
-                        </div>
-
-                        {/* Actions */}
-                        <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-3">{t("form.actions")}</div>
-                            <div className="space-y-2">
-                                {actions.map((action, i) => (
-                                    <div key={i} className="flex gap-2 items-center">
-                                        <Input
-                                            value={action.name}
-                                            placeholder={t("form.actionName")}
-                                            onChange={(e) => {
-                                                const updated = [...actions];
-                                                updated[i] = { ...updated[i], name: e.target.value };
-                                                setActions(updated);
-                                            }}
-                                        />
-                                        <Input
-                                            value={action.damage ?? ""}
-                                            placeholder={t("form.actionDamage")}
-                                            onChange={(e) => {
-                                                const updated = [...actions];
-                                                updated[i] = { ...updated[i], damage: e.target.value || undefined };
-                                                setActions(updated);
-                                            }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setActions(actions.filter((_, j) => j !== i))}
-                                            className="text-red-400/60 hover:text-red-400 px-2 text-lg shrink-0"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                {/* Affiliation */}
+                <div className="mb-4">
+                    <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("form.affiliation")}</div>
+                    <div className="flex flex-wrap gap-2">
+                        {AFFILIATIONS.map((a) => (
                             <button
+                                key={a}
                                 type="button"
-                                onClick={() => setActions([...actions, { name: "" }])}
-                                className="ui-link text-xs uppercase tracking-widest mt-3"
+                                onClick={() => setAffiliation(a)}
+                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                    affiliation === a ? "border-gold bg-gold/10 text-gold" : "border-gold/20 text-muted hover:bg-gold/5"
+                                }`}
                             >
-                                + {t("form.addAction")}
+                                {a}
                             </button>
-                        </div>
+                        ))}
                     </div>
-                )}
+                </div>
+
+                {/* Genus */}
+                <div>
+                    <FormField label={t("form.genus")} sublabel="type or pick from existing">
+                        <Input
+                            value={genus}
+                            onChange={(e) => setGenus(e.target.value)}
+                            list="genus-options"
+                            placeholder="e.g. owlbear, dragon, goblinoid"
+                        />
+                    </FormField>
+                    <datalist id="genus-options">
+                        {knownGenera.map((g) => <option key={g} value={g} />)}
+                    </datalist>
+                    {knownGenera.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                            {knownGenera.map((g) => (
+                                <button
+                                    key={g}
+                                    type="button"
+                                    onClick={() => setGenus(g)}
+                                    className={`px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-sm transition-colors ${
+                                        genus === g ? "border-gold bg-gold/10 text-gold" : "border-gold/10 text-muted/60 hover:bg-gold/5 hover:text-muted"
+                                    }`}
+                                >
+                                    {g}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </Card>
 
             {/* ── Submit ── */}
             <div className="flex gap-3">
-                <Button type="submit" className="px-6 py-2.5 text-xs uppercase tracking-widest">{t("saveMonster")}</Button>
-                <button type="button" onClick={onCancel} className="ui-button px-6 py-2.5 text-xs uppercase tracking-widest">
+                <Button type="submit" variant="primary" className="px-8 py-3 text-sm uppercase tracking-widest">{t("saveMonster")}</Button>
+                <button type="button" onClick={onCancel} className="ui-button px-8 py-3 text-xs uppercase tracking-widest">
                     {t("cancel")}
                 </button>
             </div>

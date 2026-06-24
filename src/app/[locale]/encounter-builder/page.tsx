@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
     partyBudget,
-    recommendMonstersForParty,
+    getMonstersForCR,
     suggestGroupEncounters,
     suggestBossWithMinions,
 } from "@/app/utils/encounter";
+import type { Terrain, Affiliation, Monster } from "@/app/types/monster";
 import { formatCR } from "@/app/lib/format";
 import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { Input } from "@/app/components/atoms/Input";
@@ -23,7 +24,9 @@ type Difficulty = "easy" | "medium" | "hard" | "deadly";
 type Ruleset = "2014" | "2024";
 type BudgetMode = "encounter" | "daily";
 type RelationCriteria = "terrain" | "affiliation" | "genus" | "any";
-type MonsterRecommendationMember = { count: number; name: string; cr: number };
+
+const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar"];
+const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant"];
 
 function BudgetBar({ fit, budgetFitLabel, accent = "gold" }: { fit: number; budgetFitLabel: string; accent?: "gold" | "silver" }) {
     return (
@@ -53,9 +56,40 @@ export default function CombatBalancerPage() {
     const [groupTypes, setGroupTypes] = useState(2);
     const [includeMinions, setIncludeMinions] = useState(false);
     const [relationCriteria, setRelationCriteria] = useState<RelationCriteria>("any");
+    const [filterTerrain, setFilterTerrain] = useState<Terrain | "">("");
+    const [filterAffiliation, setFilterAffiliation] = useState<Affiliation | "">("");
+    const [filterGenus, setFilterGenus] = useState("");
+    const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(0);
     const resultsRef = useRef<HTMLDivElement>(null);
     const { catalog2014, catalog2024 } = useMergedCatalog();
     const catalog = ruleset === "2024" ? catalog2024 : catalog2014;
+
+    const knownGenera = useMemo(() => {
+        return [...new Set(catalog.map((m) => m.genus).filter(Boolean) as string[])].sort();
+    }, [catalog]);
+
+    const filterMonsterPool = (monsters: Monster[]): Monster[] => {
+        if (relationCriteria === "terrain" && filterTerrain) {
+            return monsters.filter((m) => m.terrain.includes(filterTerrain) || m.terrain.includes("any"));
+        }
+        if (relationCriteria === "affiliation" && filterAffiliation) {
+            return monsters.filter((m) => m.affiliation === filterAffiliation || m.affiliation === "any");
+        }
+        if (relationCriteria === "genus" && filterGenus) {
+            return monsters.filter((m) => m.genus === filterGenus);
+        }
+        return monsters;
+    };
+
+    const hasActiveFilter = (relationCriteria === "terrain" && !!filterTerrain) ||
+        (relationCriteria === "affiliation" && !!filterAffiliation) ||
+        (relationCriteria === "genus" && !!filterGenus);
+
+    const activeFilterLabel = hasActiveFilter
+        ? relationCriteria === "terrain" ? filterTerrain
+        : relationCriteria === "affiliation" ? filterAffiliation
+        : filterGenus
+        : null;
 
     const budget = useMemo(() => {
         return partyBudget({ level: avgLevel, size: partySize, difficulty, ruleset, mode: budgetMode });
@@ -68,30 +102,6 @@ export default function CombatBalancerPage() {
     const groupSuggestions = useMemo(() => {
         return suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty, ruleset, budget, maxTypes: groupTypes, relationCriteria, catalog });
     }, [avgLevel, partySize, difficulty, ruleset, budget, groupTypes, relationCriteria, catalog]);
-
-    const monsterRecommendations = useMemo(() => {
-        return recommendMonstersForParty({
-            level: avgLevel, size: partySize, difficulty, ruleset, budget,
-            formation: mode,
-            maxTypes: mode === "group" ? groupTypes : undefined,
-            includeMinions: mode === "solo" ? includeMinions : undefined,
-            relationCriteria,
-            catalog,
-        });
-    }, [avgLevel, partySize, difficulty, ruleset, budget, mode, groupTypes, includeMinions, relationCriteria, catalog]);
-
-    const partyPresets = [
-        { label: "3 PCs", size: 3 },
-        { label: "4 PCs", size: 4 },
-        { label: "5 PCs", size: 5 },
-        { label: "6 PCs", size: 6 },
-    ];
-    const levelPresets = [
-        { label: "Lv 3", level: 3 },
-        { label: "Lv 5", level: 5 },
-        { label: "Lv 10", level: 10 },
-        { label: "Lv 15", level: 15 },
-    ];
 
     const primarySolo = soloSuggestions[0];
     const primaryGroup = groupSuggestions[0];
@@ -115,9 +125,7 @@ export default function CombatBalancerPage() {
     const primaryFit = mode === "solo" ? primarySolo?.fit : primaryGroup?.fit;
     const primaryStatus = primaryFit !== undefined ? budgetStatus(primaryFit) : null;
 
-    const scrollToResults = () => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
+    const showRelationControls = mode === "group" || (mode === "solo" && includeMinions);
 
     return (
         <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
@@ -135,162 +143,268 @@ export default function CombatBalancerPage() {
                 </Link>
             </header>
 
-            {/* ── Quick presets ── */}
-            <Card className="p-5 border-gold/10">
-                <div className="grid gap-5 grid-cols-1 lg:grid-cols-[1fr_auto] items-center">
-                    <div>
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("quickPresets")}</div>
-                        <div className="flex flex-wrap gap-2">
-                            {partyPresets.map((preset) => (
-                                <Button key={preset.label} onClick={() => setPartySize(preset.size)} className="px-3 py-1.5 text-xs uppercase tracking-widest">
-                                    {preset.label}
-                                </Button>
-                            ))}
-                            <span className="w-px self-stretch bg-gold/10 mx-1 hidden sm:block" />
-                            {levelPresets.map((preset) => (
-                                <Button key={preset.label} onClick={() => setAvgLevel(preset.level)} className="px-3 py-1.5 text-xs uppercase tracking-widest">
-                                    {preset.label}
-                                </Button>
-                            ))}
-                        </div>
+            {/* ── 1. Party Setup ── */}
+            <Card className="p-6 border-gold/10">
+                <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    Party
+                </h2>
+
+                {/* Quick presets with active state */}
+                <div className="mb-5">
+                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("quickPresets")}</div>
+                    <div className="flex flex-wrap gap-2">
+                        {[3, 4, 5, 6].map((size) => (
+                            <button
+                                key={size}
+                                onClick={() => setPartySize(size)}
+                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                    partySize === size ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                                }`}
+                            >
+                                {size} PCs
+                            </button>
+                        ))}
+                        <span className="w-px self-stretch bg-gold/10 mx-1 hidden sm:block" />
+                        {[3, 5, 10, 15, 20].map((level) => (
+                            <button
+                                key={level}
+                                onClick={() => setAvgLevel(level)}
+                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                    avgLevel === level ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                                }`}
+                            >
+                                Lv {level}
+                            </button>
+                        ))}
                     </div>
-                    <p className="text-sm text-muted max-w-xs hidden lg:block">{t("budgetMath")}</p>
+                </div>
+
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                    <FormField label={t("partySize")}>
+                        <Input type="number" min={1} max={8} value={partySize}
+                               onChange={(e) => setPartySize(+e.target.value)}
+                               aria-label="Party size (number of players)" />
+                    </FormField>
+                    <FormField label={t("avgLevel")}>
+                        <Input type="number" min={1} max={20} value={avgLevel}
+                               onChange={(e) => setAvgLevel(+e.target.value)}
+                               aria-label="Average party level" />
+                    </FormField>
+                    <FormField label={t("ruleset")}>
+                        <Select value={ruleset} onChange={(e) => setRuleset(e.target.value as Ruleset)} aria-label="Ruleset version">
+                            <option value="2014">{t("ruleset2014")}</option>
+                            <option value="2024">{t("ruleset2024")}</option>
+                        </Select>
+                    </FormField>
+                    <FormField label={t("difficulty")}>
+                        <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} aria-label="Encounter difficulty">
+                            <option value="easy">{t("easy")}</option>
+                            <option value="medium">{t("medium")}</option>
+                            <option value="hard">{t("hard")}</option>
+                            <option value="deadly">{t("deadly")}</option>
+                        </Select>
+                    </FormField>
+                </div>
+
+                {/* Live budget readout */}
+                <div className="mt-5 pt-4 border-t border-gold/10 flex flex-wrap items-center justify-between gap-3">
+                    <span className="text-sm uppercase tracking-widest text-muted">
+                        {t("totalXPBudget")}:
+                        <span className="accent-gold font-bold ml-2 text-lg">{budget.toLocaleString()} XP</span>
+                    </span>
+                    {primaryStatus && (
+                        <span className={`text-[10px] px-3 py-1 rounded-sm uppercase font-bold tracking-widest border border-gold/20 ${primaryStatus.color}`}>
+                            {primaryStatus.label}
+                        </span>
+                    )}
                 </div>
             </Card>
 
-            {/* ── Controls ── */}
-            <div className="grid gap-8">
-                {/* Party config */}
-                <div>
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-gold/50 font-bold mb-4">Party</div>
-                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                        <FormField label={t("partySize")}>
-                            <Input type="number" min={1} max={8} value={partySize}
-                                   onChange={(e) => setPartySize(+e.target.value)}
-                                   aria-label="Party size (number of players)" />
-                        </FormField>
-                        <FormField label={t("avgLevel")}>
-                            <Input type="number" min={1} max={20} value={avgLevel}
-                                   onChange={(e) => setAvgLevel(+e.target.value)}
-                                   aria-label="Average party level" />
-                        </FormField>
-                        <FormField label={t("ruleset")}>
-                            <Select value={ruleset} onChange={(e) => setRuleset(e.target.value as Ruleset)} aria-label="Ruleset version">
-                                <option value="2014">{t("ruleset2014")}</option>
-                                <option value="2024">{t("ruleset2024")}</option>
-                            </Select>
-                        </FormField>
-                        <FormField label={t("difficulty")}>
-                            <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} aria-label="Encounter difficulty">
-                                <option value="easy">{t("easy")}</option>
-                                <option value="medium">{t("medium")}</option>
-                                <option value="hard">{t("hard")}</option>
-                                <option value="deadly">{t("deadly")}</option>
-                            </Select>
-                        </FormField>
+            {/* ── 2. Encounter Shape ── */}
+            <Card className="p-6 border-gold/10">
+                <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                    Encounter
+                </h2>
+
+                {/* Formation toggle — prominent */}
+                <div className="mb-5">
+                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("formation")}</div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setMode("solo")}
+                            className={`flex-1 px-4 py-3 text-sm uppercase tracking-widest border rounded-sm transition-colors text-center ${
+                                mode === "solo" ? "border-gold bg-gold/15 text-gold font-bold shadow-[0_0_10px_rgba(197,160,89,0.3)]" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                            }`}
+                        >
+                            {t("soloBoss")}
+                        </button>
+                        <button
+                            onClick={() => setMode("group")}
+                            className={`flex-1 px-4 py-3 text-sm uppercase tracking-widest border rounded-sm transition-colors text-center ${
+                                mode === "group" ? "border-gold bg-gold/15 text-gold font-bold shadow-[0_0_10px_rgba(197,160,89,0.3)]" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                            }`}
+                        >
+                            {t("hordeGroup")}
+                        </button>
                     </div>
                 </div>
 
-                {/* Encounter config */}
-                <div>
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-gold/50 font-bold mb-4">Encounter</div>
-                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                        <FormField label={t("budgetType")}>
-                            <Select value={budgetMode} onChange={(e) => setBudgetMode(e.target.value as BudgetMode)} aria-label="XP budget type">
-                                <option value="encounter">{t("encounterBudget")}</option>
-                                <option value="daily">{t("dailyBudget")}</option>
+                <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+                    <FormField label={t("budgetType")}>
+                        <Select value={budgetMode} onChange={(e) => setBudgetMode(e.target.value as BudgetMode)} aria-label="XP budget type">
+                            <option value="encounter">{t("encounterBudget")}</option>
+                            <option value="daily">{t("dailyBudget")}</option>
+                        </Select>
+                    </FormField>
+
+                    {mode === "solo" && (
+                        <FormField label={t("includeMinions")}>
+                            <Select value={includeMinions ? "yes" : "no"} onChange={(e) => setIncludeMinions(e.target.value === "yes")} aria-label="Include minions with boss">
+                                <option value="no">{t("no")}</option>
+                                <option value="yes">{t("yes")}</option>
                             </Select>
                         </FormField>
-                        <FormField label={t("formation")}>
-                            <Select value={mode} onChange={(e) => setMode(e.target.value as Mode)} aria-label="Encounter type mode">
-                                <option value="solo">{t("soloBoss")}</option>
-                                <option value="group">{t("hordeGroup")}</option>
+                    )}
+
+                    {mode === "group" && (
+                        <FormField label={t("mixTypes")}>
+                            <Select value={groupTypes} onChange={(e) => setGroupTypes(Number(e.target.value))} aria-label="Maximum CR types in a group">
+                                <option value={2}>2 Types</option>
+                                <option value={3}>3 Types</option>
+                                <option value={4}>4 Types</option>
+                                <option value={5}>5 Types</option>
                             </Select>
                         </FormField>
-
-                        {mode === "solo" && (
-                            <FormField label={t("includeMinions")}>
-                                <Select value={includeMinions ? "yes" : "no"} onChange={(e) => setIncludeMinions(e.target.value === "yes")} aria-label="Include minions with boss">
-                                    <option value="no">{t("no")}</option>
-                                    <option value="yes">{t("yes")}</option>
-                                </Select>
-                            </FormField>
-                        )}
-                        {mode === "solo" && includeMinions && (
-                            <FormField label={t("relationCriteria")}>
-                                <Select value={relationCriteria} onChange={(e) => setRelationCriteria(e.target.value as RelationCriteria)} aria-label="Relation criteria for minions">
-                                    <option value="any">{t("anySpecies")}</option>
-                                    <option value="terrain">{t("sameTerrain")}</option>
-                                    <option value="affiliation">{t("sameAffiliation")}</option>
-                                    <option value="genus">{t("sameGenus")}</option>
-                                </Select>
-                            </FormField>
-                        )}
-
-                        {mode === "group" && (
-                            <FormField label={t("mixTypes")}>
-                                <Select value={groupTypes} onChange={(e) => setGroupTypes(Number(e.target.value))} aria-label="Maximum CR types in a group">
-                                    <option value={2}>2 Types</option>
-                                    <option value={3}>3 Types</option>
-                                    <option value={4}>4 Types</option>
-                                    <option value={5}>5 Types</option>
-                                </Select>
-                            </FormField>
-                        )}
-                        {mode === "group" && (
-                            <FormField label={t("relationCriteria")}>
-                                <Select value={relationCriteria} onChange={(e) => setRelationCriteria(e.target.value as RelationCriteria)} aria-label="Relation criteria for horde">
-                                    <option value="any">{t("anySpecies")}</option>
-                                    <option value="terrain">{t("sameTerrain")}</option>
-                                    <option value="affiliation">{t("sameAffiliation")}</option>
-                                    <option value="genus">{t("sameGenus")}</option>
-                                </Select>
-                            </FormField>
-                        )}
-                    </div>
+                    )}
                 </div>
-            </div>
+            </Card>
 
-            <Button
-                variant="primary"
-                onClick={scrollToResults}
-                className="w-full lg:w-auto lg:self-start px-10 py-3 uppercase tracking-widest font-serif"
-            >
-                {t("showSuggestions")}
-            </Button>
+            {/* ── 3. Monster Filter (only when relevant) ── */}
+            {showRelationControls && (
+                <Card className="p-6 border-gold/10">
+                    <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                        Monster Filter
+                    </h2>
 
-            {/* ── Results ── */}
+                    <div className="mb-4">
+                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("relationCriteria")}</div>
+                        <div className="flex flex-wrap gap-2">
+                            {([
+                                { value: "any", label: t("anySpecies") },
+                                { value: "terrain", label: t("sameTerrain") },
+                                { value: "affiliation", label: t("sameAffiliation") },
+                                { value: "genus", label: t("sameGenus") },
+                            ] as const).map(({ value, label }) => (
+                                <button
+                                    key={value}
+                                    onClick={() => { setRelationCriteria(value); setFilterTerrain(""); setFilterAffiliation(""); setFilterGenus(""); }}
+                                    className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                        relationCriteria === value ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                                    }`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Value selectors */}
+                    {relationCriteria === "terrain" && (
+                        <div>
+                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("sameTerrain")}</div>
+                            <div className="flex flex-wrap gap-2">
+                                {TERRAINS.map((ter) => (
+                                    <button
+                                        key={ter}
+                                        onClick={() => setFilterTerrain(filterTerrain === ter ? "" : ter)}
+                                        className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                            filterTerrain === ter ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                                        }`}
+                                    >
+                                        {ter}
+                                    </button>
+                                ))}
+                            </div>
+                            {!filterTerrain && <p className="text-xs text-muted italic mt-2">Select a terrain to filter the monster pool below.</p>}
+                        </div>
+                    )}
+                    {relationCriteria === "affiliation" && (
+                        <div>
+                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("sameAffiliation")}</div>
+                            <div className="flex flex-wrap gap-2">
+                                {AFFILIATIONS.map((a) => (
+                                    <button
+                                        key={a}
+                                        onClick={() => setFilterAffiliation(filterAffiliation === a ? "" : a)}
+                                        className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
+                                            filterAffiliation === a ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
+                                        }`}
+                                    >
+                                        {a}
+                                    </button>
+                                ))}
+                            </div>
+                            {!filterAffiliation && <p className="text-xs text-muted italic mt-2">Select an affiliation to filter the monster pool below.</p>}
+                        </div>
+                    )}
+                    {relationCriteria === "genus" && (
+                        <div>
+                            <FormField label={t("sameGenus")} sublabel="type or pick">
+                                <Input
+                                    value={filterGenus}
+                                    onChange={(e) => setFilterGenus(e.target.value)}
+                                    list="encounter-genus-options"
+                                    placeholder="e.g. dragon, goblinoid"
+                                />
+                            </FormField>
+                            <datalist id="encounter-genus-options">
+                                {knownGenera.map((g) => <option key={g} value={g} />)}
+                            </datalist>
+                            {knownGenera.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                    {knownGenera.map((g) => (
+                                        <button
+                                            key={g}
+                                            onClick={() => setFilterGenus(filterGenus === g ? "" : g)}
+                                            className={`px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-sm transition-colors ${
+                                                filterGenus === g ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/10 text-muted/60 hover:bg-gold/5 hover:text-muted hover:border-gold/30 cursor-pointer"
+                                            }`}
+                                        >
+                                            {g}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </Card>
+            )}
+
+            {/* ── 4. Results ── */}
             <Card className="p-6" ref={resultsRef}>
-
                 {/* Results header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-gold/10 pb-5 mb-6">
                     <div>
                         <h2 className="font-serif text-2xl accent-gold uppercase tracking-wide">{t("suggestedEncounters")}</h2>
                         <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-widest font-bold text-gold/60">
-                            <span className="border border-gold/20 px-2 py-0.5">Party {partySize}</span>
-                            <span className="border border-gold/20 px-2 py-0.5">Lv {avgLevel}</span>
+                            <span className="border border-gold/20 px-2 py-0.5">{partySize} PCs · Lv {avgLevel}</span>
                             <span className="border border-gold/20 px-2 py-0.5">{difficulty}</span>
                             <span className="border border-gold/20 px-2 py-0.5">{ruleset}</span>
                             <span className="border border-gold/20 px-2 py-0.5">{budgetMode}</span>
-                            {mode === "solo" && includeMinions && <span className="border border-gold/20 px-2 py-0.5">+minions</span>}
-                            {(mode === "group" || (mode === "solo" && includeMinions)) && relationCriteria !== "any" && (
-                                <span className="border border-gold/20 px-2 py-0.5">{relationCriteria}</span>
+                            <span className="border border-gold/20 px-2 py-0.5">{mode === "solo" ? (includeMinions ? "boss + minions" : "solo boss") : `group ≤${groupTypes}`}</span>
+                            {hasActiveFilter && (
+                                <span className="border border-gold/40 bg-gold/10 px-2 py-0.5 text-gold">
+                                    {relationCriteria}: {activeFilterLabel}
+                                </span>
                             )}
-                            {mode === "group" && <span className="border border-gold/20 px-2 py-0.5">≤{groupTypes} types</span>}
                         </div>
                     </div>
                     <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
                         <span className="text-sm font-medium uppercase tracking-widest">
-                            {t("totalXPBudget")}: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span>
+                            <span className="accent-gold font-bold text-lg">{budget.toLocaleString()} XP</span>
                         </span>
-                        {primaryStatus && (
-                            <span className={`text-[10px] px-3 py-1 rounded-sm uppercase font-bold tracking-widest border border-gold/20 ${primaryStatus.color}`}>
-                                {t("budgetStatus")}: {primaryStatus.label}
-                            </span>
-                        )}
                     </div>
                 </div>
-
 
                 {/* Recommended mix highlight */}
                 {mode === "solo" && primarySolo && (
@@ -312,92 +426,103 @@ export default function CombatBalancerPage() {
                     </div>
                 )}
 
-                {/* Monster recommendations */}
-                {monsterRecommendations.length > 0 && (
-                    <section className="mb-10">
-                        <div className="mb-4">
-                            <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">{t("monsterRecommendations")}</h3>
-                            <p className="text-xs text-muted mt-1">{t("monsterRecommendationsNote")}</p>
-                        </div>
-                        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                            {monsterRecommendations.map((recommendation, i) => (
-                                <li key={i}>
-                                    <Card className="p-5 border border-gold/10 hover:border-gold/30 transition-all hover:shadow-glow bg-bg/50">
-                                        <div className="flex justify-between items-start gap-3">
-                                            <div className="min-w-0">
-                                                {recommendation.members.map((m: MonsterRecommendationMember, idx: number) => (
-                                                    <span key={idx}>
-                                                        <span className="font-bold text-xl accent-gold">{m.count}</span>
-                                                        <span className="text-muted mx-1 font-sans italic">&times;</span>
-                                                        <span className="text-foreground text-lg">{m.name}</span>
-                                                        {idx < recommendation.members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <div className="text-muted text-xs font-bold uppercase shrink-0">{recommendation.adjustedXP.toLocaleString()} XP</div>
-                                        </div>
-                                        <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(recommendation.fit).color}`}>
-                                            {budgetStatus(recommendation.fit).label}
-                                        </div>
-                                        <BudgetBar fit={recommendation.fit} budgetFitLabel={t("budgetFit")} />
-                                    </Card>
-                                </li>
-                            ))}
-                        </ul>
-                    </section>
-                )}
-
-                {/* CR mix options */}
+                {/* Encounter suggestions */}
                 <section>
                     <div className="mb-4">
                         <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">{t("crMixOptions")}</h3>
                         <p className="text-xs text-muted mt-1">{t("crMixOptionsNote")}</p>
                     </div>
 
-                    {mode === "solo" ? (
-                        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                            {soloSuggestions.map((s, i) => (
+                    <ul className="grid gap-4">
+                        {(mode === "solo" ? soloSuggestions : groupSuggestions).map((suggestion, i) => {
+                            const members = mode === "solo"
+                                ? [
+                                    { cr: (suggestion as typeof soloSuggestions[0]).boss.cr, count: (suggestion as typeof soloSuggestions[0]).boss.count, label: "Boss" },
+                                    ...(suggestion as typeof soloSuggestions[0]).minions.map((m) => ({ cr: m.cr, count: m.count, label: "Minion" })),
+                                  ]
+                                : (suggestion as typeof groupSuggestions[0]).members.map((m) => ({ cr: m.cr, count: m.count, label: undefined as string | undefined }));
+
+                            const uniqueCRs = [...new Set(members.map((m) => m.cr))];
+                            const isExpanded = expandedSuggestion === i;
+
+                            return (
                                 <li key={i}>
-                                    <Card className="p-5 border border-gold/10 hover:border-gold/30 transition-all hover:shadow-glow bg-bg/50">
-                                        <div className="flex justify-between items-start gap-3">
-                                            <div className="font-serif text-xl accent-gold">{formatBossMinions(s)}</div>
-                                            <div className="text-muted text-xs font-bold uppercase shrink-0">{s.adjustedXP.toLocaleString()} XP</div>
-                                        </div>
-                                        <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(s.fit).color}`}>
-                                            {budgetStatus(s.fit).label}
-                                        </div>
-                                        <BudgetBar fit={s.fit} budgetFitLabel={t("budgetFit")} />
-                                    </Card>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                            {groupSuggestions.map((g, i) => (
-                                <li key={i}>
-                                    <Card className="p-5 border border-silver/10 hover:border-silver/30 transition-all hover:shadow-glow bg-bg/50">
-                                        <div className="flex justify-between items-start gap-3">
-                                            <div>
-                                                {g.members.map((m, idx) => (
-                                                    <span key={idx}>
-                                                        <span className="font-bold text-xl accent-gold">{m.count}</span>
-                                                        <span className="text-muted mx-1 font-sans italic">&times;</span>
-                                                        <span className="text-foreground text-lg">CR {formatCR(m.cr)}</span>
-                                                        {idx < g.members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
-                                                    </span>
-                                                ))}
+                                    <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all ${isExpanded ? "shadow-glow border-gold/30" : "hover:border-gold/20"} bg-bg/50`}>
+                                        {/* Clickable header */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setExpandedSuggestion(isExpanded ? null : i)}
+                                            className="w-full p-5 text-left cursor-pointer hover:bg-gold/[0.02] transition-colors rounded-sm"
+                                        >
+                                            <div className="flex justify-between items-start gap-3">
+                                                <div className="flex flex-wrap items-baseline gap-x-1">
+                                                    {members.map((m, idx) => (
+                                                        <span key={idx}>
+                                                            <span className="font-bold text-xl accent-gold">{m.count}</span>
+                                                            <span className="text-muted mx-1 font-sans italic">&times;</span>
+                                                            <span className="text-foreground text-lg">CR {formatCR(m.cr)}</span>
+                                                            {m.label && <span className="text-muted text-xs ml-1">({m.label})</span>}
+                                                            {idx < members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <div className="flex items-center gap-3 shrink-0">
+                                                    <span className="text-muted text-xs font-bold uppercase">{suggestion.adjustedXP.toLocaleString()} XP</span>
+                                                    <span className={`text-base text-gold/50 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>▾</span>
+                                                </div>
                                             </div>
-                                            <div className="text-muted text-xs font-bold uppercase shrink-0">{g.adjustedXP.toLocaleString()} XP</div>
-                                        </div>
-                                        <div className={`mt-2 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(g.fit).color}`}>
-                                            {budgetStatus(g.fit).label}
-                                        </div>
-                                        <BudgetBar fit={g.fit} budgetFitLabel={t("budgetFit")} accent="silver" />
+                                            <div className={`mt-1 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
+                                                {budgetStatus(suggestion.fit).label} · {(suggestion.fit * 100).toFixed(0)}%
+                                            </div>
+                                            <BudgetBar fit={suggestion.fit} budgetFitLabel={t("budgetFit")} accent={mode === "solo" ? "gold" : "silver"} />
+                                        </button>
+
+                                        {/* Expandable monster pool */}
+                                        {isExpanded && (
+                                            <div className="px-5 pb-5 pt-1 border-t border-gold/10 grid gap-3">
+                                                {uniqueCRs.map((cr) => {
+                                                    const allMonsters = getMonstersForCR(cr, ruleset, catalog);
+                                                    const monsters = filterMonsterPool(allMonsters);
+                                                    const slot = members.find((m) => m.cr === cr);
+                                                    const filtered = hasActiveFilter && monsters.length < allMonsters.length;
+                                                    return (
+                                                        <div key={cr}>
+                                                            <div className="text-[10px] uppercase tracking-[0.2em] text-gold/60 font-bold mb-1.5">
+                                                                CR {formatCR(cr)} {slot?.label ? `(${slot.label})` : ""}
+                                                                {" — "}
+                                                                {monsters.length} available
+                                                                {filtered && <span className="text-gold/40 ml-1">({allMonsters.length} total)</span>}
+                                                            </div>
+                                                            {monsters.length === 0 ? (
+                                                                <p className="text-muted text-xs italic">No monsters match the current filter at this CR.</p>
+                                                            ) : (
+                                                                <div className="flex flex-wrap gap-1.5">
+                                                                    {monsters.map((m) => (
+                                                                        <span
+                                                                            key={m.name}
+                                                                            className={`inline-flex items-center px-2.5 py-1 text-xs rounded-sm border transition-colors ${
+                                                                                m.source === "homebrew"
+                                                                                    ? "border-gold/30 bg-gold/10 text-gold"
+                                                                                    : "border-gold/10 bg-gold/5 text-foreground"
+                                                                            }`}
+                                                                            title={`${m.name} — ${m.affiliation}${m.genus ? `, ${m.genus}` : ""}${m.terrain?.length ? ` · ${m.terrain.join(", ")}` : ""}`}
+                                                                        >
+                                                                            {m.name}
+                                                                            {m.source === "homebrew" && <span className="ml-1 text-[9px] text-gold/60">★</span>}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </Card>
                                 </li>
-                            ))}
-                        </ul>
-                    )}
+                            );
+                        })}
+                    </ul>
                 </section>
             </Card>
 

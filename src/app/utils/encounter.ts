@@ -136,6 +136,11 @@ export type MonsterRecommendation = {
 };
 
 
+export function getMonstersForCR(cr: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]): Monster[] {
+    const catalog = customCatalog ?? (ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG);
+    return catalog.filter((monster) => monster.cr === cr);
+}
+
 function pickMonsterManualBenchmark(cr: number, seed: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]) {
     const catalog = customCatalog ?? (ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG);
     const exactMatches = catalog.filter((monster) => monster.cr === cr);
