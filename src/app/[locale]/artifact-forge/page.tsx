@@ -9,6 +9,9 @@ import { FormField } from "@/app/components/molecules/FormField";
 import { Card, CardContent } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
+import { PageSection } from "@/app/components/atoms/PageSection";
+import { PageHeader } from "@/app/components/atoms/PageHeader";
+import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 
 const TYPES: ItemType[] = ["Weapon", "Armor", "Wand", "Wondrous"];
 const COMMON_TARGETS = ["undead", "fiend", "dragon", "construct"];
@@ -175,17 +178,11 @@ export default function ItemCreatorPage() {
   };
 
   return (
-    <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-      <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
-        <div>
-          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
-          <p className="text-muted mt-2 font-light italic">
-            {t("description")}
-          </p>
-          <WhyDifferent className="mt-3" />
-        </div>
+    <PageSection>
+      <PageHeader title={t("title")} description={t("description")}>
+        <WhyDifferent className="mt-3 lg:mt-0" />
         <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
-      </header>
+      </PageHeader>
 
       <Card className="p-6 border-gold/10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -354,7 +351,7 @@ export default function ItemCreatorPage() {
       </Button>
 
       <Card className="p-8 border-gold/10" ref={outputRef}>
-        <h2 className="mb-6 font-serif text-2xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("itemProperties")}</h2>
+        <SectionHeader>{t("itemProperties")}</SectionHeader>
         <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">
           <span>{t("exportPreview")}</span>
           <span className="text-muted normal-case tracking-normal">{t("matchesJsonOutput")}</span>
@@ -468,6 +465,6 @@ export default function ItemCreatorPage() {
       <div className="hidden lg:block pt-4">
         <a href="/artifact-forge/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
       </div>
-    </section>
+    </PageSection>
   );
 }

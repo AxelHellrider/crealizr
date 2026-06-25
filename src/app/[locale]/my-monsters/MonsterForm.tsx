@@ -6,22 +6,18 @@ import type { Monster, Terrain, Affiliation, Edition, MonsterSize, MonsterAction
 import { Button } from "@/app/components/atoms/Button";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
+import { Autocomplete } from "@/app/components/atoms/Autocomplete";
+import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
 import { MONSTER_MANUAL_2014_CATALOG, MONSTER_MANUAL_2024_CATALOG } from "@/app/data/monsters";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
+import { formatCR } from "@/app/lib/format";
 
 const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar", "any"];
 const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant", "any"];
 const SIZES: MonsterSize[] = ["Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"];
 const CR_OPTIONS = [0, 0.125, 0.25, 0.5, ...Array.from({ length: 30 }, (_, i) => i + 1)];
-
-function formatCR(cr: number): string {
-    if (cr === 0.125) return "1/8";
-    if (cr === 0.25) return "1/4";
-    if (cr === 0.5) return "1/2";
-    return String(cr);
-}
 
 function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
@@ -110,12 +106,6 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
         onSave(monster);
     }
 
-    function toggleTerrain(t: Terrain) {
-        setTerrain((prev) =>
-            prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]
-        );
-    }
-
     return (
         <form onSubmit={handleSubmit} className="grid gap-6">
             {error && (
@@ -127,9 +117,9 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
             {/* ── Identity — mirrors top of a D&D stat block ── */}
             <Card className="p-6 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
-                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                <SectionHeader>
                     {initial ? t("editMonster") : t("addMonster")}
-                </h2>
+                </SectionHeader>
 
                 {/* Name — large, like the stat block title */}
                 <FormField label={t("form.name")}>
@@ -185,9 +175,9 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
             {/* ── Defense — AC / HP / Speed block ── */}
             <Card className="p-6">
-                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                <SectionHeader>
                     {t("form.statBlock")}
-                </h2>
+                </SectionHeader>
 
                 <div className="grid gap-3 border-y border-gold/20 py-4 mb-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -245,9 +235,9 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
             {/* ── Actions ── */}
             <Card className="p-6">
-                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                <SectionHeader>
                     {t("form.actions")}
-                </h2>
+                </SectionHeader>
                 <div className="space-y-2">
                     {actions.map((action, i) => (
                         <div key={i} className="flex gap-2 items-center">
@@ -290,77 +280,45 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
             {/* ── Encounter Data — terrain, affiliation, genus ── */}
             <Card className="p-6">
-                <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
+                <SectionHeader>
                     Encounter Data
-                </h2>
+                </SectionHeader>
 
                 {/* Terrain */}
                 <div className="mb-4">
-                    <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("form.terrain")}</div>
-                    <div className="flex flex-wrap gap-2">
-                        {TERRAINS.map((ter) => (
-                            <button
-                                key={ter}
-                                type="button"
-                                onClick={() => toggleTerrain(ter)}
-                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                    terrain.includes(ter) ? "border-gold bg-gold/10 text-gold" : "border-gold/20 text-muted hover:bg-gold/5"
-                                }`}
-                            >
-                                {ter}
-                            </button>
-                        ))}
-                    </div>
+                    <FormField label={t("form.terrain")}>
+                        <Autocomplete
+                            multiple
+                            value={terrain}
+                            onChange={(val) => setTerrain(val as Terrain[])}
+                            options={TERRAINS}
+                            placeholder="Search terrains..."
+                        />
+                    </FormField>
                 </div>
 
                 {/* Affiliation */}
                 <div className="mb-4">
-                    <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("form.affiliation")}</div>
-                    <div className="flex flex-wrap gap-2">
-                        {AFFILIATIONS.map((a) => (
-                            <button
-                                key={a}
-                                type="button"
-                                onClick={() => setAffiliation(a)}
-                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                    affiliation === a ? "border-gold bg-gold/10 text-gold" : "border-gold/20 text-muted hover:bg-gold/5"
-                                }`}
-                            >
-                                {a}
-                            </button>
-                        ))}
-                    </div>
+                    <FormField label={t("form.affiliation")}>
+                        <Autocomplete
+                            value={affiliation}
+                            onChange={(val) => setAffiliation(val as Affiliation)}
+                            options={AFFILIATIONS}
+                            placeholder="Search affiliations..."
+                        />
+                    </FormField>
                 </div>
 
                 {/* Genus */}
                 <div>
                     <FormField label={t("form.genus")} sublabel="type or pick from existing">
-                        <Input
+                        <Autocomplete
                             value={genus}
-                            onChange={(e) => setGenus(e.target.value)}
-                            list="genus-options"
+                            onChange={setGenus}
+                            options={knownGenera}
                             placeholder="e.g. owlbear, dragon, goblinoid"
                         />
                     </FormField>
-                    <datalist id="genus-options">
-                        {knownGenera.map((g) => <option key={g} value={g} />)}
-                    </datalist>
-                    {knownGenera.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                            {knownGenera.map((g) => (
-                                <button
-                                    key={g}
-                                    type="button"
-                                    onClick={() => setGenus(g)}
-                                    className={`px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-sm transition-colors ${
-                                        genus === g ? "border-gold bg-gold/10 text-gold" : "border-gold/10 text-muted/60 hover:bg-gold/5 hover:text-muted"
-                                    }`}
-                                >
-                                    {g}
-                                </button>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </Card>
 

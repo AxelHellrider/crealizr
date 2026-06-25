@@ -1,6 +1,7 @@
 "use client";
 
 import {useState} from "react";
+import {formatCR} from "@/app/lib/format";
 
 // ---------------------------------------------------------------------------------------
 // FULL CR MATRICES (2014 & 2024) — All values included, 0 to 30
@@ -79,16 +80,6 @@ const CR_MATRIX_2024_FULL = [
     {cr: 29, pb: 9, ac: 22, hp: 1120, atkb: 18, dpr: 180, save_dc: 24},
     {cr: 30, pb: 9, ac: 23, hp: 1200, atkb: 19, dpr: 186, save_dc: 24},
 ];
-
-// ---------------------------------------------------------------------------------------
-// Helper for nicely formatting CR values (0.125 ⇒ "1/8")
-// ---------------------------------------------------------------------------------------
-function formatCR(value: number) {
-    if (value === 1 / 8) return "1/8";
-    if (value === 1 / 4) return "1/4";
-    if (value === 1 / 2) return "1/2";
-    return value.toString();
-}
 
 // ---------------------------------------------------------------------------------------
 // Reusable CR table renderer

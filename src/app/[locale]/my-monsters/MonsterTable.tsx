@@ -4,13 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CustomMonster } from "@/app/lib/monsterDB";
 import { Input } from "@/app/components/atoms/Input";
-
-function formatCR(cr: number): string {
-    if (cr === 0.125) return "1/8";
-    if (cr === 0.25) return "1/4";
-    if (cr === 0.5) return "1/2";
-    return String(cr);
-}
+import { formatCR } from "@/app/lib/format";
 
 type Props = {
     monsters: CustomMonster[];
@@ -41,61 +35,69 @@ export default function MonsterTable({ monsters, onEdit, onDelete }: Props) {
                     <p className="text-muted text-sm italic">{t("emptyState")}</p>
                 </div>
             ) : (
-                <div className="overflow-x-auto border border-gold/10 rounded-sm">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="border-b border-gold/20 text-left">
-                                <th className="py-3 px-4 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("form.name")}</th>
-                                <th className="py-3 px-4 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("form.cr")}</th>
-                                <th className="py-3 px-4 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold hidden sm:table-cell">{t("form.edition")}</th>
-                                <th className="py-3 px-4 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold hidden md:table-cell">{t("form.affiliation")}</th>
-                                <th className="py-3 px-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map((monster) => (
-                                <tr key={monster.id} className="border-b border-gold/5 hover:bg-gold/5 transition-colors">
-                                    <td className="py-3 px-4 font-serif accent-gold">{monster.name}</td>
-                                    <td className="py-3 px-4 text-muted">{formatCR(monster.cr)}</td>
-                                    <td className="py-3 px-4 text-muted hidden sm:table-cell">{monster.edition}</td>
-                                    <td className="py-3 px-4 text-muted capitalize hidden md:table-cell">{monster.affiliation}</td>
-                                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map((monster) => (
+                        <div
+                            key={monster.id}
+                            className="border border-gold/10 rounded-sm p-4 hover:border-gold/30 transition-colors bg-gradient-to-b from-gold/[0.02] to-transparent"
+                        >
+                            <div className="flex items-start justify-between mb-3">
+                                <h3 className="font-serif accent-gold text-lg leading-tight">{monster.name}</h3>
+                                <span className="ml-2 shrink-0 text-xs font-bold uppercase tracking-widest bg-gold/10 text-gold/70 px-2 py-1 rounded-sm">
+                                    CR {formatCR(monster.cr)}
+                                </span>
+                            </div>
+
+                            <div className="space-y-1 text-xs text-muted mb-4">
+                                {monster.type && (
+                                    <p className="capitalize">{monster.size} {monster.type}</p>
+                                )}
+                                <p className="capitalize">{monster.affiliation}</p>
+                                <p>{monster.edition === "2024" ? "2024 Rules" : "2014 Rules"}</p>
+                                {monster.stats && (
+                                    <div className="grid grid-cols-3 gap-x-3 gap-y-0.5 mt-2 pt-2 border-t border-gold/10">
+                                        <span>AC {monster.stats.ac}</span>
+                                        <span>HP {monster.stats.hp}</span>
+                                        <span>{monster.stats.speed}</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-3 border-t border-gold/10">
+                                <button
+                                    onClick={() => onEdit(monster)}
+                                    className="ui-link text-xs uppercase tracking-widest"
+                                >
+                                    {t("editMonster")}
+                                </button>
+                                <span className="text-gold/10">|</span>
+                                {confirmId === monster.id ? (
+                                    <>
                                         <button
-                                            onClick={() => onEdit(monster)}
-                                            className="ui-link text-xs uppercase tracking-widest"
+                                            onClick={() => { onDelete(monster.id); setConfirmId(null); }}
+                                            className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-bold"
                                         >
-                                            {t("editMonster")}
+                                            {t("confirmDelete")}
                                         </button>
-                                        <span className="mx-2 text-gold/10">|</span>
-                                        {confirmId === monster.id ? (
-                                            <>
-                                                <button
-                                                    onClick={() => { onDelete(monster.id); setConfirmId(null); }}
-                                                    className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-bold"
-                                                >
-                                                    {t("confirmDelete")}
-                                                </button>
-                                                <span className="mx-2 text-gold/10">|</span>
-                                                <button
-                                                    onClick={() => setConfirmId(null)}
-                                                    className="text-muted hover:text-gold text-xs uppercase tracking-widest"
-                                                >
-                                                    {t("cancel")}
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button
-                                                onClick={() => setConfirmId(monster.id)}
-                                                className="text-red-400/50 hover:text-red-400 text-xs uppercase tracking-widest"
-                                            >
-                                                {t("delete")}
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        <span className="text-gold/10">|</span>
+                                        <button
+                                            onClick={() => setConfirmId(null)}
+                                            className="text-muted hover:text-gold text-xs uppercase tracking-widest"
+                                        >
+                                            {t("cancel")}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={() => setConfirmId(monster.id)}
+                                        className="text-red-400/50 hover:text-red-400 text-xs uppercase tracking-widest"
+                                    >
+                                        {t("delete")}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

@@ -16,9 +16,12 @@ import { Input } from "@/app/components/atoms/Input";
 import { Button } from "@/app/components/atoms/Button";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
-import { Difficulty, partyBudget, suggestEncounters, suggestGroupEncounters } from "@/app/utils/encounter";
+import type { Difficulty } from "@/app/utils/encounter";
+import { useEncounterSuggestions } from "@/app/hooks/useEncounterSuggestions";
 import { formatCR } from "@/app/lib/format";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
+import { PageSection } from "@/app/components/atoms/PageSection";
+import { PageHeader } from "@/app/components/atoms/PageHeader";
 
 export default function EncountersEnRoutePage() {
   const t = useTranslations("travelEncounters");
@@ -52,43 +55,20 @@ export default function EncountersEnRoutePage() {
     }
   };
 
-  const budget = partyBudget({
+  const { budget, soloSuggestions, groupSuggestions } = useEncounterSuggestions({
     level: avgLevel,
     size: partySize,
-    difficulty: difficulty,
+    difficulty,
     ruleset: "2014",
-    mode: "encounter",
-  });
-
-  const soloSuggestions = suggestEncounters({
-    level: avgLevel,
-    size: partySize,
-    difficulty: difficulty,
-    ruleset: "2014",
-    budget,
-  });
-
-  const groupSuggestions = suggestGroupEncounters({
-    level: avgLevel,
-    size: partySize,
-    difficulty: difficulty,
-    ruleset: "2014",
-    budget,
   });
 
   const terrains: readonly Terrain[] = TERRAINS;
 
   return (
-    <div className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-      <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
-        <div>
-          <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
-          <p className="text-muted mt-2 font-light italic">
-            {t("description")}
-          </p>
-          <WhyDifferent className="mt-3" />
-        </div>
-      </header>
+    <PageSection>
+      <PageHeader title={t("title")} description={t("description")}>
+        <WhyDifferent className="mt-3 lg:mt-0" />
+      </PageHeader>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <FormField label={t("travellingTerrain")}>
@@ -287,6 +267,6 @@ export default function EncountersEnRoutePage() {
           </div>
         )}
       </div>
-    </div>
+    </PageSection>
   );
 }

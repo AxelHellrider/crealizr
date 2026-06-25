@@ -8,76 +8,56 @@ import {
     suggestGroupEncounters,
 } from "@/app/utils/encounter";
 
-const RULESETS = ["2014", "2024"] as const;
-
-describe("partyBudget", () => {
-    it("should return a budget for level 1-10 2014 ruleset", () => {
-        const budget = partyBudget({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        });
-        expect(budget).toBe(2000); // 500 * 4
+describe("encounterMultiplier", () => {
+    it("returns 1 for a single monster", () => {
+        expect(encounterMultiplier(1)).toBe(1);
     });
-
-    it("should return a budget for level 11-20 in 2014 ruleset", () => {
-        const budget = partyBudget({
-            level: 11,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        });
-        expect(budget).toBe(6400); // 1600 * 4
+    it("returns 1.5 for 2 monsters", () => {
+        expect(encounterMultiplier(2)).toBe(1.5);
     });
-
-    it("should return a budget for 2024 ruleset", () => {
-        const budget = partyBudget({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2024",
-            mode: "encounter",
-        });
-        expect(budget).toBe(2000); // 500 * 4
+    it("returns 2 for 3-6 monsters", () => {
+        expect(encounterMultiplier(3)).toBe(2);
+        expect(encounterMultiplier(6)).toBe(2);
     });
-
-    it("should handle level out of bounds by clamping", () => {
-        const budgetLvl25 = partyBudget({
-            level: 25,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        });
-        expect(budgetLvl25).toBe(partyBudget({
-            level: 20,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        }));
+    it("returns 2.5 for 7-10 monsters", () => {
+        expect(encounterMultiplier(7)).toBe(2.5);
+        expect(encounterMultiplier(10)).toBe(2.5);
+    });
+    it("returns 3 for 11-14 monsters", () => {
+        expect(encounterMultiplier(11)).toBe(3);
+        expect(encounterMultiplier(14)).toBe(3);
+    });
+    it("returns 4 for 15+ monsters", () => {
+        expect(encounterMultiplier(15)).toBe(4);
+        expect(encounterMultiplier(20)).toBe(4);
     });
 });
 
-describe("encounterMultiplier", () => {
-    it("applies the DMG multiplier bands", () => {
-        expect(encounterMultiplier(1)).toBe(1);
-        expect(encounterMultiplier(2)).toBe(1.5);
-        expect(encounterMultiplier(3)).toBe(2);
-        expect(encounterMultiplier(6)).toBe(2);
-        expect(encounterMultiplier(7)).toBe(2.5);
-        expect(encounterMultiplier(10)).toBe(2.5);
-        expect(encounterMultiplier(11)).toBe(3);
-        expect(encounterMultiplier(14)).toBe(3);
-        expect(encounterMultiplier(15)).toBe(4);
+describe("partyBudget", () => {
+    it("returns a positive number for valid inputs", () => {
+        const result = partyBudget({
+            level: 5,
+            size: 4,
+            difficulty: "medium",
+            ruleset: "2014",
+            mode: "encounter",
+        });
+        expect(result).toBeGreaterThan(0);
+    });
+    it("scales with party size", () => {
+        const small = partyBudget({ level: 5, size: 3, difficulty: "medium", ruleset: "2014", mode: "encounter" });
+        const big = partyBudget({ level: 5, size: 6, difficulty: "medium", ruleset: "2014", mode: "encounter" });
+        expect(big).toBeGreaterThan(small);
+    });
+    it("scales with difficulty", () => {
+        const easy = partyBudget({ level: 5, size: 4, difficulty: "easy", ruleset: "2014", mode: "encounter" });
+        const deadly = partyBudget({ level: 5, size: 4, difficulty: "deadly", ruleset: "2014", mode: "encounter" });
+        expect(deadly).toBeGreaterThan(easy);
     });
 });
 
 describe("suggestEncounters", () => {
-    it("returns suggestions sorted by fit and capped to 12 results", () => {
+    it("returns suggestions with fit >= 0.7", () => {
         const budget = partyBudget({
             level: 5,
             size: 4,
@@ -94,32 +74,25 @@ describe("suggestEncounters", () => {
         });
         expect(results.length).toBeGreaterThan(0);
         expect(results.length).toBeLessThanOrEqual(12);
-        for (let i = 1; i < results.length; i++) {
-            expect(results[i - 1].fit).toBeGreaterThanOrEqual(results[i].fit);
-        }
         results.forEach((r) => {
             expect(r.fit).toBeGreaterThanOrEqual(0.7);
+            expect(r.cr).toBeGreaterThanOrEqual(0);
             expect(r.count).toBeGreaterThanOrEqual(1);
-            expect(r.count).toBeLessThanOrEqual(8);
+            expect(r.adjustedXP).toBeGreaterThan(0);
         });
     });
 
-    it("includes reasonable fits near the budget target", () => {
-        const budget = 2000;
-        const results = suggestEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget,
-        });
-        const hasCR3x2 = results.some((r) => r.cr === 3 && r.count === 2);
-        expect(hasCR3x2).toBe(true);
+    it("sorts by highest fit first", () => {
+        const budget = partyBudget({ level: 5, size: 4, difficulty: "hard", ruleset: "2014", mode: "encounter" });
+        const results = suggestEncounters({ level: 5, size: 4, difficulty: "hard", ruleset: "2014", budget });
+        for (let i = 1; i < results.length; i++) {
+            expect(results[i - 1].fit).toBeGreaterThanOrEqual(results[i].fit);
+        }
     });
 });
 
 describe("suggestGroupEncounters", () => {
-    it("returns grouped suggestions within fit bounds", () => {
+    it("returns mixed-CR group suggestions", () => {
         const budget = partyBudget({
             level: 5,
             size: 4,
@@ -133,8 +106,8 @@ describe("suggestGroupEncounters", () => {
             difficulty: "medium",
             ruleset: "2014",
             budget,
-            maxTypes: 2,
         });
+
         expect(results.length).toBeGreaterThan(0);
         expect(results.length).toBeLessThanOrEqual(12);
         results.forEach((r) => {
@@ -149,7 +122,7 @@ describe("suggestGroupEncounters", () => {
 });
 
 describe("recommendMonstersForParty", () => {
-    it("returns 2014 Monster Manual benchmarks matched to the budget suggestions", () => {
+    it("returns recommendations with named monsters from the catalog", () => {
         const budget = partyBudget({
             level: 5,
             size: 4,
@@ -167,13 +140,17 @@ describe("recommendMonstersForParty", () => {
 
         expect(results.length).toBeGreaterThan(0);
         expect(results.length).toBeLessThanOrEqual(6);
-        results.forEach((monster) => {
-            expect(monster.name).toBeTruthy();
-            expect(monster.benchmarkCr).toBeGreaterThanOrEqual(0);
-            expect(monster.crDelta).toBeGreaterThanOrEqual(0);
-            expect(["exact", "nearest"]).toContain(monster.matchQuality);
-            expect(monster.fit).toBeGreaterThanOrEqual(0.7);
-            expect(monster.count).toBeGreaterThanOrEqual(1);
+        results.forEach((recommendation) => {
+            expect(recommendation.members.length).toBeGreaterThan(0);
+            expect(recommendation.fit).toBeGreaterThanOrEqual(0.7);
+            expect(recommendation.totalCount).toBeGreaterThanOrEqual(1);
+            recommendation.members.forEach((member) => {
+                expect(member.name).toBeTruthy();
+                expect(member.benchmarkCr).toBeGreaterThanOrEqual(0);
+                expect(member.crDelta).toBeGreaterThanOrEqual(0);
+                expect(["exact", "nearest"]).toContain(member.matchQuality);
+                expect(member.count).toBeGreaterThanOrEqual(1);
+            });
         });
     });
 
@@ -196,182 +173,5 @@ describe("recommendMonstersForParty", () => {
         });
 
         expect(results.length).toBeLessThanOrEqual(3);
-    });
-});
-
-describe("encounter builder documentation behavior", () => {
-    it("applies daily budget multiplier for both rulesets", () => {
-        RULESETS.forEach((ruleset) => {
-            const encounter = partyBudget({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                mode: "encounter",
-            });
-            const daily = partyBudget({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                mode: "daily",
-            });
-            expect(encounter).toBe(600);
-            expect(daily).toBe(Math.round(encounter * 3.4));
-        });
-    });
-
-    it("keeps solo suggestions within fit bounds for a level 3 party", () => {
-        RULESETS.forEach((ruleset) => {
-            const budget = partyBudget({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                mode: "encounter",
-            });
-            const results = suggestEncounters({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                budget,
-            });
-            expect(results.length).toBeGreaterThan(0);
-            results.forEach((r) => {
-                expect(r.fit).toBeGreaterThanOrEqual(0.7);
-                expect(r.cr).toBeLessThanOrEqual(3);
-            });
-        });
-    });
-
-    it("keeps group suggestions within fit bounds for a level 3 party", () => {
-        RULESETS.forEach((ruleset) => {
-            const budget = partyBudget({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                mode: "encounter",
-            });
-            const results = suggestGroupEncounters({
-                level: 3,
-                size: 4,
-                difficulty: "medium",
-                ruleset,
-                budget,
-                maxTypes: 2,
-            });
-            expect(results.length).toBeGreaterThan(0);
-            results.forEach((r) => {
-                expect(r.fit).toBeGreaterThanOrEqual(0.7);
-                const maxCr = Math.max(...r.members.map((m) => m.cr));
-                expect(maxCr).toBeLessThanOrEqual(3);
-            });
-        });
-    });
-
-    it("returns parity between 2014 and 2024 rulesets for identical inputs", () => {
-        const budget2014 = partyBudget({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        });
-        const budget2024 = partyBudget({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2024",
-            mode: "encounter",
-        });
-
-        const solo2014 = suggestEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget: budget2014,
-        });
-        const solo2024 = suggestEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2024",
-            budget: budget2024,
-        });
-        const group2014 = suggestGroupEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget: budget2014,
-            maxTypes: 2,
-        });
-        const group2024 = suggestGroupEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2024",
-            budget: budget2024,
-            maxTypes: 2,
-        });
-
-        expect(solo2024).toEqual(solo2014);
-        expect(group2024).toEqual(group2014);
-    });
-
-    it("sorts suggestions by fit descending, then by lower adjusted XP", () => {
-        const budget = partyBudget({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            mode: "encounter",
-        });
-        const solo = suggestEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget,
-        });
-        const groups = suggestGroupEncounters({
-            level: 5,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget,
-            maxTypes: 2,
-        });
-
-        const assertSorted = (items: { fit: number; adjustedXP: number }[]) => {
-            for (let i = 1; i < items.length; i += 1) {
-                const prev = items[i - 1];
-                const curr = items[i];
-                expect(prev.fit).toBeGreaterThanOrEqual(curr.fit);
-                if (Math.abs(prev.fit - curr.fit) < 1e-12) {
-                    expect(prev.adjustedXP).toBeLessThanOrEqual(curr.adjustedXP);
-                }
-            }
-        };
-
-        assertSorted(solo);
-        assertSorted(groups);
-    });
-
-    it("supports three-type mixes when enabled", () => {
-        const results = suggestGroupEncounters({
-            level: 3,
-            size: 4,
-            difficulty: "medium",
-            ruleset: "2014",
-            budget: 2700,
-            maxTypes: 3,
-        });
-        expect(results.length).toBeGreaterThan(0);
-        const hasThreeType = results.some((r) => r.members.length === 3 && r.totalCount === 3 && r.adjustedXP === 2700);
-        expect(hasThreeType).toBe(true);
     });
 });

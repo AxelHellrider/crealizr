@@ -7,8 +7,10 @@ import type { CustomMonster } from "@/app/lib/monsterDB";
 import type { Monster } from "@/app/types/monster";
 import MonsterForm from "./MonsterForm";
 import MonsterTable from "./MonsterTable";
-import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
+import { InfoGrid } from "@/app/components/molecules/InfoGrid";
+import { PageSection } from "@/app/components/atoms/PageSection";
+import { PageHeader } from "@/app/components/atoms/PageHeader";
 
 export default function MyMonstersPage() {
     const t = useTranslations("myMonsters");
@@ -77,33 +79,17 @@ export default function MyMonstersPage() {
     if (loading) return null;
 
     return (
-        <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+        <PageSection>
 
             {/* ── Header ── */}
-            <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
-                <div>
-                    <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
-                    <p className="text-muted mt-2 font-light italic">{t("description")}</p>
-                </div>
-            </header>
+            <PageHeader title={t("title")} description={t("description")} />
 
             {/* ── Info cards ── */}
-            <Card className="p-6 border-gold/10">
-                <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 text-sm">
-                    <div>
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("infoStorage")}</div>
-                        <p className="text-muted mt-2">{t("infoStorageDesc")}</p>
-                    </div>
-                    <div>
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("infoUsage")}</div>
-                        <p className="text-muted mt-2">{t("infoUsageDesc")}</p>
-                    </div>
-                    <div>
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("infoPortability")}</div>
-                        <p className="text-muted mt-2">{t("infoPortabilityDesc")}</p>
-                    </div>
-                </div>
-            </Card>
+            <InfoGrid items={[
+                { label: t("infoStorage"), description: t("infoStorageDesc") },
+                { label: t("infoUsage"), description: t("infoUsageDesc") },
+                { label: t("infoPortability"), description: t("infoPortabilityDesc") },
+            ]} />
 
             {/* ── Feedback ── */}
             {feedback && (
@@ -146,6 +132,6 @@ export default function MyMonstersPage() {
                     onCancel={() => { setMode("list"); setEditingMonster(null); }}
                 />
             )}
-        </section>
+        </PageSection>
     );
 }

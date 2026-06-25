@@ -18,6 +18,9 @@ import { FormField } from "@/app/components/molecules/FormField";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
+import { PageSection } from "@/app/components/atoms/PageSection";
+import { PageHeader } from "@/app/components/atoms/PageHeader";
+import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 
 type Mode = "solo" | "group";
 type Difficulty = "easy" | "medium" | "hard" | "deadly";
@@ -128,26 +131,22 @@ export default function CombatBalancerPage() {
     const showRelationControls = mode === "group" || (mode === "solo" && includeMinions);
 
     return (
-        <section className="grid gap-8 glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+        <PageSection>
 
             {/* ── Header ── */}
-            <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
+            <PageHeader title={t("title")} description={t("description")}>
                 <div>
-                    <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
-                    <p className="text-muted mt-2 font-light italic">{t("description")}</p>
-                    <p className="text-xs text-muted mt-2">{t("rulesetNote")}</p>
+                    <p className="text-xs text-muted">{t("rulesetNote")}</p>
                     <WhyDifferent className="mt-3" />
                 </div>
                 <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic hidden lg:inline-flex">
                     {t("viewDocs")}
                 </Link>
-            </header>
+            </PageHeader>
 
             {/* ── 1. Party Setup ── */}
             <Card className="p-6 border-gold/10">
-                <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
-                    Party
-                </h2>
+                <SectionHeader>Party</SectionHeader>
 
                 {/* Quick presets with active state */}
                 <div className="mb-5">
@@ -222,9 +221,7 @@ export default function CombatBalancerPage() {
 
             {/* ── 2. Encounter Shape ── */}
             <Card className="p-6 border-gold/10">
-                <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
-                    Encounter
-                </h2>
+                <SectionHeader>Encounter</SectionHeader>
 
                 {/* Formation toggle — prominent */}
                 <div className="mb-5">
@@ -282,9 +279,7 @@ export default function CombatBalancerPage() {
             {/* ── 3. Monster Filter (only when relevant) ── */}
             {showRelationControls && (
                 <Card className="p-6 border-gold/10">
-                    <h2 className="mb-5 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">
-                        Monster Filter
-                    </h2>
+                    <SectionHeader>Monster Filter</SectionHeader>
 
                     <div className="mb-4">
                         <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("relationCriteria")}</div>
@@ -533,6 +528,6 @@ export default function CombatBalancerPage() {
                     {t("viewDocs")}
                 </Link>
             </div>
-        </section>
+        </PageSection>
     );
 }

@@ -955,9 +955,35 @@ function assignRanges(entries: EncounterSeed[]): EncounterOutcome[] {
   return outcomes;
 }
 
-export const TRAVEL_ENCOUNTER_TABLES: Record<Terrain, EncounterOutcome[]> = Object.fromEntries(
-  TERRAINS.map((terrain) => [terrain, assignRanges(buildTerrainEntries(terrain))])
-) as Record<Terrain, EncounterOutcome[]>;
+const _tableCache = new Map<Terrain, EncounterOutcome[]>();
+
+function getTable(terrain: Terrain): EncounterOutcome[] {
+  let table = _tableCache.get(terrain);
+  if (!table) {
+    table = assignRanges(buildTerrainEntries(terrain));
+    _tableCache.set(terrain, table);
+  }
+  return table;
+}
+
+export const TRAVEL_ENCOUNTER_TABLES: Record<Terrain, EncounterOutcome[]> = new Proxy(
+  {} as Record<Terrain, EncounterOutcome[]>,
+  {
+    get(_, prop: string) {
+      if (TERRAINS.includes(prop as Terrain)) return getTable(prop as Terrain);
+      return undefined;
+    },
+    ownKeys() {
+      return [...TERRAINS];
+    },
+    getOwnPropertyDescriptor(_, prop: string) {
+      if (TERRAINS.includes(prop as Terrain)) {
+        return { configurable: true, enumerable: true, value: getTable(prop as Terrain) };
+      }
+      return undefined;
+    },
+  }
+);
 
 export function getTravelEncounter(terrain: Terrain, roll: number, typeFilter: EncounterType | "all" = "all"): EncounterOutcome | null {
   const table = TRAVEL_ENCOUNTER_TABLES[terrain];

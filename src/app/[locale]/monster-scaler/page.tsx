@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
-import { MonsterBase } from "@/app/types/monsters_schema";
+import { MonsterBase } from "@/app/types/monster";
 import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
 import { formatCR } from "@/app/lib/format";
 import html2canvas from "html2canvas";
@@ -13,8 +13,12 @@ import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
+import { InfoGrid } from "@/app/components/molecules/InfoGrid";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
+import { PageSection } from "@/app/components/atoms/PageSection";
+import { PageHeader } from "@/app/components/atoms/PageHeader";
+import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 
 export default function ScalePage() {
     const t = useTranslations("monsterScaler");
@@ -156,40 +160,23 @@ export default function ScalePage() {
     };
 
     return (
-        <section className="glass-panel p-5 lg:p-12 fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+        <PageSection>
             {step === 1 && (
                 <div className="grid gap-8">
-                    <header className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4 border-b border-gold/20 pb-6">
-                        <div>
-                            <h1 className="text-4xl font-serif accent-gold uppercase tracking-tight">{t("title")}</h1>
-                            <p className="text-muted mt-2 font-light italic">
-                                {t("description")}
-                            </p>
-                            <WhyDifferent className="mt-3" />
-                        </div>
+                    <PageHeader title={t("title")} description={t("description")}>
+                        <WhyDifferent className="mt-3 lg:mt-0" />
                         <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
-                    </header>
+                    </PageHeader>
 
-                    <Card className="p-6 border-gold/10">
-                        <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 text-sm">
-                            <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("whatScales")}</div>
-                                <p className="text-muted mt-2">{t("whatScalesDesc")}</p>
-                            </div>
-                            <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("rulesetNotes")}</div>
-                                <p className="text-muted mt-2">{t("rulesetNotesDesc")}</p>
-                            </div>
-                            <div>
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("guardrails")}</div>
-                                <p className="text-muted mt-2">{t("guardrailsDesc")}</p>
-                            </div>
-                        </div>
-                    </Card>
+                    <InfoGrid items={[
+                        { label: t("whatScales"), description: t("whatScalesDesc") },
+                        { label: t("rulesetNotes"), description: t("rulesetNotesDesc") },
+                        { label: t("guardrails"), description: t("guardrailsDesc") },
+                    ]} />
 
                     {/* --- Basic Info --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("generalInfo")}</h2>
+                        <SectionHeader>{t("generalInfo")}</SectionHeader>
                         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("name")}>
                                 <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder={t("namePlaceholder")} />
@@ -225,7 +212,7 @@ export default function ScalePage() {
 
                     {/* --- Base Stats --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("baseAttributes")}</h2>
+                        <SectionHeader>{t("baseAttributes")}</SectionHeader>
                         <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
                             {Object.entries(monster.stats).map(([key, value]) => (
                                 <FormField key={key} label={key}>
@@ -241,7 +228,7 @@ export default function ScalePage() {
 
                     {/* --- Additional Bonuses --- */}
                     <Card className="p-6">
-                        <h2 className="mb-6 font-serif text-xl accent-gold border-b border-gold/10 pb-3 uppercase tracking-wide">{t("defenseAdjustments")}</h2>
+                        <SectionHeader>{t("defenseAdjustments")}</SectionHeader>
 
                         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("equipmentACBonus")}>
@@ -416,6 +403,6 @@ export default function ScalePage() {
             <div className="hidden lg:block pt-4">
                 <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
             </div>
-        </section>
+        </PageSection>
     );
 }
