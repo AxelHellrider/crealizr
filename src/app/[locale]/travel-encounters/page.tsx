@@ -12,13 +12,12 @@ import {
   TERRAINS
 } from "@/app/utils/travelEncounter";
 import { Select } from "@/app/components/atoms/Select";
-import { Input } from "@/app/components/atoms/Input";
 import { Button } from "@/app/components/atoms/Button";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
 import type { Difficulty } from "@/app/utils/encounter";
 import { useEncounterSuggestions } from "@/app/hooks/useEncounterSuggestions";
-import { formatCR } from "@/app/lib/format";
+import { EncounterBalancerPanel } from "@/app/components/organisms/EncounterBalancerPanel";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
@@ -35,7 +34,7 @@ export default function EncountersEnRoutePage() {
   const [showBalancer, setShowBalancer] = useState(false);
   const [partySize, setPartySize] = useState(4);
   const [avgLevel, setAvgLevel] = useState(5);
-  const [difficulty] = useState<Difficulty>("medium");
+  const difficulty: Difficulty = "medium";
   const [showTables, setShowTables] = useState(false);
 
   const handleRoll = () => {
@@ -144,76 +143,17 @@ export default function EncountersEnRoutePage() {
                   {t("balanceThisEncounter")}
                 </Button>
               ) : (
-                <div className="grid gap-6">
-                  <div className="flex justify-between items-center border-b border-gold/10 pb-3">
-                    <h3 className="font-serif text-lg accent-gold uppercase tracking-wide">{t("encounterBalancer")}</h3>
-                    <button 
-                      onClick={() => setShowBalancer(false)}
-                      className="text-[10px] text-muted hover:text-gold transition-colors uppercase tracking-widest font-bold"
-                    >
-                      {t("close")}
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <FormField label={t("partySize")}>
-                      <Input 
-                        type="number" 
-                        min={1} 
-                        value={partySize}
-                        onChange={(e) => setPartySize(+e.target.value)}
-                        aria-label="Party size"
-                      />
-                    </FormField>
-                    <FormField label={t("avgLevel")}>
-                      <Input 
-                        type="number" 
-                        min={1} 
-                        max={20}
-                        value={avgLevel}
-                        onChange={(e) => setAvgLevel(+e.target.value)}
-                        aria-label="Average Level"
-                      />
-                    </FormField>
-                  </div>
-
-                  <div className="text-sm font-medium uppercase tracking-widest">
-                    {t("targetBudget")}: <span className="accent-gold font-bold">{budget.toLocaleString()} XP</span> <span className="text-muted font-normal italic">({difficulty})</span>
-                  </div>
-
-                  <div className="grid gap-4">
-                    <h4 className="text-[10px] uppercase text-gold/60 font-bold tracking-[0.2em]">{t("soloSuggestions")}</h4>
-                    <div className="grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
-                      {soloSuggestions.slice(0, 4).map((s, i) => (
-                        <Card key={i} className="p-4 border border-gold/10 bg-bg/50">
-                          <div className="font-serif text-lg accent-gold">{s.count} × CR {formatCR(s.cr)}</div>
-                          <div className="text-muted text-[10px] font-bold uppercase tracking-widest mt-1">{s.adjustedXP} XP</div>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4">
-                    <h4 className="text-[10px] uppercase text-silver/60 font-bold tracking-[0.2em]">{t("groupSuggestions")}</h4>
-                    <div className="grid gap-3">
-                      {groupSuggestions.slice(0, 2).map((g, i) => (
-                        <Card key={i} className="p-4 border border-silver/10 bg-bg/50 flex justify-between items-center">
-                          <div className="font-serif">
-                            {g.members.map((m, idx) => (
-                              <span key={idx}>
-                                <span className="font-bold text-lg accent-gold">{m.count}</span>
-                                <span className="text-muted mx-1 font-sans italic">×</span>
-                                <span className="text-foreground text-base">CR {formatCR(m.cr)}</span>
-                                {idx < g.members.length - 1 && <span className="text-gold/30 mx-3">|</span>}
-                              </span>
-                            ))}
-                          </div>
-                          <span className="text-muted text-[10px] font-bold uppercase tracking-widest">{g.adjustedXP} XP</span>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <EncounterBalancerPanel
+                  partySize={partySize}
+                  onPartySizeChange={setPartySize}
+                  avgLevel={avgLevel}
+                  onAvgLevelChange={setAvgLevel}
+                  budget={budget}
+                  difficulty={difficulty}
+                  soloSuggestions={soloSuggestions}
+                  groupSuggestions={groupSuggestions}
+                  onClose={() => setShowBalancer(false)}
+                />
               )}
             </div>
           )}

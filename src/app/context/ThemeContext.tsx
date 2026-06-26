@@ -13,15 +13,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [season, setSeason] = useState<Season>(() => {
         if (typeof window !== "undefined") {
-            const savedSeason = localStorage.getItem("theme-season") as Season | null;
-            if (savedSeason && ['spring', 'summer', 'autumn', 'winter'].includes(savedSeason)) {
-                return savedSeason;
-            }
+            const saved = localStorage.getItem("theme-season") as Season | null;
+            if (saved && ['spring', 'summer', 'autumn', 'winter'].includes(saved)) return saved;
             return getSeason();
         }
         return getSeason();
     });
-    
+
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -30,27 +28,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        if (mounted) {
-            document.documentElement.setAttribute("data-season", season);
-            
-            // Apply CSS variables for the current seasonal theme
-            const colors = getThemeForSeason(season);
-            const root = document.documentElement;
-            
-            root.style.setProperty('--bg', colors.bg);
-            root.style.setProperty('--bg-elev', colors.bgElev);
-            root.style.setProperty('--card', colors.card);
-            root.style.setProperty('--muted', colors.muted);
-            root.style.setProperty('--text', colors.text);
-            root.style.setProperty('--accent-gold', colors.accentPrimary);
-            root.style.setProperty('--accent-silver', colors.accentSecondary);
-            root.style.setProperty('--accent-crimson', colors.accentTertiary);
-            root.style.setProperty('--accent-blue-ishgard', colors.accentQuaternary);
-            root.style.setProperty('--border-gold', `1px solid ${colors.borderPrimary}`);
-            root.style.setProperty('--border-silver', `1px solid ${colors.borderSecondary}`);
-            root.style.setProperty('--glass-border', colors.glassBorder);
-            root.style.setProperty('--glass-bg', colors.glassBg);
-        }
+        if (!mounted) return;
+
+        document.documentElement.setAttribute("data-season", season);
+
+        const c = getThemeForSeason(season);
+        const root = document.documentElement;
+
+        root.style.setProperty('--surface-base',   c.surfaceBase);
+        root.style.setProperty('--surface-raised',  c.surfaceRaised);
+        root.style.setProperty('--surface-card',    c.surfaceCard);
+        root.style.setProperty('--surface-glass',   c.surfaceGlass);
+        root.style.setProperty('--text-base',        c.textBase);
+        root.style.setProperty('--text-secondary',   c.textSecondary);
+        root.style.setProperty('--accent-primary',   c.accentPrimary);
+        root.style.setProperty('--accent-secondary', c.accentSecondary);
+        root.style.setProperty('--accent-tertiary',  c.accentTertiary);
+        root.style.setProperty('--accent-special',   c.accentSpecial);
+        root.style.setProperty('--border-accent',    c.borderAccent);
+        root.style.setProperty('--border-subtle',    c.borderSubtle);
+        root.style.setProperty('--border-glass',     c.borderGlass);
     }, [season, mounted]);
 
     const setSeasonHandler = (newSeason: Season) => {
@@ -67,8 +64,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
     const context = useContext(ThemeContext);
-    if (context === undefined) {
-        throw new Error("useTheme must be used within a ThemeProvider");
-    }
+    if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
     return context;
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import { MonsterBase } from "@/app/types/monster";
-import { ABILITY_SCORE_MODIFIERS, CR_VALUES } from "@/app/data/constants";
+import { CR_VALUES } from "@/app/data/constants";
 import { formatCR } from "@/app/lib/format";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -19,12 +19,16 @@ import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
+import { SubLabel } from "@/app/components/atoms/SubLabel";
+import { StatRow } from "@/app/components/molecules/StatRow";
+import { StatBlockDisplay } from "@/app/components/organisms/StatBlockDisplay";
+import { AbilityScoreGrid, type AbilityKey, type AbilityScores } from "@/app/components/molecules/AbilityScoreGrid";
 
 export default function ScalePage() {
     const t = useTranslations("monsterScaler");
     const { addMonster: saveToLibrary } = useCustomMonsters();
     const [saved, setSaved] = useState(false);
-    const [step, setStep] = useState<1 | 2>(1);
+    const [isScaling, startScaling] = useTransition();
     const [monster, setMonster] = useState<MonsterBase>({
         name: "",
         edition: "2014",
@@ -49,7 +53,6 @@ export default function ScalePage() {
     const [acEquipment, setAcEquipment] = useState<number>(0);
     const [acRace, setAcRace] = useState<number>(0);
     const [abilityBonus, setAbilityBonus] = useState<Partial<Record<keyof MonsterBase["stats"], number>>>({});
-    const [isScaling, setIsScaling] = useState(false);
     const statBlockRef = useRef<HTMLDivElement>(null);
 
     const handleStatChange = (stat: keyof MonsterBase["stats"], value: number | string) => {
@@ -65,22 +68,12 @@ export default function ScalePage() {
      * Effectively a simple debounce for UX performance.
      */
     const handleScale = () => {
-        setIsScaling(true);
-        setTimeout(() => {
-            if (targetCR !== null) {
-                const base = { ...monster, edition };
-                const fn = edition === "2024" ? scaleMonster2024 : scaleMonster2014;
-                setScaledMonster(
-                    fn(base, targetCR, {
-                        acEquipment,
-                        acRace,
-                        abilityScoreBonus: abilityBonus
-                    })
-                );
-                setStep(2);
-            }
-            setIsScaling(false);
-        }, 100);
+        if (targetCR === null) return;
+        startScaling(() => {
+            const base = { ...monster, edition };
+            const fn = edition === "2024" ? scaleMonster2024 : scaleMonster2014;
+            setScaledMonster(fn(base, targetCR, { acEquipment, acRace, abilityScoreBonus: abilityBonus }));
+        });
     };
 
     const downloadImage = async () => {
@@ -152,20 +145,13 @@ export default function ScalePage() {
         } as Parameters<typeof html2canvas>[1] & { scale?: number });
     };
 
-    const getModifier = (score: number) => {
-        for (const [mod, scores] of Object.entries(ABILITY_SCORE_MODIFIERS)) {
-            if (scores.includes(score)) return mod;
-        }
-        return "0";
-    };
-
     return (
         <PageSection>
-            {step === 1 && (
+            {!scaledMonster && (
                 <div className="grid gap-8">
                     <PageHeader title={t("title")} description={t("description")}>
                         <WhyDifferent className="mt-3 lg:mt-0" />
-                        <a href="/monster-scaler/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
+                        <a href="/monster-scaler/docs" className="ui-link text-sm italic">{t("viewDocs")}</a>
                     </PageHeader>
 
                     <InfoGrid items={[
@@ -213,17 +199,21 @@ export default function ScalePage() {
                     {/* --- Base Stats --- */}
                     <Card className="p-6">
                         <SectionHeader>{t("baseAttributes")}</SectionHeader>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
-                            {Object.entries(monster.stats).map(([key, value]) => (
-                                <FormField key={key} label={key}>
-                                    <Input
-                                        type={key === "speed" ? "text" : "number"}
-                                        value={value as string | number}
-                                        onChange={(e) => handleStatChange(key as keyof MonsterBase["stats"], key === "speed" ? e.target.value : Number(e.target.value))}
-                                    />
-                                </FormField>
-                            ))}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <FormField label={t("ac")}>
+                                <Input type="number" value={monster.stats.ac} onChange={(e) => handleStatChange("ac", Number(e.target.value))} />
+                            </FormField>
+                            <FormField label={t("hp")}>
+                                <Input type="number" value={monster.stats.hp} onChange={(e) => handleStatChange("hp", Number(e.target.value))} />
+                            </FormField>
+                            <FormField label={t("speed")}>
+                                <Input value={monster.stats.speed} onChange={(e) => handleStatChange("speed", e.target.value)} />
+                            </FormField>
                         </div>
+                        <AbilityScoreGrid
+                            values={{ str: monster.stats.str, dex: monster.stats.dex, con: monster.stats.con, int: monster.stats.int, wis: monster.stats.wis, cha: monster.stats.cha } as AbilityScores}
+                            onChange={(key, value) => handleStatChange(key as keyof MonsterBase["stats"], value)}
+                        />
                     </Card>
 
                     {/* --- Additional Bonuses --- */}
@@ -239,18 +229,18 @@ export default function ScalePage() {
                             </FormField>
                         </div>
 
-                        <h3 className="mt-8 mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gold/60">{t("abilityScoreBonuses")}</h3>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-                            {["str", "dex", "con", "int", "wis", "cha"].map((ab) => (
-                                <FormField key={ab} label={ab}>
-                                    <Input
-                                        type="number"
-                                        value={abilityBonus[ab as keyof MonsterBase["stats"]] ?? 0}
-                                        onChange={(e) => handleAbilityBonusChange(ab as keyof MonsterBase["stats"], Number(e.target.value))}
-                                    />
-                                </FormField>
-                            ))}
-                        </div>
+                        <SubLabel className="mt-8 mb-4">{t("abilityScoreBonuses")}</SubLabel>
+                        <AbilityScoreGrid
+                            values={{
+                                str: abilityBonus.str ?? 0,
+                                dex: abilityBonus.dex ?? 0,
+                                con: abilityBonus.con ?? 0,
+                                int: abilityBonus.int ?? 0,
+                                wis: abilityBonus.wis ?? 0,
+                                cha: abilityBonus.cha ?? 0,
+                            }}
+                            onChange={(key: AbilityKey, value: number) => handleAbilityBonusChange(key as keyof MonsterBase["stats"], value)}
+                        />
                     </Card>
 
                     <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full lg:w-auto self-start">
@@ -259,7 +249,7 @@ export default function ScalePage() {
                 </div>
             )}
 
-            {step === 2 && scaledMonster && (
+            {scaledMonster && (
                 <div className="grid gap-6">
                     {(() => {
                         const advice = (scaledMonster as MonsterBase & { _advice?: { suggestedAttackBonus?: number; suggestedSaveDC?: number } })._advice;
@@ -272,15 +262,9 @@ export default function ScalePage() {
                                     <h2 className="font-serif text-xl uppercase tracking-wide">{t("tuningNotes")}</h2>
                                     <span className="text-xs text-muted italic">{t("derivedFromMatrix")}</span>
                                 </div>
-                                <div className="grid gap-3 grid-cols-1 lg:grid-cols-2 text-sm">
-                                    <div className="flex justify-between border-b border-gold/5 pb-2">
-                                        <span className="text-muted">{t("suggestedAttackBonus")}</span>
-                                        <span className="font-medium">{suggestedAttackBonus ?? "—"}</span>
-                                    </div>
-                                    <div className="flex justify-between border-b border-gold/5 pb-2">
-                                        <span className="text-muted">{t("suggestedSaveDC")}</span>
-                                        <span className="font-medium">{suggestedSaveDC ?? "—"}</span>
-                                    </div>
+                                <div className="grid gap-3 grid-cols-1 lg:grid-cols-2">
+                                    <StatRow label={t("suggestedAttackBonus")}>{suggestedAttackBonus ?? "—"}</StatRow>
+                                    <StatRow label={t("suggestedSaveDC")}>{suggestedSaveDC ?? "—"}</StatRow>
                                 </div>
                             </Card>
                         );
@@ -292,95 +276,56 @@ export default function ScalePage() {
                         </div>
                         <div className="grid gap-4 sm:grid-cols-2 text-sm">
                             <div className="space-y-2">
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("original")}</div>
-                                <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{monster.stats.ac}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{monster.stats.hp}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{monster.dpr.range}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(monster.cr)}</span></div>
+                                <SubLabel className="mb-2">{t("original")}</SubLabel>
+                                <StatRow label={t("ac")}>{monster.stats.ac}</StatRow>
+                                <StatRow label={t("hp")}>{monster.stats.hp}</StatRow>
+                                <StatRow label={t("dpr")}>{monster.dpr.range}</StatRow>
+                                <StatRow label={t("cr")}>{formatCR(monster.cr)}</StatRow>
                             </div>
                             <div className="space-y-2">
-                                <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("scaled")}</div>
-                                <div className="flex justify-between"><span className="text-muted">{t("ac")}</span><span className="font-medium">{scaledMonster.stats.ac}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("hp")}</span><span className="font-medium">{scaledMonster.stats.hp}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("dpr")}</span><span className="font-medium">{scaledMonster.dpr?.range ?? "—"}</span></div>
-                                <div className="flex justify-between"><span className="text-muted">{t("cr")}</span><span className="font-medium">{formatCR(scaledMonster.cr)}</span></div>
+                                <SubLabel className="mb-2">{t("scaled")}</SubLabel>
+                                <StatRow label={t("ac")}>{scaledMonster.stats.ac}</StatRow>
+                                <StatRow label={t("hp")}>{scaledMonster.stats.hp}</StatRow>
+                                <StatRow label={t("dpr")}>{scaledMonster.dpr?.range ?? "—"}</StatRow>
+                                <StatRow label={t("cr")}>{formatCR(scaledMonster.cr)}</StatRow>
                             </div>
                         </div>
-                        <div className="mt-4 grid gap-3 grid-cols-1 lg:grid-cols-3 text-xs">
-                            <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">{t("acChange")}</span>
-                                <span className="font-medium">{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">{t("hpChange")}</span>
-                                <span className="font-medium">{scaledMonster.stats.hp - monster.stats.hp >= 0 ? "+" : ""}{scaledMonster.stats.hp - monster.stats.hp}</span>
-                            </div>
-                            <div className="flex justify-between border-b border-gold/5 pb-2">
-                                <span className="text-muted">{t("crShift")}</span>
-                                <span className="font-medium">{formatCR(monster.cr)} → {formatCR(scaledMonster.cr)}</span>
-                            </div>
+                        <div className="mt-4 grid gap-3 grid-cols-1 lg:grid-cols-3">
+                            <StatRow label={t("acChange")}>{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</StatRow>
+                            <StatRow label={t("hpChange")}>{scaledMonster.stats.hp - monster.stats.hp >= 0 ? "+" : ""}{scaledMonster.stats.hp - monster.stats.hp}</StatRow>
+                            <StatRow label={t("crShift")}>{formatCR(monster.cr)} → {formatCR(scaledMonster.cr)}</StatRow>
                         </div>
                     </Card>
 
-                    <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-                        <span>{t("exportPreview")}</span>
-                        <span className="text-muted normal-case tracking-normal">{t("pngPdfLayout")}</span>
+                    <div className="flex items-center justify-between">
+                        <SubLabel>{t("exportPreview")}</SubLabel>
+                        <span className="text-xs text-muted">{t("pngPdfLayout")}</span>
                     </div>
-                    <div
+                    <StatBlockDisplay
                         ref={statBlockRef}
-                        data-export-statblock="true"
-                        className="neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card"
-                    >
-                        <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
-                        <h1 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
-                            {scaledMonster.name || t("scaledMonster")}
-                        </h1>
-                        <div className="grid gap-1 mb-6 italic text-muted font-serif">
-                            <div>{scaledMonster.size} {scaledMonster.type}, {scaledMonster.alignment}</div>
-                        </div>
+                        monster={scaledMonster}
+                        labels={{
+                            fallbackName: t("scaledMonster"),
+                            armorClass: t("armorClass"),
+                            hitPoints: t("hitPoints"),
+                            speed: t("speed"),
+                            challengeRating: t("challengeRating"),
+                            suggestedDamagePerRound: t("suggestedDamagePerRound"),
+                        }}
+                    />
 
-                        <div className="grid gap-3 border-y border-gold/20 py-6 mb-8">
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("armorClass")}</span> <span className="text-xl font-bold">{scaledMonster.stats.ac}</span></div>
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("hitPoints")}</span> <span className="text-xl font-bold">{scaledMonster.stats.hp}</span></div>
-                            <div className="flex justify-between items-center"><span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("speed")}</span> <span className="text-xl font-bold">{scaledMonster.stats.speed}</span></div>
-                        </div>
-
-                        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
-                            {["str", "dex", "con", "int", "wis", "cha"].map((key) => (
-                                <div key={key} className="text-center p-3 border border-gold/10 bg-gold/5 rounded-sm">
-                                    <div className="text-[10px] uppercase text-gold font-bold tracking-widest mb-1">{key}</div>
-                                    <div className="text-lg font-bold">{scaledMonster.stats[key as keyof MonsterBase["stats"]]}</div>
-                                    <div className="text-xs text-muted italic">({getModifier(Number(scaledMonster.stats[key as keyof MonsterBase["stats"]]))})</div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="grid gap-3">
-                            <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
-                                <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("challengeRating")}</span>
-                                <span className="text-lg font-bold">{formatCR(scaledMonster.cr)} <span className="text-muted text-xs ml-1 font-sans">({scaledMonster.edition} Ruleset)</span></span>
-                            </div>
-                            {scaledMonster.dpr && (
-                                <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
-                                    <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{t("suggestedDamagePerRound")}</span>
-                                    <span className="text-lg font-bold">{scaledMonster.dpr.range}</span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("exportOptions")}</div>
-                    <div className="flex flex-col lg:flex-row gap-4 mt-2">
-                        <button onClick={() => setStep(1)} className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs">
+                    <SubLabel className="mb-2">{t("exportOptions")}</SubLabel>
+                    <div className="flex flex-col lg:flex-row gap-4">
+                        <Button onClick={() => setScaledMonster(null)} className="flex-1 font-serif tracking-widest uppercase text-xs">
                             {t("adjustStats")}
-                        </button>
-                        <button onClick={downloadImage} className="ui-button ui-button-primary flex-1">
+                        </Button>
+                        <Button variant="primary" onClick={downloadImage} className="flex-1">
                             {t("downloadPng")}
-                        </button>
-                        <button onClick={downloadPDF} className="ui-button ui-button-primary flex-1">
+                        </Button>
+                        <Button variant="primary" onClick={downloadPDF} className="flex-1">
                             {t("downloadPdf")}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             onClick={async () => {
                                 if (scaledMonster) {
                                     await saveToLibrary({ ...scaledMonster, terrain: ["any"], affiliation: "any" });
@@ -389,10 +334,10 @@ export default function ScalePage() {
                                 }
                             }}
                             disabled={!scaledMonster || saved}
-                            className="ui-button flex-1 border-gold/30 text-gold/80 font-serif tracking-widest uppercase text-xs disabled:opacity-40"
+                            className="flex-1 font-serif tracking-widest uppercase text-xs disabled:opacity-40"
                         >
                             {saved ? "✓ Saved" : "Save to My Monsters"}
-                        </button>
+                        </Button>
                     </div>
                     <div className="text-xs text-muted italic text-center">
                         {t("exportNote")}

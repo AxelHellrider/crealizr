@@ -16,10 +16,12 @@ export default function MyMonstersPage() {
     const t = useTranslations("myMonsters");
     const { customMonsters, addMonster, updateMonster, deleteMonster, importMonsters, exportAllMonsters, loading } = useCustomMonsters();
 
-    const [mode, setMode] = useState<"list" | "add" | "edit">("list");
-    const [editingMonster, setEditingMonster] = useState<CustomMonster | null>(null);
+    // null = list view, "new" = add form, CustomMonster = edit form
+    const [editTarget, setEditTarget] = useState<CustomMonster | "new" | null>(null);
     const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const editingMonster = editTarget !== null && editTarget !== "new" ? editTarget : null;
 
     const existingNames = new Set(
         customMonsters
@@ -28,18 +30,16 @@ export default function MyMonstersPage() {
     );
 
     async function handleSave(monster: Monster) {
-        if (mode === "edit" && editingMonster) {
+        if (editingMonster) {
             await updateMonster(editingMonster.id, monster);
         } else {
             await addMonster(monster);
         }
-        setMode("list");
-        setEditingMonster(null);
+        setEditTarget(null);
     }
 
     function handleEdit(monster: CustomMonster) {
-        setEditingMonster(monster);
-        setMode("edit");
+        setEditTarget(monster);
         setFeedback(null);
     }
 
@@ -100,11 +100,11 @@ export default function MyMonstersPage() {
                 </div>
             )}
 
-            {mode === "list" ? (
+            {editTarget === null ? (
                 <>
                     {/* ── Actions bar ── */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <Button onClick={() => { setMode("add"); setFeedback(null); }} className="px-5 py-2.5 text-xs uppercase tracking-widest">
+                        <Button onClick={() => { setEditTarget("new"); setFeedback(null); }} className="px-5 py-2.5 text-xs uppercase tracking-widest">
                             + {t("addMonster")}
                         </Button>
                         <span className="hidden sm:block w-px h-6 bg-gold/10" />
@@ -129,7 +129,7 @@ export default function MyMonstersPage() {
                     initial={editingMonster ?? undefined}
                     existingNames={existingNames}
                     onSave={handleSave}
-                    onCancel={() => { setMode("list"); setEditingMonster(null); }}
+                    onCancel={() => setEditTarget(null)}
                 />
             )}
         </PageSection>

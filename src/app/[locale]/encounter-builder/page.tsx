@@ -14,7 +14,12 @@ import { formatCR } from "@/app/lib/format";
 import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
+import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { FormField } from "@/app/components/molecules/FormField";
+import { ToggleChip } from "@/app/components/molecules/ToggleChip";
+
+import { FilterBadge } from "@/app/components/molecules/FilterBadge";
+import { MonsterFilterPanel, type RelationCriteria } from "@/app/components/organisms/MonsterFilterPanel";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
@@ -26,10 +31,6 @@ type Mode = "solo" | "group";
 type Difficulty = "easy" | "medium" | "hard" | "deadly";
 type Ruleset = "2014" | "2024";
 type BudgetMode = "encounter" | "daily";
-type RelationCriteria = "terrain" | "affiliation" | "genus" | "any";
-
-const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar"];
-const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant"];
 
 function BudgetBar({ fit, budgetFitLabel, accent = "gold" }: { fit: number; budgetFitLabel: string; accent?: "gold" | "silver" }) {
     return (
@@ -139,7 +140,7 @@ export default function CombatBalancerPage() {
                     <p className="text-xs text-muted">{t("rulesetNote")}</p>
                     <WhyDifferent className="mt-3" />
                 </div>
-                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic hidden lg:inline-flex">
+                <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic">
                     {t("viewDocs")}
                 </Link>
             </PageHeader>
@@ -148,32 +149,19 @@ export default function CombatBalancerPage() {
             <Card className="p-6 border-gold/10">
                 <SectionHeader>Party</SectionHeader>
 
-                {/* Quick presets with active state */}
                 <div className="mb-5">
-                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("quickPresets")}</div>
+                    <SubLabel className="mb-3">{t("quickPresets")}</SubLabel>
                     <div className="flex flex-wrap gap-2">
                         {[3, 4, 5, 6].map((size) => (
-                            <button
-                                key={size}
-                                onClick={() => setPartySize(size)}
-                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                    partySize === size ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                                }`}
-                            >
+                            <ToggleChip key={size} isActive={partySize === size} onClick={() => setPartySize(size)}>
                                 {size} PCs
-                            </button>
+                            </ToggleChip>
                         ))}
                         <span className="w-px self-stretch bg-gold/10 mx-1 hidden sm:block" />
                         {[3, 5, 10, 15, 20].map((level) => (
-                            <button
-                                key={level}
-                                onClick={() => setAvgLevel(level)}
-                                className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                    avgLevel === level ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                                }`}
-                            >
+                            <ToggleChip key={level} isActive={avgLevel === level} onClick={() => setAvgLevel(level)}>
                                 Lv {level}
-                            </button>
+                            </ToggleChip>
                         ))}
                     </div>
                 </div>
@@ -205,16 +193,15 @@ export default function CombatBalancerPage() {
                     </FormField>
                 </div>
 
-                {/* Live budget readout */}
                 <div className="mt-5 pt-4 border-t border-gold/10 flex flex-wrap items-center justify-between gap-3">
                     <span className="text-sm uppercase tracking-widest text-muted">
                         {t("totalXPBudget")}:
                         <span className="accent-gold font-bold ml-2 text-lg">{budget.toLocaleString()} XP</span>
                     </span>
                     {primaryStatus && (
-                        <span className={`text-[10px] px-3 py-1 rounded-sm uppercase font-bold tracking-widest border border-gold/20 ${primaryStatus.color}`}>
+                        <FilterBadge active className={primaryStatus.color}>
                             {primaryStatus.label}
-                        </span>
+                        </FilterBadge>
                     )}
                 </div>
             </Card>
@@ -223,26 +210,17 @@ export default function CombatBalancerPage() {
             <Card className="p-6 border-gold/10">
                 <SectionHeader>Encounter</SectionHeader>
 
-                {/* Formation toggle — prominent */}
                 <div className="mb-5">
-                    <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("formation")}</div>
+                    <SubLabel className="mb-3">{t("formation")}</SubLabel>
                     <div className="flex gap-2">
-                        <button
-                            onClick={() => setMode("solo")}
-                            className={`flex-1 px-4 py-3 text-sm uppercase tracking-widest border rounded-sm transition-colors text-center ${
-                                mode === "solo" ? "border-gold bg-gold/15 text-gold font-bold shadow-[0_0_10px_rgba(197,160,89,0.3)]" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                            }`}
-                        >
+                        <ToggleChip size="lg" isActive={mode === "solo"} onClick={() => setMode("solo")}
+                            className={mode === "solo" ? "shadow-[0_0_10px_rgba(197,160,89,0.3)] font-bold" : ""}>
                             {t("soloBoss")}
-                        </button>
-                        <button
-                            onClick={() => setMode("group")}
-                            className={`flex-1 px-4 py-3 text-sm uppercase tracking-widest border rounded-sm transition-colors text-center ${
-                                mode === "group" ? "border-gold bg-gold/15 text-gold font-bold shadow-[0_0_10px_rgba(197,160,89,0.3)]" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                            }`}
-                        >
+                        </ToggleChip>
+                        <ToggleChip size="lg" isActive={mode === "group"} onClick={() => setMode("group")}
+                            className={mode === "group" ? "shadow-[0_0_10px_rgba(197,160,89,0.3)] font-bold" : ""}>
                             {t("hordeGroup")}
-                        </button>
+                        </ToggleChip>
                     </div>
                 </div>
 
@@ -276,121 +254,34 @@ export default function CombatBalancerPage() {
                 </div>
             </Card>
 
-            {/* ── 3. Monster Filter (only when relevant) ── */}
+            {/* ── 3. Monster Filter ── */}
             {showRelationControls && (
-                <Card className="p-6 border-gold/10">
-                    <SectionHeader>Monster Filter</SectionHeader>
-
-                    <div className="mb-4">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-3">{t("relationCriteria")}</div>
-                        <div className="flex flex-wrap gap-2">
-                            {([
-                                { value: "any", label: t("anySpecies") },
-                                { value: "terrain", label: t("sameTerrain") },
-                                { value: "affiliation", label: t("sameAffiliation") },
-                                { value: "genus", label: t("sameGenus") },
-                            ] as const).map(({ value, label }) => (
-                                <button
-                                    key={value}
-                                    onClick={() => { setRelationCriteria(value); setFilterTerrain(""); setFilterAffiliation(""); setFilterGenus(""); }}
-                                    className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                        relationCriteria === value ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                                    }`}
-                                >
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Value selectors */}
-                    {relationCriteria === "terrain" && (
-                        <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("sameTerrain")}</div>
-                            <div className="flex flex-wrap gap-2">
-                                {TERRAINS.map((ter) => (
-                                    <button
-                                        key={ter}
-                                        onClick={() => setFilterTerrain(filterTerrain === ter ? "" : ter)}
-                                        className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                            filterTerrain === ter ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                                        }`}
-                                    >
-                                        {ter}
-                                    </button>
-                                ))}
-                            </div>
-                            {!filterTerrain && <p className="text-xs text-muted italic mt-2">Select a terrain to filter the monster pool below.</p>}
-                        </div>
-                    )}
-                    {relationCriteria === "affiliation" && (
-                        <div>
-                            <div className="text-xs font-bold uppercase tracking-widest text-muted mb-2">{t("sameAffiliation")}</div>
-                            <div className="flex flex-wrap gap-2">
-                                {AFFILIATIONS.map((a) => (
-                                    <button
-                                        key={a}
-                                        onClick={() => setFilterAffiliation(filterAffiliation === a ? "" : a)}
-                                        className={`px-3 py-1.5 text-xs uppercase tracking-widest border rounded-sm transition-colors ${
-                                            filterAffiliation === a ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/20 text-muted hover:bg-gold/5 hover:text-gold hover:border-gold/40 cursor-pointer active:scale-95"
-                                        }`}
-                                    >
-                                        {a}
-                                    </button>
-                                ))}
-                            </div>
-                            {!filterAffiliation && <p className="text-xs text-muted italic mt-2">Select an affiliation to filter the monster pool below.</p>}
-                        </div>
-                    )}
-                    {relationCriteria === "genus" && (
-                        <div>
-                            <FormField label={t("sameGenus")} sublabel="type or pick">
-                                <Input
-                                    value={filterGenus}
-                                    onChange={(e) => setFilterGenus(e.target.value)}
-                                    list="encounter-genus-options"
-                                    placeholder="e.g. dragon, goblinoid"
-                                />
-                            </FormField>
-                            <datalist id="encounter-genus-options">
-                                {knownGenera.map((g) => <option key={g} value={g} />)}
-                            </datalist>
-                            {knownGenera.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1.5">
-                                    {knownGenera.map((g) => (
-                                        <button
-                                            key={g}
-                                            onClick={() => setFilterGenus(filterGenus === g ? "" : g)}
-                                            className={`px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-sm transition-colors ${
-                                                filterGenus === g ? "border-gold bg-gold/10 text-gold shadow-[0_0_6px_rgba(197,160,89,0.2)] cursor-pointer" : "border-gold/10 text-muted/60 hover:bg-gold/5 hover:text-muted hover:border-gold/30 cursor-pointer"
-                                            }`}
-                                        >
-                                            {g}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </Card>
+                <MonsterFilterPanel
+                    relationCriteria={relationCriteria}
+                    onRelationChange={setRelationCriteria}
+                    filterTerrain={filterTerrain}
+                    onTerrainChange={setFilterTerrain}
+                    filterAffiliation={filterAffiliation}
+                    onAffiliationChange={setFilterAffiliation}
+                    filterGenus={filterGenus}
+                    onGenusChange={setFilterGenus}
+                    knownGenera={knownGenera}
+                />
             )}
 
             {/* ── 4. Results ── */}
             <Card className="p-6" ref={resultsRef}>
-                {/* Results header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-gold/10 pb-5 mb-6">
                     <div>
                         <h2 className="font-serif text-2xl accent-gold uppercase tracking-wide">{t("suggestedEncounters")}</h2>
-                        <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-widest font-bold text-gold/60">
-                            <span className="border border-gold/20 px-2 py-0.5">{partySize} PCs · Lv {avgLevel}</span>
-                            <span className="border border-gold/20 px-2 py-0.5">{difficulty}</span>
-                            <span className="border border-gold/20 px-2 py-0.5">{ruleset}</span>
-                            <span className="border border-gold/20 px-2 py-0.5">{budgetMode}</span>
-                            <span className="border border-gold/20 px-2 py-0.5">{mode === "solo" ? (includeMinions ? "boss + minions" : "solo boss") : `group ≤${groupTypes}`}</span>
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                            <FilterBadge>{partySize} PCs · Lv {avgLevel}</FilterBadge>
+                            <FilterBadge>{difficulty}</FilterBadge>
+                            <FilterBadge>{ruleset}</FilterBadge>
+                            <FilterBadge>{budgetMode}</FilterBadge>
+                            <FilterBadge>{mode === "solo" ? (includeMinions ? "boss + minions" : "solo boss") : `group ≤${groupTypes}`}</FilterBadge>
                             {hasActiveFilter && (
-                                <span className="border border-gold/40 bg-gold/10 px-2 py-0.5 text-gold">
-                                    {relationCriteria}: {activeFilterLabel}
-                                </span>
+                                <FilterBadge active>{relationCriteria}: {activeFilterLabel}</FilterBadge>
                             )}
                         </div>
                     </div>
@@ -401,10 +292,9 @@ export default function CombatBalancerPage() {
                     </div>
                 </div>
 
-                {/* Recommended mix highlight */}
                 {mode === "solo" && primarySolo && (
                     <div className="mb-6 rounded-sm border-2 border-gold/30 bg-gold/5 p-4">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("recommendedMix")}</div>
+                        <SubLabel className="mb-2">{t("recommendedMix")}</SubLabel>
                         <div className="mt-2 font-serif text-lg accent-gold">{formatBossMinions(primarySolo)}</div>
                         <div className="text-xs text-muted mt-1">
                             {t("budgetFit")} {(primarySolo.fit * 100).toFixed(0)}% · {budgetStatus(primarySolo.fit).label}
@@ -413,7 +303,7 @@ export default function CombatBalancerPage() {
                 )}
                 {mode === "group" && primaryGroup && (
                     <div className="mb-6 rounded-sm border-2 border-gold/30 bg-gold/5 p-4">
-                        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("recommendedMix")}</div>
+                        <SubLabel className="mb-2">{t("recommendedMix")}</SubLabel>
                         <div className="mt-2 font-serif text-lg accent-gold">{formatGroupMembers(primaryGroup.members)}</div>
                         <div className="text-xs text-muted mt-1">
                             {t("budgetFit")} {(primaryGroup.fit * 100).toFixed(0)}% · {budgetStatus(primaryGroup.fit).label}
@@ -421,7 +311,6 @@ export default function CombatBalancerPage() {
                     </div>
                 )}
 
-                {/* Encounter suggestions */}
                 <section>
                     <div className="mb-4">
                         <h3 className="font-serif text-xl accent-gold uppercase tracking-wide">{t("crMixOptions")}</h3>
@@ -442,8 +331,7 @@ export default function CombatBalancerPage() {
 
                             return (
                                 <li key={i}>
-                                    <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all ${isExpanded ? "shadow-glow border-gold/30" : "hover:border-gold/20"} bg-bg/50`}>
-                                        {/* Clickable header */}
+                                    <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all ${isExpanded ? "shadow-glow border-gold/30" : "hover:border-gold/20"} bg-background/50`}>
                                         <button
                                             type="button"
                                             onClick={() => setExpandedSuggestion(isExpanded ? null : i)}
@@ -472,7 +360,6 @@ export default function CombatBalancerPage() {
                                             <BudgetBar fit={suggestion.fit} budgetFitLabel={t("budgetFit")} accent={mode === "solo" ? "gold" : "silver"} />
                                         </button>
 
-                                        {/* Expandable monster pool */}
                                         {isExpanded && (
                                             <div className="px-5 pb-5 pt-1 border-t border-gold/10 grid gap-3">
                                                 {uniqueCRs.map((cr) => {
@@ -482,12 +369,12 @@ export default function CombatBalancerPage() {
                                                     const filtered = hasActiveFilter && monsters.length < allMonsters.length;
                                                     return (
                                                         <div key={cr}>
-                                                            <div className="text-[10px] uppercase tracking-[0.2em] text-gold/60 font-bold mb-1.5">
+                                                            <SubLabel className="mb-1.5">
                                                                 CR {formatCR(cr)} {slot?.label ? `(${slot.label})` : ""}
                                                                 {" — "}
                                                                 {monsters.length} available
                                                                 {filtered && <span className="text-gold/40 ml-1">({allMonsters.length} total)</span>}
-                                                            </div>
+                                                            </SubLabel>
                                                             {monsters.length === 0 ? (
                                                                 <p className="text-muted text-xs italic">No monsters match the current filter at this CR.</p>
                                                             ) : (

@@ -182,7 +182,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
         <div className="grid gap-8 sm:grid-cols-3">
           <Link href={`/${locale}/monster-scaler`} className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
-              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
+              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-background">
                 <span className="text-3xl">⚖️</span>
               </div>
               <h3 className="font-serif text-2xl group-hover:text-gold transition-colors uppercase tracking-tight text-foreground">{t("home.coreToolkit.monsterScaler.title")}</h3>
@@ -197,7 +197,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
           <Link href={`/${locale}/encounter-builder`} className="group">
             <Card className="p-10 border-silver/10 hover:border-silver/40 transition-all flex flex-col h-full bg-card">
-              <div className="h-16 w-16 rounded-full border border-silver/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-silver transition-all shadow-glow bg-bg">
+              <div className="h-16 w-16 rounded-full border border-silver/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-silver transition-all shadow-glow bg-background">
                 <span className="text-3xl">⚔️</span>
               </div>
               <h3 className="font-serif text-2xl group-hover:text-silver transition-colors uppercase tracking-tight text-foreground">{t("home.coreToolkit.encounterBuilder.title")}</h3>
@@ -212,7 +212,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
 
           <Link href={`/${locale}/artifact-forge`} className="group">
             <Card className="p-10 border-gold/10 hover:border-gold/40 transition-all flex flex-col h-full bg-card">
-              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-bg">
+              <div className="h-16 w-16 rounded-full border border-gold/30 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-gold transition-all shadow-glow bg-background">
                 <span className="text-3xl">✨</span>
               </div>
               <h3 className="font-serif text-2xl group-hover:text-gold transition-colors uppercase tracking-tight text-foreground">{t("home.coreToolkit.artifactForge.title")}</h3>

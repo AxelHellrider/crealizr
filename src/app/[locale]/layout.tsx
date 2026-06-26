@@ -5,17 +5,20 @@ import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import "../globals.css";
 import Sidebar from "@/app/components/organisms/Sidebar";
+import Header from "@/app/components/organisms/Header";
 import Footer from "@/app/components/organisms/Footer";
 import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import {ThemeProvider} from "@/app/context/ThemeContext";
 import {SidebarProvider} from "@/app/context/SidebarContext";
 import {CustomMonstersProvider} from "@/app/context/CustomMonstersContext";
-import SidebarToggle from "@/app/components/atoms/SidebarToggle";
+import {NumpadProvider} from "@/app/context/NumpadContext";
+import {Numpad} from "@/app/components/organisms/Numpad";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 import {Locale} from "@/i18n/config";
 import MainContent from "@/app/components/organisms/MainContent";
+import SidebarToggle from "@/app/components/atoms/SidebarToggle";
 
 const cinzel = Cinzel({
     variable: "--font-cinzel",
@@ -82,12 +85,16 @@ export default async function LocaleLayout({
                 </Suspense>
                 <SidebarProvider>
                     <CustomMonstersProvider>
-                        <SidebarToggle/>
-                        <Sidebar/>
-                        <MainContent>
-                            {children}
-                            <Footer/>
-                        </MainContent>
+                        <NumpadProvider>
+                            <Sidebar/>
+                            <Header/>
+                            <div className="hidden xl:block"><SidebarToggle/></div>
+                            <MainContent>
+                                {children}
+                                <Footer/>
+                            </MainContent>
+                            <Numpad/>
+                        </NumpadProvider>
                     </CustomMonstersProvider>
                 </SidebarProvider>
             </ThemeProvider>

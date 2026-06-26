@@ -129,7 +129,7 @@ export function Autocomplete(props: Props) {
         <ul
             ref={listRef}
             role="listbox"
-            style={{ ...dropdownStyle, background: "var(--bg-elev)" }}
+            style={{ ...dropdownStyle, background: "var(--surface-raised)" }}
             className="z-[9999] max-h-48 overflow-y-auto border border-gold/20 rounded-sm shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
         >
             {filtered.map((option, i) => (
@@ -194,7 +194,7 @@ export function Autocomplete(props: Props) {
                 aria-autocomplete="list"
                 className={`ui-input w-full min-h-11 lg:min-h-[38px] transition-all duration-200
                     focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold
-                    bg-bg-elev border-silver/30 text-foreground
+                    bg-surface border-silver/30 text-foreground
                     ${className || ""}`}
             />
             {dropdown}

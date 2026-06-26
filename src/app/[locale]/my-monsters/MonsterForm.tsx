@@ -8,6 +8,7 @@ import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { Autocomplete } from "@/app/components/atoms/Autocomplete";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
+import { AbilityScoreGrid, type AbilityScores } from "@/app/components/molecules/AbilityScoreGrid";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
 import { MONSTER_MANUAL_2014_CATALOG, MONSTER_MANUAL_2024_CATALOG } from "@/app/data/monsters";
@@ -53,12 +54,14 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
     const [ac, setAc] = useState(initial?.stats?.ac ?? 10);
     const [hp, setHp] = useState(initial?.stats?.hp ?? 10);
     const [speed, setSpeed] = useState(initial?.stats?.speed ?? "30 ft");
-    const [str, setStr] = useState(initial?.stats?.str ?? 10);
-    const [dex, setDex] = useState(initial?.stats?.dex ?? 10);
-    const [con, setCon] = useState(initial?.stats?.con ?? 10);
-    const [int, setInt] = useState(initial?.stats?.int ?? 10);
-    const [wis, setWis] = useState(initial?.stats?.wis ?? 10);
-    const [cha, setCha] = useState(initial?.stats?.cha ?? 10);
+    const [abilityScores, setAbilityScores] = useState<AbilityScores>({
+        str: initial?.stats?.str ?? 10,
+        dex: initial?.stats?.dex ?? 10,
+        con: initial?.stats?.con ?? 10,
+        int: initial?.stats?.int ?? 10,
+        wis: initial?.stats?.wis ?? 10,
+        cha: initial?.stats?.cha ?? 10,
+    });
     const [dprMin, setDprMin] = useState(initial?.dpr?.min ?? 0);
     const [dprMax, setDprMax] = useState(initial?.dpr?.max ?? 0);
     const [dprRange, setDprRange] = useState(initial?.dpr?.range ?? "");
@@ -98,7 +101,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
             monster.type = type || undefined;
             monster.alignment = alignment || undefined;
             monster.xp = xp;
-            monster.stats = { ac, hp, speed, str, dex, con, int, wis, cha };
+            monster.stats = { ac, hp, speed, ...abilityScores };
             monster.dpr = { min: dprMin, max: dprMax, range: dprRange };
             if (actions.length > 0) monster.actions = actions;
         }
@@ -121,14 +124,11 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     {initial ? t("editMonster") : t("addMonster")}
                 </SectionHeader>
 
-                {/* Name — large, like the stat block title */}
                 <FormField label={t("form.name")}>
-                    <input
+                    <Input
                         value={name}
                         onChange={(e) => { setName(e.target.value); setError(""); }}
-                        className="ui-input w-full text-2xl font-serif py-3 transition-all duration-200
-                            focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold
-                            bg-bg-elev border-silver/30 text-foreground"
+                        className="text-2xl font-serif py-3"
                         placeholder="e.g. Dire Owlbear"
                     />
                 </FormField>
@@ -196,27 +196,15 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     </div>
                 </div>
 
-                {/* Ability Scores — 6 boxes like the stat block display */}
-                <div className="grid grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-                    {[
-                        { key: "str", val: str, set: setStr },
-                        { key: "dex", val: dex, set: setDex },
-                        { key: "con", val: con, set: setCon },
-                        { key: "int", val: int, set: setInt },
-                        { key: "wis", val: wis, set: setWis },
-                        { key: "cha", val: cha, set: setCha },
-                    ].map(({ key, val, set }) => (
-                        <div key={key} className="text-center p-3 border border-gold/10 bg-gold/5 rounded-sm">
-                            <div className="text-[10px] uppercase text-gold font-bold tracking-widest mb-2">{t(`form.${key}`)}</div>
-                            <input
-                                type="number"
-                                value={val}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { set(clamp(Number(e.target.value), 0, 30)); if (!showStats) setShowStats(true); }}
-                                className="w-full text-center text-lg font-bold bg-transparent border-0 outline-none focus:ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                            />
-                            <div className="text-xs text-muted italic">({val >= 10 ? "+" : ""}{Math.floor((val - 10) / 2)})</div>
-                        </div>
-                    ))}
+                <div className="mb-6">
+                    <AbilityScoreGrid
+                        values={abilityScores}
+                        onChange={(key, value) => {
+                            setAbilityScores((prev) => ({ ...prev, [key]: value }));
+                            if (!showStats) setShowStats(true);
+                        }}
+                        labels={{ str: t("form.str"), dex: t("form.dex"), con: t("form.con"), int: t("form.int"), wis: t("form.wis"), cha: t("form.cha") }}
+                    />
                 </div>
 
                 {/* DPR */}
@@ -325,9 +313,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
             {/* ── Submit ── */}
             <div className="flex gap-3">
                 <Button type="submit" variant="primary" className="px-8 py-3 text-sm uppercase tracking-widest">{t("saveMonster")}</Button>
-                <button type="button" onClick={onCancel} className="ui-button px-8 py-3 text-xs uppercase tracking-widest">
-                    {t("cancel")}
-                </button>
+                <Button type="button" onClick={onCancel} className="px-8 py-3 text-xs uppercase tracking-widest">{t("cancel")}</Button>
             </div>
         </form>
     );

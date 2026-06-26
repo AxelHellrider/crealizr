@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CustomMonster } from "@/app/lib/monsterDB";
 import { Input } from "@/app/components/atoms/Input";
+import { EmptyState } from "@/app/components/molecules/EmptyState";
 import { formatCR } from "@/app/lib/format";
 
 type Props = {
@@ -31,9 +32,7 @@ export default function MonsterTable({ monsters, onEdit, onDelete }: Props) {
             />
 
             {filtered.length === 0 ? (
-                <div className="py-12 text-center border border-gold/10 rounded-sm">
-                    <p className="text-muted text-sm italic">{t("emptyState")}</p>
-                </div>
+                <EmptyState message={t("emptyState")} />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filtered.map((monster) => (

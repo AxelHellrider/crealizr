@@ -5,13 +5,16 @@ import { useTranslations } from "next-intl";
 import { buildItem, ItemType } from "@/app/utils/items";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
+import { SubLabel } from "@/app/components/atoms/SubLabel";
+import { Textarea } from "@/app/components/atoms/Textarea";
 import { FormField } from "@/app/components/molecules/FormField";
-import { Card, CardContent } from "@/app/components/atoms/Card";
+import { Tag } from "@/app/components/molecules/Tag";
+import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
-import { SectionHeader } from "@/app/components/atoms/SectionHeader";
+import { ItemPreviewCard } from "@/app/components/organisms/ItemPreviewCard";
 
 const TYPES: ItemType[] = ["Weapon", "Armor", "Wand", "Wondrous"];
 const COMMON_TARGETS = ["undead", "fiend", "dragon", "construct"];
@@ -99,35 +102,29 @@ export default function ItemCreatorPage() {
   }), [name, type, attunement, level, targets, ingredients, craftingCost, craftingTime, craftingTimeUnit, craftingRequirement, lore]);
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (!t) return;
-    if (!targets.includes(t)) setTargets((arr) => [...arr, t]);
+    const v = tagInput.trim();
+    if (!v) return;
+    if (!targets.includes(v)) setTargets((arr) => [...arr, v]);
     setTagInput("");
   };
 
-  const addTarget = (t: string) => {
-    if (!targets.includes(t)) setTargets((arr) => [...arr, t]);
+  const addTarget = (v: string) => {
+    if (!targets.includes(v)) setTargets((arr) => [...arr, v]);
   };
 
-  const removeTag = (t: string) => setTargets((arr) => arr.filter((x) => x !== t));
+  const removeTag = (v: string) => setTargets((arr) => arr.filter((x) => x !== v));
 
   const addIngredient = () => {
     const nameValue = ingredientName.trim();
     const quantityValue = typeof ingredientQty === "number" ? ingredientQty : Number(ingredientQty);
     if (!nameValue || !Number.isFinite(quantityValue) || quantityValue <= 0) return;
-    setIngredients((arr) => [...arr, {
-      name: nameValue,
-      quantity: quantityValue,
-      unit: ingredientUnit.trim() || undefined,
-    }]);
+    setIngredients((arr) => [...arr, { name: nameValue, quantity: quantityValue, unit: ingredientUnit.trim() || undefined }]);
     setIngredientName("");
     setIngredientQty("");
     setIngredientUnit("");
   };
 
-  const removeIngredient = (index: number) => {
-    setIngredients((arr) => arr.filter((_, i) => i !== index));
-  };
+  const removeIngredient = (index: number) => setIngredients((arr) => arr.filter((_, i) => i !== index));
 
   const addQuickIngredient = (ingredient: { name: string; quantity: number; unit?: string }) => {
     setIngredients((arr) => [...arr, ingredient]);
@@ -150,30 +147,14 @@ export default function ItemCreatorPage() {
     setLore(example.lore);
   };
 
-  const clearFlavor = () => {
-    setName("");
-    setTargets([]);
-    setLore("");
-  };
-
-  const clearCrafting = () => {
-    setIngredients([]);
-    setCraftingCost("");
-    setCraftingTime("");
-    setCraftingRequirement("");
-  };
-
-  const scrollToOutput = () => {
-    outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  const clearFlavor = () => { setName(""); setTargets([]); setLore(""); };
+  const clearCrafting = () => { setIngredients([]); setCraftingCost(""); setCraftingTime(""); setCraftingRequirement(""); };
+  const scrollToOutput = () => outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const loreWordCount = lore.trim() ? lore.trim().split(/\s+/).length : 0;
   const handleLoreChange = (value: string) => {
     const words = value.trim() ? value.trim().split(/\s+/) : [];
-    if (words.length <= 100) {
-      setLore(value);
-      return;
-    }
+    if (words.length <= 100) { setLore(value); return; }
     setLore(words.slice(0, 100).join(" "));
   };
 
@@ -181,14 +162,14 @@ export default function ItemCreatorPage() {
     <PageSection>
       <PageHeader title={t("title")} description={t("description")}>
         <WhyDifferent className="mt-3 lg:mt-0" />
-        <a href="/artifact-forge/docs" className="ui-link text-sm italic hidden lg:inline-flex">{t("viewDocs")}</a>
+        <a href="/artifact-forge/docs" className="ui-link text-sm italic">{t("viewDocs")}</a>
       </PageHeader>
 
       <Card className="p-6 border-gold/10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("quickActions")}</div>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <SubLabel className="mb-3">{t("quickActions")}</SubLabel>
+            <div className="flex flex-wrap gap-2">
               <Button onClick={applyExample} className="px-4 text-xs font-bold uppercase tracking-widest">{t("useExample")}</Button>
               <Button onClick={clearFlavor} className="px-4 text-xs font-bold uppercase tracking-widest">{t("clearFlavor")}</Button>
               <Button onClick={clearCrafting} className="px-4 text-xs font-bold uppercase tracking-widest">{t("clearCrafting")}</Button>
@@ -204,15 +185,13 @@ export default function ItemCreatorPage() {
             <span className="text-xs font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">{t("lockMechanics")}</span>
           </label>
         </div>
-        <p className="mt-4 text-sm text-muted">
-          {t("mechanicsNote")}
-        </p>
+        <p className="mt-4 text-sm text-muted">{t("mechanicsNote")}</p>
       </Card>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
         {EXAMPLE_ITEMS.slice(0, 3).map((example) => (
           <Card key={example.name} className="p-5 border-gold/10 bg-card">
-            <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("example")}</div>
+            <SubLabel className="mb-2">{t("example")}</SubLabel>
             <h3 className="mt-2 font-serif text-lg accent-gold">{example.name}</h3>
             <p className="text-xs text-muted mt-1">{example.type} · Level {example.level}</p>
             <p className="text-sm text-muted mt-3 italic">&quot;{example.lore}&quot;</p>
@@ -221,18 +200,17 @@ export default function ItemCreatorPage() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-        <div className="lg:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-          {t("mechanics")}
+        <div className="lg:col-span-2">
+          <SubLabel>{t("mechanics")}</SubLabel>
         </div>
+
         <FormField label={t("itemName")}>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("itemNamePlaceholder")} />
         </FormField>
 
         <FormField label={t("itemType")}>
           <Select value={type} onChange={(e) => setType(e.target.value as ItemType)}>
-            {TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
+            {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </Select>
         </FormField>
 
@@ -258,18 +236,16 @@ export default function ItemCreatorPage() {
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-2 min-h-6">
-            {targets.map((t) => (
-              <span key={t} className="inline-flex items-center gap-1 rounded-sm border border-gold/20 bg-gold/5 px-3 py-1 text-[10px] uppercase font-bold tracking-widest accent-gold shadow-glow">
-                {t}
-                <button onClick={() => removeTag(t)} className="text-gold/40 hover:text-red-400 ml-2 transition-colors text-base leading-none">×</button>
-              </span>
+            {targets.map((target) => (
+              <Tag key={target} onRemove={() => removeTag(target)}>{target}</Tag>
             ))}
           </div>
         </FormField>
 
-        <div className="lg:col-span-2 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">
-          {t("flavorCrafting")}
+        <div className="lg:col-span-2">
+          <SubLabel>{t("flavorCrafting")}</SubLabel>
         </div>
+
         <FormField label={t("craftingIngredients")} sublabel={t("optional")}>
           <div className="grid gap-2 grid-cols-1 lg:grid-cols-[1.5fr_0.6fr_0.7fr_auto]">
             <Input value={ingredientName} onChange={(e) => setIngredientName(e.target.value)} placeholder={t("ingredientNamePlaceholder")} />
@@ -291,10 +267,9 @@ export default function ItemCreatorPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2 min-h-6">
             {ingredients.map((ingredient, index) => (
-              <span key={`${ingredient.name}-${index}`} className="inline-flex items-center gap-1 rounded-sm border border-gold/20 bg-gold/5 px-3 py-1 text-[10px] uppercase font-bold tracking-widest accent-gold shadow-glow">
+              <Tag key={`${ingredient.name}-${index}`} onRemove={() => removeIngredient(index)}>
                 {ingredient.quantity}{ingredient.unit ? ` ${ingredient.unit}` : ""} {ingredient.name}
-                <button onClick={() => removeIngredient(index)} className="text-gold/40 hover:text-red-400 ml-2 transition-colors text-base leading-none">×</button>
-              </span>
+              </Tag>
             ))}
           </div>
         </FormField>
@@ -319,15 +294,14 @@ export default function ItemCreatorPage() {
         </FormField>
 
         <FormField
-            label={t("itemLore")}
-            sublabel={t("loreWordCount", { count: loreWordCount })}
+          label={t("itemLore")}
+          sublabel={t("loreWordCount", { count: loreWordCount })}
         >
-          <textarea
+          <Textarea
             value={lore}
             onChange={(e) => handleLoreChange(e.target.value)}
             placeholder={t("lorePlaceholder")}
             rows={4}
-            className="ui-input w-full min-h-[120px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold bg-bg-elev border-silver/30 text-foreground"
           />
         </FormField>
 
@@ -350,115 +324,7 @@ export default function ItemCreatorPage() {
         {t("viewItemBlueprint")}
       </Button>
 
-      <Card className="p-8 border-gold/10" ref={outputRef}>
-        <SectionHeader>{t("itemProperties")}</SectionHeader>
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">
-          <span>{t("exportPreview")}</span>
-          <span className="text-muted normal-case tracking-normal">{t("matchesJsonOutput")}</span>
-        </div>
-        <div className="rounded-sm border border-gold/20 bg-gold/5 p-4 mb-6 text-sm">
-          <div className="font-serif text-lg accent-gold">{item.name || t("unnamedArtifact")}</div>
-          <div className="text-xs text-muted mt-1">
-            {item.rarity} · {item.type} · Level {item.levelTuned} · {item.attunement ? t("attunement") : t("noAttunement")}
-          </div>
-          <div className="mt-2 text-xs text-muted">
-            {item.bonusToHit !== undefined && t("toHit", { value: item.bonusToHit })}
-            {item.bonusAC !== undefined && t("acBonus", { value: item.bonusAC })}
-            {item.bonusSaveDC !== undefined && t("saveDC", { value: item.bonusSaveDC })}
-            {item.avgDamageBonus !== undefined && t("avgDmg", { value: item.avgDamageBonus })}
-          </div>
-        </div>
-        <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("mechanicalSummary")}</div>
-        <CardContent className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("name")}:</span>
-            <span className="font-serif accent-gold break-words lg:text-right">{item.name || "—"}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("type")}:</span>
-            <span className="font-medium break-words lg:text-right">{item.type}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("rarity")}:</span>
-            <span className="font-bold text-blue-400 uppercase tracking-widest break-words lg:text-right">{item.rarity}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("attunement")}:</span>
-            <span className="font-medium break-words lg:text-right">{item.attunement ? t("required") : t("none")}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("powerBand")}:</span>
-            <span className="font-medium italic break-words lg:text-right">Level {item.levelTuned}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("special")}:</span>
-            <span className="font-medium text-silver break-words sm:text-right">{item.targetTags.join(", ") || t("none")}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftCost")}:</span>
-            <span className="font-medium break-words lg:text-right">{item.craftingCost !== undefined ? `${item.craftingCost} gp` : "—"}</span>
-          </div>
-          <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftTime")}:</span>
-            <span className="font-medium break-words lg:text-right">{item.craftingTime !== undefined ? `${item.craftingTime} ${item.craftingTimeUnit ?? "days"}` : "—"}</span>
-          </div>
-          {item.bonusToHit !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("toHitLabel")}:</span>
-              <span className="font-bold text-gold break-words lg:text-right">+{item.bonusToHit}</span>
-            </div>
-          )}
-          {item.bonusAC !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("acBonusLabel")}:</span>
-              <span className="font-bold text-blue-300 break-words lg:text-right">+{item.bonusAC}</span>
-            </div>
-          )}
-          {item.bonusSaveDC !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("saveDCLabel")}:</span>
-              <span className="font-bold text-purple-400 break-words lg:text-right">DC {item.bonusSaveDC}</span>
-            </div>
-          )}
-          {item.avgDamageBonus !== undefined && (
-            <div className="flex min-w-0 flex-col gap-1 border-b border-gold/5 pb-2 lg:flex-row lg:items-center lg:justify-between">
-              <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("damageBonus")}:</span>
-              <span className="font-bold text-red-400 break-words lg:text-right">+{item.avgDamageBonus} {t("avg")}</span>
-            </div>
-          )}
-        </CardContent>
-
-        <div className="mt-8 text-xs uppercase tracking-[0.2em] text-gold/70 font-bold mb-4">{t("loreCrafting")}</div>
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("ingredients")}:</span>
-            <span className="font-medium text-silver break-words">
-              {item.ingredients.length
-                ? item.ingredients.map((ingredient) => `${ingredient.quantity}${ingredient.unit ? ` ${ingredient.unit}` : ""} ${ingredient.name}`).join(", ")
-                : t("none")}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("craftingRequirementLabel")}:</span>
-            <span className="font-medium text-silver break-words">{item.craftingRequirement || t("none")}</span>
-          </div>
-          <div className="flex flex-col gap-2 border-b border-gold/5 pb-2 lg:col-span-2">
-            <span className="font-bold uppercase tracking-widest text-muted text-[10px]">{t("lore")}:</span>
-            <span className="font-medium text-silver break-words">{item.lore || t("none")}</span>
-          </div>
-        </div>
-        
-        {item.notes && (
-          <div className="mt-8 p-6 bg-gold/5 rounded-sm border border-gold/20 text-base italic text-muted-foreground font-serif leading-relaxed">
-             &quot;{item.notes}&quot;
-          </div>
-        )}
-
-        <details className="mt-8 neo-card bg-background/40 border-gold/10 overflow-hidden">
-          <summary className="cursor-pointer p-4 text-[10px] text-muted hover:text-gold transition-colors uppercase tracking-[0.2em] font-bold">{t("itemMetadata")}</summary>
-          <pre className="p-6 overflow-x-auto text-[10px] text-blue-400/80 leading-relaxed">{JSON.stringify(item, null, 2)}</pre>
-        </details>
-      </Card>
+      <ItemPreviewCard ref={outputRef} item={item} />
 
       <p className="text-xs text-muted italic text-center">{t("baselineNote")}</p>
 
