@@ -6,7 +6,7 @@
     "travelEncounters": "Встречи в пути",
     "artifactForge": "Кузница артефактов",
     "contact": "Контакты",
-    "myMonsters": "My Monsters"
+    "myMonsters": "My Bestiary"
   },
   "sidebar": {
     "language": "Язык",
@@ -275,7 +275,9 @@
     "craftingRequirementLabel": "Требование к созданию",
     "lore": "Лор",
     "itemMetadata": "Метаданные предмета (JSON)",
-    "baselineNote": "Эти предложения дают сбалансированную базу; подгоняйте свойства под силу вашей кампании."
+    "baselineNote": "Эти предложения дают сбалансированную базу; подгоняйте свойства под силу вашей кампании.",
+    "downloadPng": "Download PNG",
+    "downloadPdf": "Download PDF"
   },
   "travelEncounters": {
     "title": "Встречи по пути",
@@ -302,7 +304,8 @@
     "hideDmTables": "Скрыть таблицы Мастера",
     "showDmTables": "Показать таблицы Мастера",
     "dmTables": "Таблицы Мастера",
-    "filter": "Фильтр"
+    "filter": "Фильтр",
+    "openInEncounterBuilder": "Open in Encounter Builder"
   },
   "contact": {
     "title": "Контакты",
@@ -328,7 +331,7 @@
     }
   },
   "myMonsters": {
-    "title": "My Monsters",
+    "title": "My Bestiary",
     "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
     "addMonster": "Add Monster",
     "editMonster": "Edit",

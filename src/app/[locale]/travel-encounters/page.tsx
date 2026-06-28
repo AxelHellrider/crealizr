@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Terrain,
   getTravelEncounter,
@@ -15,15 +16,28 @@ import { Select } from "@/app/components/atoms/Select";
 import { Button } from "@/app/components/atoms/Button";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
-import type { Difficulty } from "@/app/utils/encounter";
-import { useEncounterSuggestions } from "@/app/hooks/useEncounterSuggestions";
-import { EncounterBalancerPanel } from "@/app/components/organisms/EncounterBalancerPanel";
+import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
+import type { Monster } from "@/app/types/monster";
+
+type CatalogTerrain = Monster["terrain"][number];
+
+const TERRAIN_TO_CATALOG: Record<Terrain, CatalogTerrain[]> = {
+  Forest: ["wilderness"],
+  Desert: ["wilderness"],
+  Mountains: ["wilderness"],
+  Plains: ["wilderness"],
+  Swamp: ["wilderness"],
+  Arctic: ["wilderness"],
+  Coast: ["wilderness", "underwater"],
+  Underdark: ["dungeon"],
+};
 
 export default function EncountersEnRoutePage() {
   const t = useTranslations("travelEncounters");
+  const locale = useLocale();
   const [terrain, setTerrain] = useState<Terrain>("Forest");
   const [typeFilter, setTypeFilter] = useState<EncounterType | "all">("all");
   const [result, setResult] = useState<{
@@ -31,35 +45,29 @@ export default function EncountersEnRoutePage() {
     outcome: EncounterOutcome | null;
   } | null>(null);
 
-  const [showBalancer, setShowBalancer] = useState(false);
   const [partySize, setPartySize] = useState(4);
   const [avgLevel, setAvgLevel] = useState(5);
-  const difficulty: Difficulty = "medium";
   const [showTables, setShowTables] = useState(false);
+  const { catalog2014 } = useMergedCatalog();
+
+  const terrainMonsters = useMemo(() => {
+    const catalogTerrains = TERRAIN_TO_CATALOG[terrain];
+    return catalog2014.filter((m) => m.terrain.some((t) => catalogTerrains.includes(t as CatalogTerrain)));
+  }, [catalog2014, terrain]);
 
   const handleRoll = () => {
     const roll = rollD500();
     const outcome = getTravelEncounter(terrain, roll, typeFilter);
     setResult({ roll, outcome });
-    setShowBalancer(false);
-    
-    // Announce the result to screen readers
-    const message = outcome 
+
+    const message = outcome
       ? `Rolled ${roll}. Outcome: ${outcome.description}. Type: ${outcome.type}.`
       : `Rolled ${roll}. No outcome found.`;
-    
-    const announcer = document.getElementById('sr-announcer');
-    if (announcer) {
-      announcer.textContent = message;
-    }
+    const announcer = document.getElementById("sr-announcer");
+    if (announcer) announcer.textContent = message;
   };
 
-  const { budget, soloSuggestions, groupSuggestions } = useEncounterSuggestions({
-    level: avgLevel,
-    size: partySize,
-    difficulty,
-    ruleset: "2014",
-  });
+  const builderHref = `/${locale}/encounter-builder?partySize=${partySize}&avgLevel=${avgLevel}&difficulty=medium&mode=group&relation=terrain&filterTerrain=${TERRAIN_TO_CATALOG[terrain][0]}`;
 
   const terrains: readonly Terrain[] = TERRAINS;
 
@@ -134,27 +142,27 @@ export default function EncountersEnRoutePage() {
           </p>
 
           {result.outcome.type === "combat" && (
-            <div className="mt-8 pt-8 border-t border-gold/10">
-              {!showBalancer ? (
-                <Button
-                  onClick={() => setShowBalancer(true)}
-                  className="px-6 text-sm font-bold uppercase tracking-widest"
-                >
-                  {t("balanceThisEncounter")}
-                </Button>
-              ) : (
-                <EncounterBalancerPanel
-                  partySize={partySize}
-                  onPartySizeChange={setPartySize}
-                  avgLevel={avgLevel}
-                  onAvgLevelChange={setAvgLevel}
-                  budget={budget}
-                  difficulty={difficulty}
-                  soloSuggestions={soloSuggestions}
-                  groupSuggestions={groupSuggestions}
-                  onClose={() => setShowBalancer(false)}
-                />
+            <div className="mt-8 pt-8 border-t border-gold/10 flex flex-col gap-4">
+              {terrainMonsters.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {terrainMonsters.slice(0, 10).map((m) => (
+                    <span key={m.name} className="text-[10px] px-2 py-1 rounded-sm bg-crimson/10 text-crimson border border-crimson/20 uppercase font-bold tracking-widest">
+                      {m.name}
+                    </span>
+                  ))}
+                  {terrainMonsters.length > 10 && (
+                    <span className="text-[10px] px-2 py-1 text-muted">+{terrainMonsters.length - 10} more</span>
+                  )}
+                </div>
               )}
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={builderHref}
+                  className="ui-button px-6 text-sm font-bold uppercase tracking-widest inline-flex items-center"
+                >
+                  {t("openInEncounterBuilder")}
+                </Link>
+              </div>
             </div>
           )}
         </Card>
@@ -200,6 +208,18 @@ export default function EncountersEnRoutePage() {
                       }`}>
                         {item.type}
                       </span>
+                      {item.type === "combat" && terrainMonsters.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {terrainMonsters.slice(0, 5).map((m) => (
+                            <span key={m.name} className="text-[9px] px-2 py-0.5 rounded-sm bg-crimson/10 text-crimson border border-crimson/20 uppercase font-bold tracking-wide">
+                              {m.name}
+                            </span>
+                          ))}
+                          {terrainMonsters.length > 5 && (
+                            <span className="text-[9px] text-muted px-1">+{terrainMonsters.length - 5}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

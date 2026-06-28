@@ -37,7 +37,7 @@ export const ItemPreviewCard = forwardRef<HTMLDivElement, ItemPreviewCardProps>(
         const t = useTranslations("artifactForge");
 
         return (
-            <Card className="p-8 border-gold/10" ref={ref}>
+            <Card className="p-8 border-gold/10" ref={ref} data-export-card="true">
                 <SectionHeader>{t("itemProperties")}</SectionHeader>
                 <div className="flex items-center justify-between mb-4">
                     <SubLabel>{t("exportPreview")}</SubLabel>

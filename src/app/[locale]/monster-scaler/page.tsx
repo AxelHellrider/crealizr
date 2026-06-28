@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import { MonsterBase } from "@/app/types/monster";
 import { CR_VALUES } from "@/app/data/constants";
 import { formatCR } from "@/app/lib/format";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import { exportMonster } from "@/app/lib/exportCard";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { FormField } from "@/app/components/molecules/FormField";
@@ -23,10 +22,13 @@ import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { StatRow } from "@/app/components/molecules/StatRow";
 import { StatBlockDisplay } from "@/app/components/organisms/StatBlockDisplay";
 import { AbilityScoreGrid, type AbilityKey, type AbilityScores } from "@/app/components/molecules/AbilityScoreGrid";
+import { Autocomplete } from "@/app/components/atoms/Autocomplete";
+import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 
 export default function ScalePage() {
     const t = useTranslations("monsterScaler");
     const { addMonster: saveToLibrary } = useCustomMonsters();
+    const { catalog2014, catalog2024 } = useMergedCatalog();
     const [saved, setSaved] = useState(false);
     const [isScaling, startScaling] = useTransition();
     const [monster, setMonster] = useState<MonsterBase>({
@@ -53,7 +55,40 @@ export default function ScalePage() {
     const [acEquipment, setAcEquipment] = useState<number>(0);
     const [acRace, setAcRace] = useState<number>(0);
     const [abilityBonus, setAbilityBonus] = useState<Partial<Record<keyof MonsterBase["stats"], number>>>({});
-    const statBlockRef = useRef<HTMLDivElement>(null);
+    const [catalogSearch, setCatalogSearch] = useState("");
+    const allMonsters = useMemo(() => {
+        const combined = [...catalog2014, ...catalog2024];
+        const seen = new Set<string>();
+        return combined.filter((m) => {
+            const key = `${m.name}|${m.edition}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }, [catalog2014, catalog2024]);
+
+    const handleLoadFromCatalog = (name: string) => {
+        const match = allMonsters.find((m) => m.name === name);
+        if (!match) return;
+        const ed = match.edition ?? "2014";
+        setEdition(ed as "2014" | "2024");
+        setMonster((prev) => ({
+            ...prev,
+            name: match.name,
+            type: match.type ?? match.affiliation ?? prev.type,
+            cr: match.cr,
+            edition: ed as "2014" | "2024",
+            terrain: match.terrain,
+            affiliation: match.affiliation,
+            genus: match.genus,
+            size: match.size ?? prev.size,
+            stats: match.stats ?? prev.stats,
+            actions: match.actions ?? prev.actions,
+        }));
+        setTargetCR(null);
+        setScaledMonster(null);
+        setCatalogSearch("");
+    };
 
     const handleStatChange = (stat: keyof MonsterBase["stats"], value: number | string) => {
         setMonster((prev) => ({ ...prev, stats: { ...prev.stats, [stat]: value } }));
@@ -76,74 +111,20 @@ export default function ScalePage() {
         });
     };
 
-    const downloadImage = async () => {
-        const canvas = await captureStatBlock();
-        if (!canvas) return;
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = `${scaledMonster?.name || "monster"}.png`;
-        link.click();
-    };
+    const exportLabels = () => ({
+        fallbackName: t("scaledMonster"),
+        armorClass: t("armorClass"),
+        hitPoints: t("hitPoints"),
+        speed: t("speed"),
+        challengeRating: t("challengeRating"),
+        suggestedDamagePerRound: t("suggestedDamagePerRound"),
+    });
 
-    const downloadPDF = async () => {
-        const canvas = await captureStatBlock();
-        if (!canvas) return;
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [canvas.width, canvas.height] });
-        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-        pdf.save(`${scaledMonster?.name || "monster"}.pdf`);
-    };
+    const downloadImage = () =>
+        scaledMonster && exportMonster(scaledMonster, scaledMonster.name || "monster", "png", exportLabels());
 
-    const captureStatBlock = async () => {
-        const element = statBlockRef.current;
-        if (!element) return null;
-        const { scrollWidth, scrollHeight } = element;
-        return html2canvas(element, {
-            scale: 2,
-            width: scrollWidth,
-            height: scrollHeight,
-            windowWidth: scrollWidth,
-            windowHeight: scrollHeight,
-            onclone: (doc: Document) => {
-                const exportRoot = doc.querySelector('[data-export-statblock="true"]');
-                if (!exportRoot) return;
-                exportRoot.setAttribute("data-exporting", "true");
-                const exportElement = exportRoot as HTMLElement;
-                exportElement.style.overflow = "visible";
-                exportElement.style.width = `${scrollWidth}px`;
-                exportElement.style.height = `${scrollHeight}px`;
-                const style = doc.createElement("style");
-                style.textContent = `
-                    [data-exporting="true"] {
-                        background: #12151c !important;
-                        color: #f0f2f5 !important;
-                        border-color: rgba(212, 175, 55, 0.4) !important;
-                        box-shadow: none !important;
-                    }
-                    [data-exporting="true"] * {
-                        color: inherit !important;
-                        border-color: rgba(212, 175, 55, 0.2) !important;
-                        box-shadow: none !important;
-                        text-shadow: none !important;
-                    }
-                    [data-exporting="true"] .accent-gold { color: #d4af37 !important; }
-                    [data-exporting="true"] .text-muted { color: #a0aec0 !important; }
-                    [data-exporting="true"] [class~="text-gold/80"] { color: rgba(212, 175, 55, 0.8) !important; }
-                    [data-exporting="true"] [class~="text-gold/60"] { color: rgba(212, 175, 55, 0.6) !important; }
-                    [data-exporting="true"] [class~="bg-gold/5"] { background-color: rgba(212, 175, 55, 0.08) !important; }
-                    [data-exporting="true"] .bg-card { background-color: #12151c !important; }
-                    [data-exporting="true"] [class~="bg-background/40"] { background-color: rgba(18, 21, 28, 0.4) !important; }
-                    [data-exporting="true"] [class~="border-gold/30"] { border-color: rgba(212, 175, 55, 0.3) !important; }
-                    [data-exporting="true"] [class~="border-gold/20"] { border-color: rgba(212, 175, 55, 0.2) !important; }
-                    [data-exporting="true"] [class~="border-gold/10"] { border-color: rgba(212, 175, 55, 0.1) !important; }
-                    [data-exporting="true"] .text-purple-400 { color: #c4b5fd !important; }
-                    [data-exporting="true"] .text-red-400 { color: #f87171 !important; }
-                    [data-exporting="true"] .text-blue-300 { color: #93c5fd !important; }
-                `;
-                doc.head.appendChild(style);
-            },
-        } as Parameters<typeof html2canvas>[1] & { scale?: number });
-    };
+    const downloadPDF = () =>
+        scaledMonster && exportMonster(scaledMonster, scaledMonster.name || "monster", "pdf", exportLabels());
 
     return (
         <PageSection>
@@ -153,6 +134,20 @@ export default function ScalePage() {
                         <WhyDifferent className="mt-3 lg:mt-0" />
                         <a href="/monster-scaler/docs" className="ui-link text-sm italic">{t("viewDocs")}</a>
                     </PageHeader>
+
+                    <Card className="p-6 border-gold/10">
+                        <SectionHeader>Load from Bestiary</SectionHeader>
+                        <SubLabel className="mb-3">Search the SRD or your homebrew monsters to pre-fill the form</SubLabel>
+                        <Autocomplete
+                            options={allMonsters.map((m) => m.name)}
+                            value={catalogSearch}
+                            onChange={(val) => {
+                                setCatalogSearch(val);
+                                handleLoadFromCatalog(val);
+                            }}
+                            placeholder="Search monsters…"
+                        />
+                    </Card>
 
                     <InfoGrid items={[
                         { label: t("whatScales"), description: t("whatScalesDesc") },
@@ -302,7 +297,6 @@ export default function ScalePage() {
                         <span className="text-xs text-muted">{t("pngPdfLayout")}</span>
                     </div>
                     <StatBlockDisplay
-                        ref={statBlockRef}
                         monster={scaledMonster}
                         labels={{
                             fallbackName: t("scaledMonster"),
@@ -336,7 +330,7 @@ export default function ScalePage() {
                             disabled={!scaledMonster || saved}
                             className="flex-1 font-serif tracking-widest uppercase text-xs disabled:opacity-40"
                         >
-                            {saved ? "✓ Saved" : "Save to My Monsters"}
+                            {saved ? "✓ Saved" : "Save to My Bestiary"}
                         </Button>
                     </div>
                     <div className="text-xs text-muted italic text-center">

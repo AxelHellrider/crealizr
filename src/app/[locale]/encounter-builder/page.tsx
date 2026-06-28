@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
     partyBudget,
@@ -51,9 +52,12 @@ function BudgetBar({ fit, budgetFitLabel, accent = "gold" }: { fit: number; budg
 export default function CombatBalancerPage() {
     const locale = useLocale();
     const t = useTranslations("encounterBuilder");
+    const searchParams = useSearchParams();
+
     const [partySize, setPartySize] = useState(4);
     const [avgLevel, setAvgLevel] = useState(5);
     const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+
     const [mode, setMode] = useState<Mode>("solo");
     const [ruleset, setRuleset] = useState<Ruleset>("2014");
     const [budgetMode, setBudgetMode] = useState<BudgetMode>("encounter");
@@ -65,6 +69,21 @@ export default function CombatBalancerPage() {
     const [filterGenus, setFilterGenus] = useState("");
     const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(0);
     const resultsRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const ps = searchParams.get("partySize");
+        const al = searchParams.get("avgLevel");
+        const diff = searchParams.get("difficulty") as Difficulty | null;
+        const md = searchParams.get("mode") as Mode | null;
+        const ft = searchParams.get("filterTerrain") as Terrain | null;
+        const rel = searchParams.get("relation") as RelationCriteria | null;
+        if (ps) setPartySize(Number(ps));
+        if (al) setAvgLevel(Number(al));
+        if (diff && ["easy", "medium", "hard", "deadly"].includes(diff)) setDifficulty(diff);
+        if (md && ["solo", "group"].includes(md)) setMode(md);
+        if (ft) setFilterTerrain(ft);
+        if (rel && ["any", "terrain", "affiliation", "genus"].includes(rel)) setRelationCriteria(rel);
+    }, [searchParams]);
     const { catalog2014, catalog2024 } = useMergedCatalog();
     const catalog = ruleset === "2024" ? catalog2024 : catalog2014;
 
@@ -317,7 +336,7 @@ export default function CombatBalancerPage() {
                         <p className="text-xs text-muted mt-1">{t("crMixOptionsNote")}</p>
                     </div>
 
-                    <ul className="grid gap-4">
+                    <ul className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                         {(mode === "solo" ? soloSuggestions : groupSuggestions).map((suggestion, i) => {
                             const members = mode === "solo"
                                 ? [
@@ -330,7 +349,7 @@ export default function CombatBalancerPage() {
                             const isExpanded = expandedSuggestion === i;
 
                             return (
-                                <li key={i}>
+                                <li key={i} className={isExpanded ? "lg:col-span-2" : ""}>
                                     <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all ${isExpanded ? "shadow-glow border-gold/30" : "hover:border-gold/20"} bg-background/50`}>
                                         <button
                                             type="button"

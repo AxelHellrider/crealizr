@@ -15,6 +15,7 @@ import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { ItemPreviewCard } from "@/app/components/organisms/ItemPreviewCard";
+import { exportItem } from "@/app/lib/exportCard";
 
 const TYPES: ItemType[] = ["Weapon", "Armor", "Wand", "Wondrous"];
 const COMMON_TARGETS = ["undead", "fiend", "dragon", "construct"];
@@ -325,6 +326,23 @@ export default function ItemCreatorPage() {
       </Button>
 
       <ItemPreviewCard ref={outputRef} item={item} />
+
+      <div className="flex flex-col lg:flex-row gap-4">
+        <Button
+          variant="primary"
+          onClick={() => exportItem(item, item.name || "artifact", "png")}
+          className="flex-1"
+        >
+          {t("downloadPng")}
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => exportItem(item, item.name || "artifact", "pdf")}
+          className="flex-1"
+        >
+          {t("downloadPdf")}
+        </Button>
+      </div>
 
       <p className="text-xs text-muted italic text-center">{t("baselineNote")}</p>
 

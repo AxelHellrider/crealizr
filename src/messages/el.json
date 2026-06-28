@@ -6,7 +6,7 @@
     "travelEncounters": "Συναντήσεις Ταξιδιού",
     "artifactForge": "Καμίνι Κειμηλίων",
     "contact": "Επικοινωνία",
-    "myMonsters": "My Monsters"
+    "myMonsters": "My Bestiary"
   },
   "sidebar": {
     "language": "Γλώσσα",
@@ -275,7 +275,9 @@
     "craftingRequirementLabel": "Απαίτηση Κατασκευής",
     "lore": "Γνώση",
     "itemMetadata": "Μεταδεδομένα Αντικειμένου (JSON)",
-    "baselineNote": "Αυτές οι προτάσεις παρέχουν μια ισορροπημένη βάση· προσαρμόστε τις ιδιότητες ώστε να ταιριάζουν με το επίπεδο ισχύος της καμπάνιας σας."
+    "baselineNote": "Αυτές οι προτάσεις παρέχουν μια ισορροπημένη βάση· προσαρμόστε τις ιδιότητες ώστε να ταιριάζουν με το επίπεδο ισχύος της καμπάνιας σας.",
+    "downloadPng": "Download PNG",
+    "downloadPdf": "Download PDF"
   },
   "travelEncounters": {
     "title": "Συναντήσεις καθ' οδόν",
@@ -302,7 +304,8 @@
     "hideDmTables": "Απόκρυψη Πινάκων DM",
     "showDmTables": "Εμφάνιση Πινάκων DM",
     "dmTables": "Πίνακες DM",
-    "filter": "Φίλτρο"
+    "filter": "Φίλτρο",
+    "openInEncounterBuilder": "Open in Encounter Builder"
   },
   "contact": {
     "title": "Επικοινωνία",
@@ -328,7 +331,7 @@
     }
   },
   "myMonsters": {
-    "title": "My Monsters",
+    "title": "My Bestiary",
     "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
     "addMonster": "Add Monster",
     "editMonster": "Edit",

@@ -1,5 +1,3 @@
-"use client";
-
 import React, { forwardRef } from "react";
 import type { MonsterBase } from "@/app/types/monster";
 import { formatCR } from "@/app/lib/format";
@@ -34,7 +32,7 @@ export const StatBlockDisplay = forwardRef<HTMLDivElement, StatBlockDisplayProps
         return (
             <div
                 ref={ref}
-                data-export-statblock="true"
+                data-export-card="true"
                 className={`neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card ${className}`}
             >
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />

@@ -6,7 +6,7 @@
     "travelEncounters": "Rencontres de voyage",
     "artifactForge": "Forge d’artefacts",
     "contact": "Contact",
-    "myMonsters": "My Monsters"
+    "myMonsters": "My Bestiary"
   },
   "sidebar": {
     "language": "Langue",
@@ -275,7 +275,9 @@
     "craftingRequirementLabel": "Condition de fabrication",
     "lore": "Histoire",
     "itemMetadata": "Métadonnées de l’objet (JSON)",
-    "baselineNote": "Ces suggestions fournissent une base équilibrée ; ajustez les propriétés pour correspondre au niveau de puissance de votre campagne."
+    "baselineNote": "Ces suggestions fournissent une base équilibrée ; ajustez les propriétés pour correspondre au niveau de puissance de votre campagne.",
+    "downloadPng": "Download PNG",
+    "downloadPdf": "Download PDF"
   },
   "travelEncounters": {
     "title": "Rencontres en route",
@@ -302,7 +304,8 @@
     "hideDmTables": "Masquer les tableaux MJ",
     "showDmTables": "Afficher les tableaux MJ",
     "dmTables": "Tableaux MJ",
-    "filter": "Filtre"
+    "filter": "Filtre",
+    "openInEncounterBuilder": "Open in Encounter Builder"
   },
   "contact": {
     "title": "Contact",
@@ -328,7 +331,7 @@
     }
   },
   "myMonsters": {
-    "title": "My Monsters",
+    "title": "My Bestiary",
     "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
     "addMonster": "Add Monster",
     "editMonster": "Edit",

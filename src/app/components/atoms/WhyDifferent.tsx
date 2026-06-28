@@ -1,5 +1,3 @@
-"use client";
-
 export function WhyDifferent({ className = "" }: { className?: string }) {
   return (
     <p className={`text-xs uppercase tracking-[0.2em] text-gold/70 font-bold ${className}`}>

@@ -70,7 +70,8 @@ function scaleMonster(
     const srcRow = findCRRow(matrix, srcCR);
     const tgtRow = findCRRow(matrix, targetCR);
 
-    const srcDPR = estimateDPR(monster);
+    const hasActions = (monster.actions?.length ?? 0) > 0;
+    const srcDPR = hasActions ? estimateDPR(monster) : null;
     const tgtDPR = tgtRow.dpr;
 
     const finalDPR = {
@@ -79,10 +80,13 @@ function scaleMonster(
         range: `${Math.max(1, Math.round(tgtDPR * 0.75))}–${Math.max(1, Math.round(tgtDPR * 1.25))}`
     };
 
-    const hpScale = tgtRow.hp / Math.max(1, monster.stats.hp);
+    // Scale HP proportionally: preserve how far above/below this monster sits relative
+    // to its own CR's baseline, then apply that ratio at the target CR.
+    const hpScale = tgtRow.hp / Math.max(1, srcRow.hp);
     const finalHp = Math.max(1, Math.round(monster.stats.hp * hpScale));
 
-    const dprScale = tgtDPR / Math.max(1, srcDPR);
+    // dprScale is only meaningful when actions were provided; otherwise tgtDPR is shown directly.
+    const dprScale = srcDPR !== null ? tgtDPR / Math.max(1, srcDPR) : null;
 
     const acDiff = tgtRow.ac - monster.stats.ac;
     let finalAC = clamp(monster.stats.ac + Math.sign(acDiff) * Math.min(2, Math.abs(acDiff)), 5, 30);
@@ -122,7 +126,9 @@ function scaleMonster(
             srcDPR,
             tgtDPR,
             hpScale,
-            dprScale,
+            ...(dprScale !== null
+                ? { dprScale }
+                : { dprNote: "no actions provided — tgtDPR shows target CR expected DPR directly" }),
             usedRow: tgtRow,
         },
     };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 const title = "Encounter Builder for D&D 5e | CRealizr";
 const description =
@@ -45,5 +46,5 @@ export default function EncounterBuilderLayout({
                                                }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <Suspense>{children}</Suspense>;
 }
