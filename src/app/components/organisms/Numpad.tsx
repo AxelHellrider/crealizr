@@ -48,6 +48,7 @@ export function Numpad() {
                                 {displayValue}
                             </span>
                             <button
+                                type="button"
                                 onPointerDown={(e) => { e.preventDefault(); commit(); }}
                                 className="shrink-0 px-5 py-2 rounded-sm bg-gold/10 border border-gold/30 text-gold text-sm font-bold uppercase tracking-widest hover:bg-gold/20 active:scale-95 transition-all"
                             >
@@ -63,6 +64,8 @@ export function Numpad() {
                                 return (
                                     <button
                                         key={key}
+                                        type="button"
+                                        aria-label={key === "⌫" ? "Backspace" : key === "±" ? "Toggle sign" : key}
                                         onPointerDown={(e) => { e.preventDefault(); if (!isDisabled) handleKey(key); }}
                                         disabled={isDisabled}
                                         className={`

@@ -104,17 +104,17 @@ export default function MyMonstersPage() {
                 <>
                     {/* ── Actions bar ── */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <Button onClick={() => { setEditTarget("new"); setFeedback(null); }} className="px-5 py-2.5 text-xs uppercase tracking-widest">
+                        <Button data-testid="add-monster-btn" onClick={() => { setEditTarget("new"); setFeedback(null); }} className="px-5 py-2.5 text-xs uppercase tracking-widest">
                             + {t("addMonster")}
                         </Button>
                         <span className="hidden sm:block w-px h-6 bg-gold/10" />
-                        <button
+                        <Button
                             onClick={exportAllMonsters}
                             disabled={customMonsters.length === 0}
-                            className="ui-button px-4 py-2 text-xs uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="px-4 py-2 text-xs uppercase tracking-widest"
                         >
                             {t("export")} ({customMonsters.length})
-                        </button>
+                        </Button>
                         <label className="ui-button px-4 py-2 text-xs uppercase tracking-widest cursor-pointer">
                             {t("import")}
                             <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />

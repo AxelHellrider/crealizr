@@ -126,6 +126,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
                 <FormField label={t("form.name")}>
                     <Input
+                        data-testid="homebrew-name"
                         value={name}
                         onChange={(e) => { setName(e.target.value); setError(""); }}
                         className="text-2xl font-serif py-3"
@@ -312,7 +313,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
 
             {/* ── Submit ── */}
             <div className="flex gap-3">
-                <Button type="submit" variant="primary" className="px-8 py-3 text-sm uppercase tracking-widest">{t("saveMonster")}</Button>
+                <Button data-testid="save-monster-btn" type="submit" variant="primary" className="px-8 py-3 text-sm uppercase tracking-widest">{t("saveMonster")}</Button>
                 <Button type="button" onClick={onCancel} className="px-8 py-3 text-xs uppercase tracking-widest">{t("cancel")}</Button>
             </div>
         </form>

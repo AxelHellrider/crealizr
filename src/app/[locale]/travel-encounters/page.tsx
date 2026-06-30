@@ -109,6 +109,7 @@ export default function EncountersEnRoutePage() {
       </div>
 
       <Button
+        data-testid="roll-btn"
         onClick={handleRoll}
         variant="primary"
         className="w-full py-4 text-xl font-serif tracking-widest uppercase"
@@ -137,7 +138,14 @@ export default function EncountersEnRoutePage() {
               {t("roll")}: <span className="accent-gold font-bold">{result.roll}</span>
             </div>
           </div>
-          <p className="text-muted text-xl leading-relaxed italic font-serif py-4">
+          <p className="text-[10px] uppercase tracking-widest text-muted/60 mb-1">
+            {result.outcome.type === "combat" && "Roll initiative — monsters incoming"}
+            {result.outcome.type === "hazard" && "Environmental obstacle — no combat, but costs resources or time"}
+            {result.outcome.type === "benefit" && "Lucky find — the party gains something useful"}
+            {result.outcome.type === "social" && "Encounter involves NPCs or factions, not direct combat"}
+            {result.outcome.type === "survival" && "Wilderness challenge — weather, terrain, or exhaustion"}
+          </p>
+          <p data-testid="outcome-description" className="text-muted text-xl leading-relaxed italic font-serif py-4">
             &quot;{result.outcome.description}&quot;
           </p>
 

@@ -9,6 +9,7 @@ import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { Textarea } from "@/app/components/atoms/Textarea";
 import { FormField } from "@/app/components/molecules/FormField";
 import { Tag } from "@/app/components/molecules/Tag";
+import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
@@ -176,14 +177,17 @@ export default function ItemCreatorPage() {
               <Button onClick={clearCrafting} className="px-4 text-xs font-bold uppercase tracking-widest">{t("clearCrafting")}</Button>
             </div>
           </div>
-          <label className="flex items-center gap-3 cursor-pointer group">
+          <label className="flex items-center gap-3 cursor-pointer group" title="Prevent item type changes from overwriting the bonuses you've already set">
             <input
               type="checkbox"
               className="w-5 h-5 rounded-sm border-gold/30 bg-card text-gold focus:ring-gold/20 accent-gold"
               checked={lockMechanics}
               onChange={(e) => setLockMechanics(e.target.checked)}
             />
-            <span className="text-xs font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">{t("lockMechanics")}</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-medium uppercase tracking-widest text-muted group-hover:text-gold transition-colors">{t("lockMechanics")}</span>
+              <span className="text-[10px] text-muted/50">Keep my bonuses when changing item type</span>
+            </div>
           </label>
         </div>
         <p className="mt-4 text-sm text-muted">{t("mechanicsNote")}</p>
@@ -226,14 +230,9 @@ export default function ItemCreatorPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {COMMON_TARGETS.map((target) => (
-              <button
-                key={target}
-                onClick={() => addTarget(target)}
-                type="button"
-                className="px-3 py-1 text-[10px] uppercase tracking-widest border border-gold/20 text-gold/80 hover:text-gold transition-colors"
-              >
+              <ToggleChip key={target} isActive={targets.includes(target)} onClick={() => addTarget(target)} size="xs">
                 {target}
-              </button>
+              </ToggleChip>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-2 min-h-6">
@@ -256,14 +255,9 @@ export default function ItemCreatorPage() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {QUICK_INGREDIENTS.map((ingredient) => (
-              <button
-                key={ingredient.name}
-                onClick={() => addQuickIngredient(ingredient)}
-                type="button"
-                className="px-3 py-1 text-[10px] uppercase tracking-widest border border-gold/20 text-gold/80 hover:text-gold transition-colors"
-              >
+              <ToggleChip key={ingredient.name} isActive={false} onClick={() => addQuickIngredient(ingredient)} size="xs">
                 {ingredient.name}
-              </button>
+              </ToggleChip>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap gap-2 min-h-6">

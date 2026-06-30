@@ -15,6 +15,7 @@ export default function Header() {
                     CRealizr
                 </Link>
                 <button
+                    type="button"
                     onClick={toggle}
                     aria-label={isOpen ? "Close menu" : "Open menu"}
                     aria-expanded={isOpen}

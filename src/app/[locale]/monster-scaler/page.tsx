@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
 import { scaleMonster2014, scaleMonster2024 } from "@/app/utils/scaler";
 import { MonsterBase } from "@/app/types/monster";
 import { CR_VALUES } from "@/app/data/constants";
@@ -27,6 +28,7 @@ import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 
 export default function ScalePage() {
     const t = useTranslations("monsterScaler");
+    const locale = useLocale();
     const { addMonster: saveToLibrary } = useCustomMonsters();
     const { catalog2014, catalog2024 } = useMergedCatalog();
     const [saved, setSaved] = useState(false);
@@ -160,7 +162,7 @@ export default function ScalePage() {
                         <SectionHeader>{t("generalInfo")}</SectionHeader>
                         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("name")}>
-                                <Input value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder={t("namePlaceholder")} />
+                                <Input data-testid="monster-name" value={monster.name} onChange={(e) => setMonster({ ...monster, name: e.target.value })} placeholder={t("namePlaceholder")} />
                             </FormField>
                             <FormField label={t("creatureType")}>
                                 <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder={t("typePlaceholder")} />
@@ -174,14 +176,14 @@ export default function ScalePage() {
                                 </Select>
                             </FormField>
                             <FormField label={t("currentCR")}>
-                                <Select value={monster.cr} onChange={(e) => setMonster({ ...monster, cr: Number(e.target.value) })}>
+                                <Select data-testid="current-cr" value={monster.cr} onChange={(e) => setMonster({ ...monster, cr: Number(e.target.value) })}>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
                                     ))}
                                 </Select>
                             </FormField>
                             <FormField label={t("targetCR")}>
-                                <Select value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))}>
+                                <Select data-testid="target-cr" value={targetCR ?? ""} onChange={(e) => setTargetCR(Number(e.target.value))}>
                                     <option value="" disabled>{t("selectTargetCR")}</option>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
                                         <option key={cr} value={cr}>{formatCR(cr)}</option>
@@ -238,7 +240,7 @@ export default function ScalePage() {
                         />
                     </Card>
 
-                    <Button onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full lg:w-auto self-start">
+                    <Button data-testid="scale-btn" onClick={handleScale} variant="primary" disabled={isScaling} className="px-12 py-4 text-lg w-full lg:w-auto self-start">
                         {isScaling ? t("scaling") : t("scaleMonster")}
                     </Button>
                 </div>
@@ -288,7 +290,7 @@ export default function ScalePage() {
                         <div className="mt-4 grid gap-3 grid-cols-1 lg:grid-cols-3">
                             <StatRow label={t("acChange")}>{scaledMonster.stats.ac - monster.stats.ac >= 0 ? "+" : ""}{scaledMonster.stats.ac - monster.stats.ac}</StatRow>
                             <StatRow label={t("hpChange")}>{scaledMonster.stats.hp - monster.stats.hp >= 0 ? "+" : ""}{scaledMonster.stats.hp - monster.stats.hp}</StatRow>
-                            <StatRow label={t("crShift")}>{formatCR(monster.cr)} → {formatCR(scaledMonster.cr)}</StatRow>
+                            <StatRow label={t("crShift")}><span data-testid="cr-shift">{formatCR(monster.cr)} → {formatCR(scaledMonster.cr)}</span></StatRow>
                         </div>
                     </Card>
 
@@ -310,7 +312,7 @@ export default function ScalePage() {
 
                     <SubLabel className="mb-2">{t("exportOptions")}</SubLabel>
                     <div className="flex flex-col lg:flex-row gap-4">
-                        <Button onClick={() => setScaledMonster(null)} className="flex-1 font-serif tracking-widest uppercase text-xs">
+                        <Button data-testid="adjust-stats-btn" onClick={() => setScaledMonster(null)} className="flex-1 font-serif tracking-widest uppercase text-xs">
                             {t("adjustStats")}
                         </Button>
                         <Button variant="primary" onClick={downloadImage} className="flex-1">
@@ -320,19 +322,28 @@ export default function ScalePage() {
                             {t("downloadPdf")}
                         </Button>
                         <Button
+                            data-testid="save-to-bestiary-btn"
                             onClick={async () => {
                                 if (scaledMonster) {
                                     await saveToLibrary({ ...scaledMonster, terrain: ["any"], affiliation: "any" });
                                     setSaved(true);
-                                    setTimeout(() => setSaved(false), 2000);
                                 }
                             }}
                             disabled={!scaledMonster || saved}
                             className="flex-1 font-serif tracking-widest uppercase text-xs disabled:opacity-40"
                         >
-                            {saved ? "✓ Saved" : "Save to My Bestiary"}
+                            {saved ? "✓ Saved to Bestiary" : "Save to My Bestiary"}
                         </Button>
                     </div>
+                    {saved && (
+                        <p className="text-xs text-center text-gold/60">
+                            Saved to{" "}
+                            <Link href={`/${locale}/my-monsters`} className="ui-link">
+                                My Bestiary
+                            </Link>
+                            {" "}— stored in your browser locally.
+                        </p>
+                    )}
                     <div className="text-xs text-muted italic text-center">
                         {t("exportNote")}
                     </div>

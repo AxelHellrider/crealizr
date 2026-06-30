@@ -166,6 +166,7 @@ export function Autocomplete(props: Props) {
                             {v}
                             <button
                                 type="button"
+                                aria-label={`Remove ${v}`}
                                 onMouseDown={(e) => { e.preventDefault(); props.onChange(selected.filter((s) => s !== v)); }}
                                 className="hover:text-red-400 transition-colors ml-0.5"
                             >

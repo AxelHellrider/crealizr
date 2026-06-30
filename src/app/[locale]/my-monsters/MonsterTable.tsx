@@ -38,6 +38,7 @@ export default function MonsterTable({ monsters, onEdit, onDelete }: Props) {
                     {filtered.map((monster) => (
                         <div
                             key={monster.id}
+                            data-testid="monster-card"
                             className="border border-gold/10 rounded-sm p-4 hover:border-gold/30 transition-colors bg-gradient-to-b from-gold/[0.02] to-transparent"
                         >
                             <div className="flex items-start justify-between mb-3">
@@ -64,22 +65,25 @@ export default function MonsterTable({ monsters, onEdit, onDelete }: Props) {
 
                             <div className="flex items-center gap-2 pt-3 border-t border-gold/10">
                                 <button
+                                    type="button"
                                     onClick={() => onEdit(monster)}
                                     className="ui-link text-xs uppercase tracking-widest"
                                 >
                                     {t("editMonster")}
                                 </button>
-                                <span className="text-gold/10">|</span>
+                                <span className="text-gold/10" aria-hidden="true">|</span>
                                 {confirmId === monster.id ? (
                                     <>
                                         <button
+                                            type="button"
                                             onClick={() => { onDelete(monster.id); setConfirmId(null); }}
                                             className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-bold"
                                         >
                                             {t("confirmDelete")}
                                         </button>
-                                        <span className="text-gold/10">|</span>
+                                        <span className="text-gold/10" aria-hidden="true">|</span>
                                         <button
+                                            type="button"
                                             onClick={() => setConfirmId(null)}
                                             className="text-muted hover:text-gold text-xs uppercase tracking-widest"
                                         >
@@ -88,6 +92,7 @@ export default function MonsterTable({ monsters, onEdit, onDelete }: Props) {
                                     </>
                                 ) : (
                                     <button
+                                        type="button"
                                         onClick={() => setConfirmId(monster.id)}
                                         className="text-red-400/50 hover:text-red-400 text-xs uppercase tracking-widest"
                                     >

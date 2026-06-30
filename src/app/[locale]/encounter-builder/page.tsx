@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -23,6 +25,8 @@ import { FilterBadge } from "@/app/components/molecules/FilterBadge";
 import { MonsterFilterPanel, type RelationCriteria } from "@/app/components/organisms/MonsterFilterPanel";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
+import { SliderToggle } from "@/app/components/atoms/SliderToggle";
+import type { GroupSuggestion, BossMinionSuggestion } from "@/app/utils/encounter";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
@@ -32,6 +36,129 @@ type Mode = "solo" | "group";
 type Difficulty = "easy" | "medium" | "hard" | "deadly";
 type Ruleset = "2014" | "2024";
 type BudgetMode = "encounter" | "daily";
+
+function EncounterModal({
+    suggestion,
+    mode,
+    ruleset,
+    catalog,
+    filterMonsterPool,
+    hasActiveFilter,
+    onClose,
+}: {
+    suggestion: GroupSuggestion | BossMinionSuggestion | null;
+    mode: Mode;
+    ruleset: Ruleset;
+    catalog: readonly Monster[];
+    filterMonsterPool: (monsters: Monster[]) => Monster[];
+    hasActiveFilter: boolean;
+    onClose: () => void;
+}) {
+    useEffect(() => {
+        if (!suggestion) return;
+        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [suggestion, onClose]);
+
+    if (!suggestion) return null;
+
+    const members = mode === "solo"
+        ? [
+            { cr: (suggestion as BossMinionSuggestion).boss.cr, count: (suggestion as BossMinionSuggestion).boss.count, label: "Boss" },
+            ...(suggestion as BossMinionSuggestion).minions.map((m) => ({ cr: m.cr, count: m.count, label: "Minion" })),
+          ]
+        : (suggestion as GroupSuggestion).members.map((m) => ({ cr: m.cr, count: m.count, label: undefined as string | undefined }));
+
+    const uniqueCRs = [...new Set(members.map((m) => m.cr))];
+
+    const modal = (
+        <AnimatePresence>
+            <motion.div
+                key="backdrop"
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+                <motion.div
+                    key="panel"
+                    className="relative z-10 w-full max-w-lg bg-card border border-gold/20 rounded-sm shadow-2xl overflow-hidden"
+                    initial={{ opacity: 0, scale: 0.92, y: 24 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.92, y: 24 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                    {/* Header */}
+                    <div data-testid="encounter-modal" className="flex justify-between items-start gap-3 p-5 border-b border-gold/10">
+                        <div className="flex flex-wrap items-baseline gap-x-1">
+                            {members.map((m, idx) => (
+                                <span key={idx}>
+                                    <span className="font-bold text-xl accent-gold">{m.count}</span>
+                                    <span className="text-muted mx-1 font-sans italic">&times;</span>
+                                    <span className="text-foreground text-lg">CR {formatCR(m.cr)}</span>
+                                    {m.label && <span className="text-muted text-xs ml-1">({m.label})</span>}
+                                    {idx < members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
+                                </span>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="text-muted hover:text-foreground transition-colors text-lg leading-none shrink-0 mt-0.5"
+                            aria-label="Close"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-5 grid gap-3 max-h-[60vh] overflow-y-auto">
+                        {uniqueCRs.map((cr) => {
+                            const allMonsters = getMonstersForCR(cr, ruleset, catalog);
+                            const monsters = filterMonsterPool(allMonsters);
+                            const slot = members.find((m) => m.cr === cr);
+                            const filtered = hasActiveFilter && monsters.length < allMonsters.length;
+                            return (
+                                <div key={cr}>
+                                    <SubLabel className="mb-1.5">
+                                        CR {formatCR(cr)} {slot?.label ? `(${slot.label})` : ""}
+                                        {" — "}
+                                        {monsters.length} available
+                                        {filtered && <span className="text-gold/40 ml-1">({allMonsters.length} total)</span>}
+                                    </SubLabel>
+                                    {monsters.length === 0 ? (
+                                        <p className="text-muted text-xs italic">No monsters match the current filter at this CR.</p>
+                                    ) : (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {monsters.map((m) => (
+                                                <span
+                                                    key={m.name}
+                                                    className={`inline-flex items-center px-2.5 py-1 text-xs rounded-sm border transition-colors ${
+                                                        m.source === "homebrew"
+                                                            ? "border-gold/30 bg-gold/10 text-gold"
+                                                            : "border-gold/10 bg-gold/5 text-foreground"
+                                                    }`}
+                                                    title={`${m.name} — ${m.affiliation}${m.genus ? `, ${m.genus}` : ""}${m.terrain?.length ? ` · ${m.terrain.join(", ")}` : ""}`}
+                                                >
+                                                    {m.name}
+                                                    {m.source === "homebrew" && <span className="ml-1 text-[9px] text-gold/60">★</span>}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    );
+
+    return typeof document !== "undefined" ? createPortal(modal, document.body) : null;
+}
 
 function BudgetBar({ fit, budgetFitLabel, accent = "gold" }: { fit: number; budgetFitLabel: string; accent?: "gold" | "silver" }) {
     return (
@@ -67,7 +194,7 @@ export default function CombatBalancerPage() {
     const [filterTerrain, setFilterTerrain] = useState<Terrain | "">("");
     const [filterAffiliation, setFilterAffiliation] = useState<Affiliation | "">("");
     const [filterGenus, setFilterGenus] = useState("");
-    const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(0);
+    const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -229,34 +356,104 @@ export default function CombatBalancerPage() {
             <Card className="p-6 border-gold/10">
                 <SectionHeader>Encounter</SectionHeader>
 
-                <div className="mb-5">
-                    <SubLabel className="mb-3">{t("formation")}</SubLabel>
-                    <div className="flex gap-2">
-                        <ToggleChip size="lg" isActive={mode === "solo"} onClick={() => setMode("solo")}
-                            className={mode === "solo" ? "shadow-[0_0_10px_rgba(197,160,89,0.3)] font-bold" : ""}>
-                            {t("soloBoss")}
-                        </ToggleChip>
-                        <ToggleChip size="lg" isActive={mode === "group"} onClick={() => setMode("group")}
-                            className={mode === "group" ? "shadow-[0_0_10px_rgba(197,160,89,0.3)] font-bold" : ""}>
-                            {t("hordeGroup")}
-                        </ToggleChip>
-                    </div>
-                </div>
-
                 <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+                    <FormField label={t("formation")}>
+                        <SliderToggle
+                            value={mode}
+                            onChange={setMode}
+                            options={[
+                                {
+                                    value: "solo" as Mode,
+                                    title: t("soloBoss"),
+                                    icon: (
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"/>
+                                        </svg>
+                                    ),
+                                },
+                                {
+                                    value: "group" as Mode,
+                                    title: t("hordeGroup"),
+                                    icon: (
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="9" cy="8" r="3"/>
+                                            <circle cx="17" cy="10" r="2.5"/>
+                                            <circle cx="4" cy="13" r="2"/>
+                                            <path d="M3 20 Q6 16 9 16 Q12 16 15 20"/>
+                                            <path d="M13 20 Q15 17 17 17 Q19 17 21 20"/>
+                                        </svg>
+                                    ),
+                                },
+                            ]}
+                        />
+                    </FormField>
+
                     <FormField label={t("budgetType")}>
-                        <Select value={budgetMode} onChange={(e) => setBudgetMode(e.target.value as BudgetMode)} aria-label="XP budget type">
-                            <option value="encounter">{t("encounterBudget")}</option>
-                            <option value="daily">{t("dailyBudget")}</option>
-                        </Select>
+                        <SliderToggle
+                            value={budgetMode}
+                            onChange={setBudgetMode}
+                            options={[
+                                {
+                                    value: "encounter" as BudgetMode,
+                                    title: t("encounterBudget"),
+                                    icon: (
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M3 3 L21 21 M3 3 L8 3 L3 8 M21 21 L21 16 L16 21"/>
+                                            <path d="M21 3 L3 21 M21 3 L16 3 L21 8 M3 21 L3 16 L8 21"/>
+                                        </svg>
+                                    ),
+                                },
+                                {
+                                    value: "daily" as BudgetMode,
+                                    title: t("dailyBudget"),
+                                    icon: (
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <circle cx="12" cy="12" r="4"/>
+                                            <line x1="12" y1="2" x2="12" y2="5"/>
+                                            <line x1="12" y1="19" x2="12" y2="22"/>
+                                            <line x1="2" y1="12" x2="5" y2="12"/>
+                                            <line x1="19" y1="12" x2="22" y2="12"/>
+                                            <line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/>
+                                            <line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/>
+                                            <line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/>
+                                            <line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/>
+                                        </svg>
+                                    ),
+                                },
+                            ]}
+                        />
                     </FormField>
 
                     {mode === "solo" && (
                         <FormField label={t("includeMinions")}>
-                            <Select value={includeMinions ? "yes" : "no"} onChange={(e) => setIncludeMinions(e.target.value === "yes")} aria-label="Include minions with boss">
-                                <option value="no">{t("no")}</option>
-                                <option value="yes">{t("yes")}</option>
-                            </Select>
+                            <SliderToggle
+                                value={includeMinions ? "yes" : "no"}
+                                onChange={(v) => setIncludeMinions(v === "yes")}
+                                options={[
+                                    {
+                                        value: "no" as const,
+                                        title: t("no"),
+                                        icon: (
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <circle cx="12" cy="8" r="4"/>
+                                                <path d="M4 20 Q8 14 12 14 Q16 14 20 20"/>
+                                            </svg>
+                                        ),
+                                    },
+                                    {
+                                        value: "yes" as const,
+                                        title: t("yes"),
+                                        icon: (
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <circle cx="9" cy="8" r="3.5"/>
+                                                <path d="M2 20 Q5.5 15 9 15 Q12.5 15 16 20"/>
+                                                <circle cx="18" cy="10" r="2.5"/>
+                                                <path d="M14 20 Q16 17 18 17 Q20 17 22 20"/>
+                                            </svg>
+                                        ),
+                                    },
+                                ]}
+                            />
                         </FormField>
                     )}
 
@@ -336,7 +533,7 @@ export default function CombatBalancerPage() {
                         <p className="text-xs text-muted mt-1">{t("crMixOptionsNote")}</p>
                     </div>
 
-                    <ul className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                    <ul className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                         {(mode === "solo" ? soloSuggestions : groupSuggestions).map((suggestion, i) => {
                             const members = mode === "solo"
                                 ? [
@@ -345,15 +542,12 @@ export default function CombatBalancerPage() {
                                   ]
                                 : (suggestion as typeof groupSuggestions[0]).members.map((m) => ({ cr: m.cr, count: m.count, label: undefined as string | undefined }));
 
-                            const uniqueCRs = [...new Set(members.map((m) => m.cr))];
-                            const isExpanded = expandedSuggestion === i;
-
                             return (
-                                <li key={i} className={isExpanded ? "lg:col-span-2" : ""}>
-                                    <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all ${isExpanded ? "shadow-glow border-gold/30" : "hover:border-gold/20"} bg-background/50`}>
+                                <li key={i} data-testid="suggestion-card">
+                                    <Card className={`border ${mode === "solo" ? "border-gold/10" : "border-silver/10"} transition-all hover:border-gold/20 bg-background/50`}>
                                         <button
                                             type="button"
-                                            onClick={() => setExpandedSuggestion(isExpanded ? null : i)}
+                                            onClick={() => setExpandedSuggestion(i)}
                                             className="w-full p-5 text-left cursor-pointer hover:bg-gold/[0.02] transition-colors rounded-sm"
                                         >
                                             <div className="flex justify-between items-start gap-3">
@@ -370,7 +564,7 @@ export default function CombatBalancerPage() {
                                                 </div>
                                                 <div className="flex items-center gap-3 shrink-0">
                                                     <span className="text-muted text-xs font-bold uppercase">{suggestion.adjustedXP.toLocaleString()} XP</span>
-                                                    <span className={`text-base text-gold/50 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>▾</span>
+                                                    <span className="text-[10px] text-gold/40 uppercase tracking-widest hidden sm:inline">Monsters ›</span>
                                                 </div>
                                             </div>
                                             <div className={`mt-1 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
@@ -378,52 +572,21 @@ export default function CombatBalancerPage() {
                                             </div>
                                             <BudgetBar fit={suggestion.fit} budgetFitLabel={t("budgetFit")} accent={mode === "solo" ? "gold" : "silver"} />
                                         </button>
-
-                                        {isExpanded && (
-                                            <div className="px-5 pb-5 pt-1 border-t border-gold/10 grid gap-3">
-                                                {uniqueCRs.map((cr) => {
-                                                    const allMonsters = getMonstersForCR(cr, ruleset, catalog);
-                                                    const monsters = filterMonsterPool(allMonsters);
-                                                    const slot = members.find((m) => m.cr === cr);
-                                                    const filtered = hasActiveFilter && monsters.length < allMonsters.length;
-                                                    return (
-                                                        <div key={cr}>
-                                                            <SubLabel className="mb-1.5">
-                                                                CR {formatCR(cr)} {slot?.label ? `(${slot.label})` : ""}
-                                                                {" — "}
-                                                                {monsters.length} available
-                                                                {filtered && <span className="text-gold/40 ml-1">({allMonsters.length} total)</span>}
-                                                            </SubLabel>
-                                                            {monsters.length === 0 ? (
-                                                                <p className="text-muted text-xs italic">No monsters match the current filter at this CR.</p>
-                                                            ) : (
-                                                                <div className="flex flex-wrap gap-1.5">
-                                                                    {monsters.map((m) => (
-                                                                        <span
-                                                                            key={m.name}
-                                                                            className={`inline-flex items-center px-2.5 py-1 text-xs rounded-sm border transition-colors ${
-                                                                                m.source === "homebrew"
-                                                                                    ? "border-gold/30 bg-gold/10 text-gold"
-                                                                                    : "border-gold/10 bg-gold/5 text-foreground"
-                                                                            }`}
-                                                                            title={`${m.name} — ${m.affiliation}${m.genus ? `, ${m.genus}` : ""}${m.terrain?.length ? ` · ${m.terrain.join(", ")}` : ""}`}
-                                                                        >
-                                                                            {m.name}
-                                                                            {m.source === "homebrew" && <span className="ml-1 text-[9px] text-gold/60">★</span>}
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
                                     </Card>
                                 </li>
                             );
                         })}
                     </ul>
+
+                    <EncounterModal
+                        suggestion={expandedSuggestion !== null ? (mode === "solo" ? soloSuggestions : groupSuggestions)[expandedSuggestion] : null}
+                        mode={mode}
+                        ruleset={ruleset}
+                        catalog={catalog}
+                        filterMonsterPool={filterMonsterPool}
+                        hasActiveFilter={hasActiveFilter}
+                        onClose={() => setExpandedSuggestion(null)}
+                    />
                 </section>
             </Card>
 

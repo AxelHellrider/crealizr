@@ -24,6 +24,7 @@ export function ToggleChip({ isActive, size = "sm", children, className = "", ..
     return (
         <button
             type="button"
+            aria-pressed={isActive}
             className={`${base} ${isActive ? active : inactive} ${className}`}
             {...props}
         >
