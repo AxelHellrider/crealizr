@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useCallback, useContext, useState, useEffect } from "react";
 
 type SidebarContextType = {
   isOpen: boolean;
@@ -12,11 +12,6 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Close sidebar on escape key
   useEffect(() => {
@@ -32,8 +27,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const handleClickOutside = (e: MouseEvent) => {
       const sidebar = document.getElementById("sidebar");
       const toggle = document.getElementById("sidebar-toggle");
-      if (sidebar && toggle && 
-          !sidebar.contains(e.target as Node) && 
+      if (sidebar && toggle &&
+          !sidebar.contains(e.target as Node) &&
           !toggle.contains(e.target as Node)) {
         setIsOpen(false);
       }
@@ -42,7 +37,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggle = () => setIsOpen(!isOpen);
+  // Functional update avoids stale closure on isOpen
+  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
   return (
     <SidebarContext.Provider value={{ isOpen, setIsOpen, toggle }}>

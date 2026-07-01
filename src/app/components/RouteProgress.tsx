@@ -12,7 +12,10 @@ export default function RouteProgress() {
   const [visible, setVisible] = useState(false);
   const timers = useRef<number[]>([]);
 
-  const prefersReducedMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Computed once on mount; media-query changes mid-session are rare enough to ignore
+  const prefersReducedMotion = useRef(
+    typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  ).current;
 
   useEffect(() => {
     // start progress on route key change
@@ -53,7 +56,7 @@ export default function RouteProgress() {
       timers.current.forEach((t) => window.clearTimeout(t));
       timers.current = [];
     };
-  }, [key, prefersReducedMotion]);
+  }, [key]);
 
   if (!visible) return null;
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import type { Monster } from "@/app/types/monster";
 import {
     type CustomMonster,
@@ -27,6 +27,10 @@ export function CustomMonstersProvider({ children }: { children: ReactNode }) {
     const [customMonsters, setCustomMonsters] = useState<CustomMonster[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Kept in sync with state so callbacks below never close over a stale list
+    const monstersRef = useRef(customMonsters);
+    useEffect(() => { monstersRef.current = customMonsters; });
+
     useEffect(() => {
         getAllMonsters()
             .then(setCustomMonsters)
@@ -52,9 +56,10 @@ export function CustomMonstersProvider({ children }: { children: ReactNode }) {
         setCustomMonsters((prev) => prev.filter((m) => m.id !== id));
     }, []);
 
+    // Reads current monsters via ref so this function reference stays stable
     const importMonsters = useCallback(async (data: unknown): Promise<{ added: number; errors: string[] }> => {
         const { valid, errors } = validateMonsterImport(data);
-        const existingNames = new Set(customMonsters.map((m) => m.name.toLowerCase()));
+        const existingNames = new Set(monstersRef.current.map((m) => m.name.toLowerCase()));
         let added = 0;
 
         for (const monster of valid) {
@@ -70,11 +75,11 @@ export function CustomMonstersProvider({ children }: { children: ReactNode }) {
         }
 
         return { added, errors };
-    }, [customMonsters]);
+    }, []);
 
     const exportAllMonsters = useCallback(() => {
-        ioExport(customMonsters);
-    }, [customMonsters]);
+        ioExport(monstersRef.current);
+    }, []);
 
     return (
         <CustomMonstersContext value={{

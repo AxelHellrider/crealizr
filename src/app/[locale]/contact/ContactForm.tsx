@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { useTranslations } from "next-intl";
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -36,7 +36,7 @@ export function ContactForm() {
   const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
   const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
 
-  const startedAt = useMemo(() => Date.now(), []);
+  const startedAt = useRef(Date.now()).current;
   const widgetRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
 
