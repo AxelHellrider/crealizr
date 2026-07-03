@@ -1,0 +1,16 @@
+{
+  "name": "CRealizr — DM Toolkit",
+  "short_name": "CRealizr",
+  "description": "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts.",
+  "start_url": "/en",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a2e",
+  "theme_color": "#6c63ff",
+  "categories": ["games", "utilities"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

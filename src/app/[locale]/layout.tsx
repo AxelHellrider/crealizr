@@ -43,6 +43,12 @@ export const metadata: Metadata = {
     description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
     applicationName: "CRealizr",
     category: "Game",
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        title: "CRealizr",
+    },
     alternates: {
         canonical: "/",
     },
@@ -58,6 +64,9 @@ export const metadata: Metadata = {
         title: "CRealizr | Dungeons & Dragons Toolkit",
         description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
         images: ["/og-default.svg"],
+    },
+    other: {
+        "mobile-web-app-capable": "yes",
     },
 };
 

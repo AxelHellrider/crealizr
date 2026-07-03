@@ -10,49 +10,55 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function readSavedSeason(): Season {
+    try {
+        const saved = localStorage.getItem("theme-season") as Season | null;
+        if (saved && ["spring", "summer", "autumn", "winter"].includes(saved)) return saved;
+    } catch {
+        // localStorage unavailable in SSR / private-mode browsers
+    }
+    return getSeason();
+}
+
+function applyTheme(season: Season) {
+    const root = document.documentElement;
+    const c = getThemeForSeason(season);
+    root.setAttribute("data-season", season);
+    root.style.setProperty("--surface-base",     c.surfaceBase);
+    root.style.setProperty("--surface-raised",   c.surfaceRaised);
+    root.style.setProperty("--surface-card",     c.surfaceCard);
+    root.style.setProperty("--surface-glass",    c.surfaceGlass);
+    root.style.setProperty("--text-base",        c.textBase);
+    root.style.setProperty("--text-secondary",   c.textSecondary);
+    root.style.setProperty("--accent-primary",   c.accentPrimary);
+    root.style.setProperty("--accent-secondary", c.accentSecondary);
+    root.style.setProperty("--accent-tertiary",  c.accentTertiary);
+    root.style.setProperty("--accent-special",   c.accentSpecial);
+    root.style.setProperty("--border-accent",    c.borderAccent);
+    root.style.setProperty("--border-subtle",    c.borderSubtle);
+    root.style.setProperty("--border-glass",     c.borderGlass);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [season, setSeason] = useState<Season>(() => {
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("theme-season") as Season | null;
-            if (saved && ['spring', 'summer', 'autumn', 'winter'].includes(saved)) return saved;
-            return getSeason();
-        }
-        return getSeason();
-    });
+    const [season, setSeason] = useState<Season>(getSeason);
 
-    const [mounted, setMounted] = useState(false);
-
+    // On mount: read persisted season (localStorage not available during SSR),
+    // reconcile with server-rendered value, and apply CSS vars.
     useEffect(() => {
-        const t = window.setTimeout(() => setMounted(true), 0);
-        return () => window.clearTimeout(t);
+        const saved = readSavedSeason();
+        setSeason(saved);
+        applyTheme(saved);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Re-apply theme whenever season changes after mount.
     useEffect(() => {
-        if (!mounted) return;
-
-        document.documentElement.setAttribute("data-season", season);
-
-        const c = getThemeForSeason(season);
-        const root = document.documentElement;
-
-        root.style.setProperty('--surface-base',   c.surfaceBase);
-        root.style.setProperty('--surface-raised',  c.surfaceRaised);
-        root.style.setProperty('--surface-card',    c.surfaceCard);
-        root.style.setProperty('--surface-glass',   c.surfaceGlass);
-        root.style.setProperty('--text-base',        c.textBase);
-        root.style.setProperty('--text-secondary',   c.textSecondary);
-        root.style.setProperty('--accent-primary',   c.accentPrimary);
-        root.style.setProperty('--accent-secondary', c.accentSecondary);
-        root.style.setProperty('--accent-tertiary',  c.accentTertiary);
-        root.style.setProperty('--accent-special',   c.accentSpecial);
-        root.style.setProperty('--border-accent',    c.borderAccent);
-        root.style.setProperty('--border-subtle',    c.borderSubtle);
-        root.style.setProperty('--border-glass',     c.borderGlass);
-    }, [season, mounted]);
+        applyTheme(season);
+    }, [season]);
 
     const setSeasonHandler = (newSeason: Season) => {
         setSeason(newSeason);
-        localStorage.setItem("theme-season", newSeason);
+        try { localStorage.setItem("theme-season", newSeason); } catch { /* ignore */ }
     };
 
     return (
