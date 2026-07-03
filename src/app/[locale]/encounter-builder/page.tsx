@@ -1,47 +1,46 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import {
-    partyBudget,
-    getMonstersForCR,
-    suggestGroupEncounters,
-    suggestBossWithMinions,
-} from "@/app/utils/encounter";
-import type { Terrain, Affiliation, Monster } from "@/app/types/monster";
+import { getMonstersForCR } from "@/app/utils/encounter";
 import { formatCR } from "@/app/lib/format";
-import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { FormField } from "@/app/components/molecules/FormField";
 import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import { FilterBadge } from "@/app/components/molecules/FilterBadge";
-import { MonsterFilterPanel, type RelationCriteria } from "@/app/components/organisms/MonsterFilterPanel";
-import { EncounterHexMap } from "@/app/components/organisms/EncounterHexMap";
 import { Card } from "@/app/components/atoms/Card";
 import { SliderToggle } from "@/app/components/atoms/SliderToggle";
-import type { GroupSuggestion, BossMinionSuggestion } from "@/app/utils/encounter";
 import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
-
-type Mode = "solo" | "group";
-type Difficulty = "easy" | "medium" | "hard" | "deadly";
-type Ruleset = "2014" | "2024";
-type BudgetMode = "encounter" | "daily";
+import { MonsterFilterPanel } from "./_components/MonsterFilterPanel";
+import { EncounterHexMap } from "./_components/EncounterHexMap";
+import {
+    useEncounterBuilder,
+    type EncounterMode,
+    type Difficulty,
+    type Ruleset,
+    type BudgetMode,
+    type BossMinionSuggestion,
+    type GroupSuggestion,
+} from "@/app/hooks/useEncounterBuilder";
+import type { Monster } from "@/app/types/monster";
 
 function EncounterModal({
     suggestion, mode, ruleset, catalog, filterMonsterPool, hasActiveFilter, onClose,
 }: {
     suggestion: GroupSuggestion | BossMinionSuggestion | null;
-    mode: Mode; ruleset: Ruleset; catalog: readonly Monster[];
+    mode: EncounterMode;
+    ruleset: Ruleset;
+    catalog: readonly Monster[];
     filterMonsterPool: (monsters: Monster[]) => Monster[];
-    hasActiveFilter: boolean; onClose: () => void;
+    hasActiveFilter: boolean;
+    onClose: () => void;
 }) {
     useEffect(() => {
         if (!suggestion) return;
@@ -150,109 +149,24 @@ function BudgetBar({ fit, accent = "gold" }: { fit: number; accent?: "gold" | "s
 export default function CombatBalancerPage() {
     const locale = useLocale();
     const t = useTranslations("encounterBuilder");
-    const searchParams = useSearchParams();
 
-    const [partySize, setPartySize] = useState(() => {
-        const v = searchParams.get("partySize");
-        return v ? Number(v) : 4;
-    });
-    const [avgLevel, setAvgLevel] = useState(() => {
-        const v = searchParams.get("avgLevel");
-        return v ? Number(v) : 5;
-    });
-    const [difficulty, setDifficulty] = useState<Difficulty>(() => {
-        const v = searchParams.get("difficulty") as Difficulty | null;
-        return v && ["easy", "medium", "hard", "deadly"].includes(v) ? v : "medium";
-    });
-    const [mode, setMode] = useState<Mode>(() => {
-        const v = searchParams.get("mode") as Mode | null;
-        return v && ["solo", "group"].includes(v) ? v : "solo";
-    });
-    const [ruleset, setRuleset] = useState<Ruleset>("2014");
-    const [budgetMode, setBudgetMode] = useState<BudgetMode>("encounter");
-    const [groupTypes, setGroupTypes] = useState(2);
-    const [includeMinions, setIncludeMinions] = useState(false);
-    const [relationCriteria, setRelationCriteria] = useState<RelationCriteria>(() => {
-        const v = searchParams.get("relation") as RelationCriteria | null;
-        return v && ["any", "terrain", "affiliation", "genus"].includes(v) ? v : "any";
-    });
-    const [filterTerrain, setFilterTerrain] = useState<Terrain | "">(() => {
-        return (searchParams.get("filterTerrain") as Terrain | null) ?? "";
-    });
-    const [filterAffiliation, setFilterAffiliation] = useState<Affiliation | "">("");
-    const [filterGenus, setFilterGenus] = useState("");
-    const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
-    const [selectedIdx, setSelectedIdx] = useState(0);
+    const {
+        state, dispatch,
+        catalog, budget,
+        suggestions, safeSelectedIdx, mapSuggestion, expandedSuggestion,
+        knownGenera, filterMonsterPool, hasActiveFilter, activeFilterLabel,
+        showRelationControls,
+    } = useEncounterBuilder();
 
-    // Lock body scroll on desktop only — mobile uses the normal stacked layout
+    // Lock body scroll on desktop — mobile uses normal stacked layout
     useEffect(() => {
         const mq = window.matchMedia("(min-width: 1024px)");
-        const apply = (matches: boolean) => {
-            document.body.style.overflow = matches ? "hidden" : "";
-        };
+        const apply = (matches: boolean) => { document.body.style.overflow = matches ? "hidden" : ""; };
         apply(mq.matches);
-        mq.addEventListener("change", (e) => apply(e.matches));
-        return () => {
-            mq.removeEventListener("change", (e) => apply(e.matches));
-            document.body.style.overflow = "";
-        };
+        const handler = (e: MediaQueryListEvent) => apply(e.matches);
+        mq.addEventListener("change", handler);
+        return () => { mq.removeEventListener("change", handler); document.body.style.overflow = ""; };
     }, []);
-
-    const { catalog2014, catalog2024 } = useMergedCatalog();
-    const catalog = ruleset === "2024" ? catalog2024 : catalog2014;
-
-    const knownGenera = useMemo(
-        () => [...new Set(catalog.map((m) => m.genus).filter(Boolean) as string[])].sort(),
-        [catalog]
-    );
-
-    const filterMonsterPool = (monsters: Monster[]): Monster[] => {
-        if (relationCriteria === "terrain" && filterTerrain)
-            return monsters.filter((m) => m.terrain.includes(filterTerrain) || m.terrain.includes("any"));
-        if (relationCriteria === "affiliation" && filterAffiliation)
-            return monsters.filter((m) => m.affiliation === filterAffiliation || m.affiliation === "any");
-        if (relationCriteria === "genus" && filterGenus)
-            return monsters.filter((m) => m.genus === filterGenus);
-        return monsters;
-    };
-
-    const hasActiveFilter =
-        (relationCriteria === "terrain" && !!filterTerrain) ||
-        (relationCriteria === "affiliation" && !!filterAffiliation) ||
-        (relationCriteria === "genus" && !!filterGenus);
-
-    const activeFilterLabel = hasActiveFilter
-        ? relationCriteria === "terrain" ? filterTerrain
-        : relationCriteria === "affiliation" ? filterAffiliation
-        : filterGenus
-        : null;
-
-    const budget = useMemo(
-        () => partyBudget({ level: avgLevel, size: partySize, difficulty, ruleset, mode: budgetMode }),
-        [avgLevel, partySize, difficulty, ruleset, budgetMode]
-    );
-
-    const soloSuggestions = useMemo(
-        () => suggestBossWithMinions({ level: avgLevel, size: partySize, difficulty, ruleset, budget, includeMinions, relationCriteria, catalog }),
-        [avgLevel, partySize, difficulty, ruleset, budget, includeMinions, relationCriteria, catalog]
-    );
-
-    const groupSuggestions = useMemo(
-        () => suggestGroupEncounters({ level: avgLevel, size: partySize, difficulty, ruleset, budget, maxTypes: groupTypes, relationCriteria, catalog }),
-        [avgLevel, partySize, difficulty, ruleset, budget, groupTypes, relationCriteria, catalog]
-    );
-
-    const suggestions = mode === "solo" ? soloSuggestions : groupSuggestions;
-    const safeSelectedIdx = Math.min(selectedIdx, Math.max(0, suggestions.length - 1));
-    const mapSuggestion = suggestions[safeSelectedIdx] ?? null;
-
-    const formatGroupMembers = (members: { count: number; cr: number }[]) =>
-        members.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ");
-
-    const formatBossMinions = (s: { boss: { count: number; cr: number }; minions: { count: number; cr: number }[] }) => {
-        const b = `${s.boss.count} × CR ${formatCR(s.boss.cr)} (Boss)`;
-        return s.minions.length ? `${b} + ${s.minions.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ")}` : b;
-    };
 
     const budgetStatus = (fit: number) => {
         if (fit >= 0.95 && fit <= 1.05) return { label: t("onTarget"), color: "text-green-400" };
@@ -260,15 +174,20 @@ export default function CombatBalancerPage() {
         return { label: t("underBudget"), color: "text-amber-400" };
     };
 
+    const formatGroupMembers = (members: { count: number; cr: number }[]) =>
+        members.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ");
+
+    const formatBossMinions = (s: BossMinionSuggestion) => {
+        const b = `${s.boss.count} × CR ${formatCR(s.boss.cr)} (Boss)`;
+        return s.minions.length ? `${b} + ${s.minions.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ")}` : b;
+    };
+
     const primaryFit = mapSuggestion?.fit;
     const primaryStatus = primaryFit !== undefined ? budgetStatus(primaryFit) : null;
-    const showRelationControls = mode === "group" || (mode === "solo" && includeMinions);
 
     return (
-        /* Full-height section that fills the rest of the viewport */
         <section className="glass-panel fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0 flex flex-col lg:h-[calc(100dvh-3.5rem)] xl:h-dvh lg:overflow-hidden">
 
-            {/* ── Page header (fixed height) ── */}
             <div className="shrink-0 p-4 lg:px-8 lg:pt-8 lg:pb-6">
                 <PageHeader title={t("title")} description={t("description")}>
                     <div>
@@ -281,10 +200,9 @@ export default function CombatBalancerPage() {
                 </PageHeader>
             </div>
 
-            {/* ── 3-column body (fills remaining height) ── */}
             <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[minmax(252px,1fr)_minmax(320px,1.6fr)_minmax(252px,1fr)] gap-6 p-4 lg:px-8 lg:pb-8">
 
-                {/* ── LEFT: Party Options ── */}
+                {/* LEFT: Party Options */}
                 <div className="min-h-0 flex flex-col gap-4 lg:overflow-y-auto">
                     <Card className="p-6 border-gold/10 shrink-0">
                         <SectionHeader>Party</SectionHeader>
@@ -293,13 +211,13 @@ export default function CombatBalancerPage() {
                             <SubLabel className="mb-3">{t("quickPresets")}</SubLabel>
                             <div className="flex flex-wrap gap-2">
                                 {[3, 4, 5, 6].map((size) => (
-                                    <ToggleChip key={size} isActive={partySize === size} onClick={() => setPartySize(size)}>
+                                    <ToggleChip key={size} isActive={state.partySize === size} onClick={() => dispatch({ type: "SET_PARTY_SIZE", payload: size })}>
                                         {size} PCs
                                     </ToggleChip>
                                 ))}
                                 <span className="w-px self-stretch bg-gold/10 mx-1" />
                                 {[3, 5, 10, 15, 20].map((level) => (
-                                    <ToggleChip key={level} isActive={avgLevel === level} onClick={() => setAvgLevel(level)}>
+                                    <ToggleChip key={level} isActive={state.avgLevel === level} onClick={() => dispatch({ type: "SET_AVG_LEVEL", payload: level })}>
                                         Lv {level}
                                     </ToggleChip>
                                 ))}
@@ -308,23 +226,23 @@ export default function CombatBalancerPage() {
 
                         <div className="grid gap-4 grid-cols-2">
                             <FormField label={t("partySize")}>
-                                <Input type="number" min={1} max={8} value={partySize}
-                                    onChange={(e) => setPartySize(+e.target.value)}
+                                <Input type="number" min={1} max={8} value={state.partySize}
+                                    onChange={(e) => dispatch({ type: "SET_PARTY_SIZE", payload: +e.target.value })}
                                     aria-label="Party size (number of players)" />
                             </FormField>
                             <FormField label={t("avgLevel")}>
-                                <Input type="number" min={1} max={20} value={avgLevel}
-                                    onChange={(e) => setAvgLevel(+e.target.value)}
+                                <Input type="number" min={1} max={20} value={state.avgLevel}
+                                    onChange={(e) => dispatch({ type: "SET_AVG_LEVEL", payload: +e.target.value })}
                                     aria-label="Average party level" />
                             </FormField>
                             <FormField label={t("ruleset")}>
-                                <Select value={ruleset} onChange={(e) => setRuleset(e.target.value as Ruleset)} aria-label="Ruleset version">
+                                <Select value={state.ruleset} onChange={(e) => dispatch({ type: "SET_RULESET", payload: e.target.value as Ruleset })} aria-label="Ruleset version">
                                     <option value="2014">{t("ruleset2014")}</option>
                                     <option value="2024">{t("ruleset2024")}</option>
                                 </Select>
                             </FormField>
                             <FormField label={t("difficulty")}>
-                                <Select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} aria-label="Encounter difficulty">
+                                <Select value={state.difficulty} onChange={(e) => dispatch({ type: "SET_DIFFICULTY", payload: e.target.value as Difficulty })} aria-label="Encounter difficulty">
                                     <option value="easy">{t("easy")}</option>
                                     <option value="medium">{t("medium")}</option>
                                     <option value="hard">{t("hard")}</option>
@@ -351,20 +269,16 @@ export default function CombatBalancerPage() {
                     <p className="text-xs text-muted italic text-center shrink-0 pb-2">{t("calculationsNote")}</p>
                 </div>
 
-                {/* ── MIDDLE: Battlefield map ── */}
+                {/* MIDDLE: Battlefield map */}
                 <div className="min-h-0 flex flex-col lg:overflow-hidden">
                     <Card className="flex-1 flex flex-col p-5 border-gold/10 min-h-0">
                         <SectionHeader className="mb-3! shrink-0">Battlefield</SectionHeader>
-
-                        {/* Hex map fills remaining card space */}
-                        <EncounterHexMap partySize={partySize} suggestion={mapSuggestion} mode={mode} />
-
-                        {/* Callout: selected encounter summary */}
+                        <EncounterHexMap partySize={state.partySize} suggestion={mapSuggestion} mode={state.mode} />
                         {mapSuggestion && (
-                            <div className="shrink-0 mt-3 rounded-sm border border-gold/15 bg-gold/[0.03] p-3">
+                            <div className="shrink-0 mt-3 rounded-sm border border-gold/15 bg-gold/3 p-3">
                                 <SubLabel className="mb-1">{t("recommendedMix")}</SubLabel>
                                 <div className="mt-1 font-serif text-sm accent-gold leading-snug">
-                                    {mode === "solo"
+                                    {state.mode === "solo"
                                         ? formatBossMinions(mapSuggestion as BossMinionSuggestion)
                                         : formatGroupMembers((mapSuggestion as GroupSuggestion).members)}
                                 </div>
@@ -378,17 +292,15 @@ export default function CombatBalancerPage() {
                     </Card>
                 </div>
 
-                {/* ── RIGHT: Encounter Options + Suggestions ── */}
+                {/* RIGHT: Encounter Options + Suggestions */}
                 <div className="min-h-0 flex flex-col gap-4 lg:overflow-y-auto">
-
-                    {/* Encounter shape */}
                     <Card className="p-6 border-gold/10 shrink-0">
                         <SectionHeader>Encounter</SectionHeader>
                         <div className="flex flex-col gap-4">
                             <FormField label={t("formation")}>
-                                <SliderToggle value={mode} onChange={setMode} options={[
+                                <SliderToggle value={state.mode} onChange={(v) => dispatch({ type: "SET_MODE", payload: v as EncounterMode })} options={[
                                     {
-                                        value: "solo" as Mode, title: t("soloBoss"),
+                                        value: "solo" as EncounterMode, title: t("soloBoss"),
                                         icon: (
                                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"/>
@@ -396,7 +308,7 @@ export default function CombatBalancerPage() {
                                         ),
                                     },
                                     {
-                                        value: "group" as Mode, title: t("hordeGroup"),
+                                        value: "group" as EncounterMode, title: t("hordeGroup"),
                                         icon: (
                                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                                 <circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><circle cx="4" cy="13" r="2"/>
@@ -408,7 +320,7 @@ export default function CombatBalancerPage() {
                             </FormField>
 
                             <FormField label={t("budgetType")}>
-                                <SliderToggle value={budgetMode} onChange={setBudgetMode} options={[
+                                <SliderToggle value={state.budgetMode} onChange={(v) => dispatch({ type: "SET_BUDGET_MODE", payload: v as BudgetMode })} options={[
                                     {
                                         value: "encounter" as BudgetMode, title: t("encounterBudget"),
                                         icon: (
@@ -433,11 +345,11 @@ export default function CombatBalancerPage() {
                                 ]} />
                             </FormField>
 
-                            {mode === "solo" && (
+                            {state.mode === "solo" && (
                                 <FormField label={t("includeMinions")}>
                                     <SliderToggle
-                                        value={includeMinions ? "yes" : "no"}
-                                        onChange={(v) => setIncludeMinions(v === "yes")}
+                                        value={state.includeMinions ? "yes" : "no"}
+                                        onChange={(v) => dispatch({ type: "SET_INCLUDE_MINIONS", payload: v === "yes" })}
                                         options={[
                                             {
                                                 value: "no" as const, title: t("no"),
@@ -461,9 +373,9 @@ export default function CombatBalancerPage() {
                                 </FormField>
                             )}
 
-                            {mode === "group" && (
+                            {state.mode === "group" && (
                                 <FormField label={t("mixTypes")}>
-                                    <Select value={groupTypes} onChange={(e) => setGroupTypes(Number(e.target.value))} aria-label="Maximum CR types in a group">
+                                    <Select value={state.groupTypes} onChange={(e) => dispatch({ type: "SET_GROUP_TYPES", payload: Number(e.target.value) })} aria-label="Maximum CR types in a group">
                                         <option value={2}>2 Types</option>
                                         <option value={3}>3 Types</option>
                                         <option value={4}>4 Types</option>
@@ -477,20 +389,19 @@ export default function CombatBalancerPage() {
                     {showRelationControls && (
                         <div className="shrink-0">
                             <MonsterFilterPanel
-                                relationCriteria={relationCriteria}
-                                onRelationChange={setRelationCriteria}
-                                filterTerrain={filterTerrain}
-                                onTerrainChange={setFilterTerrain}
-                                filterAffiliation={filterAffiliation}
-                                onAffiliationChange={setFilterAffiliation}
-                                filterGenus={filterGenus}
-                                onGenusChange={setFilterGenus}
+                                relationCriteria={state.relationCriteria}
+                                onRelationChange={(v) => dispatch({ type: "SET_RELATION_CRITERIA", payload: v })}
+                                filterTerrain={state.filterTerrain}
+                                onTerrainChange={(v) => dispatch({ type: "SET_FILTER_TERRAIN", payload: v })}
+                                filterAffiliation={state.filterAffiliation}
+                                onAffiliationChange={(v) => dispatch({ type: "SET_FILTER_AFFILIATION", payload: v })}
+                                filterGenus={state.filterGenus}
+                                onGenusChange={(v) => dispatch({ type: "SET_FILTER_GENUS", payload: v })}
                                 knownGenera={knownGenera}
                             />
                         </div>
                     )}
 
-                    {/* Suggestions */}
                     <Card className="p-5 shrink-0">
                         <div className="flex items-baseline justify-between gap-2 mb-3">
                             <h2 className="font-serif text-lg accent-gold uppercase tracking-wide">{t("suggestedEncounters")}</h2>
@@ -498,18 +409,18 @@ export default function CombatBalancerPage() {
                         </div>
 
                         <div className="flex flex-wrap gap-1 mb-4">
-                            <FilterBadge>{partySize} PCs · Lv {avgLevel}</FilterBadge>
-                            <FilterBadge>{difficulty}</FilterBadge>
-                            <FilterBadge>{ruleset}</FilterBadge>
-                            <FilterBadge>{budgetMode}</FilterBadge>
+                            <FilterBadge>{state.partySize} PCs · Lv {state.avgLevel}</FilterBadge>
+                            <FilterBadge>{state.difficulty}</FilterBadge>
+                            <FilterBadge>{state.ruleset}</FilterBadge>
+                            <FilterBadge>{state.budgetMode}</FilterBadge>
                             {hasActiveFilter && (
-                                <FilterBadge active>{relationCriteria}: {activeFilterLabel}</FilterBadge>
+                                <FilterBadge active>{state.relationCriteria}: {activeFilterLabel}</FilterBadge>
                             )}
                         </div>
 
                         <ul className="flex flex-col gap-2">
                             {suggestions.map((suggestion, i) => {
-                                const members = mode === "solo"
+                                const members = state.mode === "solo"
                                     ? [
                                         { cr: (suggestion as BossMinionSuggestion).boss.cr, count: (suggestion as BossMinionSuggestion).boss.count, label: "Boss" },
                                         ...(suggestion as BossMinionSuggestion).minions.map((m) => ({ cr: m.cr, count: m.count, label: "Minion" })),
@@ -520,18 +431,17 @@ export default function CombatBalancerPage() {
 
                                 return (
                                     <li key={i} data-testid="suggestion-card">
-                                        {/* div wrapper — avoids nested <button> which is invalid HTML */}
                                         <Card
                                             className={`border transition-all duration-150 cursor-pointer ${
                                                 isSelected
-                                                    ? (mode === "solo" ? "border-gold/50 bg-gold/6" : "border-silver/50 bg-silver/4")
-                                                    : (mode === "solo" ? "border-gold/10 bg-background/50" : "border-silver/10 bg-background/50")
+                                                    ? (state.mode === "solo" ? "border-gold/50 bg-gold/6" : "border-silver/50 bg-silver/4")
+                                                    : (state.mode === "solo" ? "border-gold/10 bg-background/50" : "border-silver/10 bg-background/50")
                                             }`}
-                                            onClick={() => setSelectedIdx(i)}
+                                            onClick={() => dispatch({ type: "SET_SELECTED_IDX", payload: i })}
                                             role="button"
                                             tabIndex={0}
                                             aria-pressed={isSelected}
-                                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSelectedIdx(i); }}
+                                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: "SET_SELECTED_IDX", payload: i }); }}
                                         >
                                             <div className="p-3">
                                                 <div className="flex justify-between items-start gap-2">
@@ -550,7 +460,7 @@ export default function CombatBalancerPage() {
                                                         <span className="text-muted text-[10px] font-bold uppercase">{suggestion.adjustedXP.toLocaleString()} XP</span>
                                                         <button
                                                             type="button"
-                                                            onClick={(e) => { e.stopPropagation(); setExpandedSuggestion(i); }}
+                                                            onClick={(e) => { e.stopPropagation(); dispatch({ type: "SET_EXPANDED_IDX", payload: i }); }}
                                                             className="text-[10px] text-gold/40 hover:text-gold transition-colors uppercase tracking-widest px-1 py-0.5 border border-gold/10 hover:border-gold/30 rounded-sm"
                                                             aria-label="View monster options"
                                                         >
@@ -561,7 +471,7 @@ export default function CombatBalancerPage() {
                                                 <div className={`mt-0.5 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
                                                     {budgetStatus(suggestion.fit).label} · {(suggestion.fit * 100).toFixed(0)}%
                                                 </div>
-                                                <BudgetBar fit={suggestion.fit} accent={mode === "solo" ? "gold" : "silver"} />
+                                                <BudgetBar fit={suggestion.fit} accent={state.mode === "solo" ? "gold" : "silver"} />
                                             </div>
                                         </Card>
                                     </li>
@@ -579,13 +489,13 @@ export default function CombatBalancerPage() {
             </div>
 
             <EncounterModal
-                suggestion={expandedSuggestion !== null ? suggestions[expandedSuggestion] : null}
-                mode={mode}
-                ruleset={ruleset}
+                suggestion={expandedSuggestion}
+                mode={state.mode}
+                ruleset={state.ruleset}
                 catalog={catalog}
                 filterMonsterPool={filterMonsterPool}
                 hasActiveFilter={hasActiveFilter}
-                onClose={() => setExpandedSuggestion(null)}
+                onClose={() => dispatch({ type: "SET_EXPANDED_IDX", payload: null })}
             />
         </section>
     );
