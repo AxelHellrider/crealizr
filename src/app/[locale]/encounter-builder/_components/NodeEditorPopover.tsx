@@ -1,29 +1,43 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
-import type { ManualNode, CoverLevel } from "@/app/types/encounterLayout";
+import { formatCR } from "@/app/lib/format";
+import type { EncounterNode, CoverLevel } from "@/app/types/encounterLayout";
 
 interface NodeEditorPopoverProps {
-    node: ManualNode;
+    node: EncounterNode;
     x: number;
     y: number;
-    onChange: (patch: Partial<ManualNode>) => void;
+    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel }) => void;
     onRemove: () => void;
     onClose: () => void;
 }
 
+function nodeTitle(node: EncounterNode): string {
+    switch (node.kind) {
+        case "party": return "Party member";
+        case "enemy": return `${node.isBoss ? "Boss" : "Enemy"} · CR ${formatCR(node.cr)}`;
+        case "hazard": return `${node.source} hazard`;
+        case "cover": return "cover";
+    }
+}
+
 export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: NodeEditorPopoverProps) {
-    return (
+    if (typeof document === "undefined") return null;
+
+    return createPortal(
         <>
             <div className="fixed inset-0 z-40" onClick={onClose} />
             <div
-                className="fixed z-50 w-56 rounded-sm border border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2"
+                className="fixed z-50 w-56 rounded-sm border border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2
+                    max-sm:!left-1/2 max-sm:!top-1/2 max-sm:!-translate-x-1/2 max-sm:!-translate-y-1/2"
                 style={{ left: x, top: y }}
             >
                 <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-gold/70 font-bold">
-                        {node.kind === "hazard" ? `${node.source} hazard` : "cover"}
+                        {nodeTitle(node)}
                     </span>
                     <button type="button" onClick={onClose} className="text-muted hover:text-foreground text-sm leading-none p-2 -m-2" aria-label="Close">✕</button>
                 </div>
@@ -62,9 +76,10 @@ export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: N
                     onClick={onRemove}
                     className="text-[10px] uppercase tracking-widest text-crimson/80 hover:text-crimson transition-colors self-start mt-1 py-1.5 -my-1"
                 >
-                    Remove
+                    Remove from grid
                 </button>
             </div>
-        </>
+        </>,
+        document.body,
     );
 }

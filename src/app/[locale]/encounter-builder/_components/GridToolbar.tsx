@@ -7,6 +7,8 @@ export type ArmedTool = { kind: "hazard"; source: HazardSource } | { kind: "cove
 interface GridToolbarProps {
     armed: ArmedTool;
     onArm: (tool: ArmedTool) => void;
+    onClearAll: () => void;
+    canClearAll: boolean;
 }
 
 function toolsEqual(a: ArmedTool, b: ArmedTool): boolean {
@@ -16,7 +18,7 @@ function toolsEqual(a: ArmedTool, b: ArmedTool): boolean {
     return true;
 }
 
-export function GridToolbar({ armed, onArm }: GridToolbarProps) {
+export function GridToolbar({ armed, onArm, onClearAll, canClearAll }: GridToolbarProps) {
     const items: { tool: ArmedTool; label: string }[] = [
         { tool: { kind: "hazard", source: "environment" }, label: "Environment Hazard" },
         { tool: { kind: "hazard", source: "spell" }, label: "Spell Hazard" },
@@ -43,6 +45,16 @@ export function GridToolbar({ armed, onArm }: GridToolbarProps) {
                     </button>
                 );
             })}
+
+            <button
+                type="button"
+                onClick={onClearAll}
+                disabled={!canClearAll}
+                className="min-h-9 sm:min-h-0 text-[11px] sm:text-[10px] uppercase tracking-widest px-2.5 sm:px-2 py-2 sm:py-1 rounded-sm border border-crimson/25 text-crimson/70 hover:text-crimson hover:border-crimson/50 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+            >
+                Clear hazards &amp; cover
+            </button>
+
             {armed && (
                 <span className="text-[9px] text-muted/60 italic ml-1">Tap an empty hex to place</span>
             )}

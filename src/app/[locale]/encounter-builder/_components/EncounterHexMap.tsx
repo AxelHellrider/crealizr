@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Line, Group, Text } from "react-konva";
+import { Stage, Layer, Line, Group, Text, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { GridToolbar, type ArmedTool } from "./GridToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
 import type { GroupSuggestion, BossMinionSuggestion } from "@/app/utils/encounter";
-import type { EncounterNode, GridCoord, ManualNode } from "@/app/types/encounterLayout";
+import type { EncounterNode, GridCoord } from "@/app/types/encounterLayout";
 import { formatCR } from "@/app/lib/format";
 
 type Mode = "solo" | "group";
@@ -118,7 +118,7 @@ export function EncounterHexMap({ partySize, suggestion, mode }: EncounterHexMap
 
     const baseScale = Math.min(size.width / GRID_W, 1);
     const scale = baseScale * zoom;
-    const editingNode = editingId ? (layout.nodes.find((n) => n.id === editingId) as ManualNode | undefined) : undefined;
+    const editingNode = editingId ? layout.nodes.find((n) => n.id === editingId) : undefined;
 
     const bgCells = useMemo(() => {
         const worldLeft = -stagePos.x / scale;
@@ -188,10 +188,15 @@ export function EncounterHexMap({ partySize, suggestion, mode }: EncounterHexMap
     };
 
     const handleNodeClick = (node: EncounterNode, e: KonvaEventObject<Event>) => {
-        if (node.kind !== "hazard" && node.kind !== "cover") return;
         const pos = popoverPosFromEvent(e);
         if (pos) setPopoverPos(pos);
         setEditingId(node.id);
+    };
+
+    const handleQuickRemove = (node: EncounterNode, e: KonvaEventObject<Event>) => {
+        e.cancelBubble = true;
+        if (editingId === node.id) { setEditingId(null); setPopoverPos(null); }
+        layout.removeNode(node.id);
     };
 
     const handleDragEnd = (node: EncounterNode, e: KonvaEventObject<DragEvent>) => {
@@ -206,7 +211,18 @@ export function EncounterHexMap({ partySize, suggestion, mode }: EncounterHexMap
 
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-2">
-            <GridToolbar armed={armed} onArm={setArmed} />
+            <GridToolbar
+                armed={armed}
+                onArm={setArmed}
+                canClearAll={layout.nodes.some((n) => n.kind === "hazard" || n.kind === "cover")}
+                onClearAll={() => {
+                    if (editingNode && (editingNode.kind === "hazard" || editingNode.kind === "cover")) {
+                        setEditingId(null);
+                        setPopoverPos(null);
+                    }
+                    layout.clearManualNodes();
+                }}
+            />
 
             <div
                 ref={containerRef}
@@ -271,6 +287,15 @@ export function EncounterHexMap({ partySize, suggestion, mode }: EncounterHexMap
                                     {node.kind === "enemy" && node.isBoss && (
                                         <Text text="BOSS" fontSize={5.5} fontFamily="serif" fill="rgba(220,38,38,0.4)" align="center" width={W} offsetX={W / 2} y={6} />
                                     )}
+                                    <Group
+                                        x={R * 0.62}
+                                        y={-R * 0.62}
+                                        onClick={(e) => handleQuickRemove(node, e)}
+                                        onTap={(e) => handleQuickRemove(node, e)}
+                                    >
+                                        <Circle radius={6} fill="rgba(15,15,19,0.85)" stroke={style.stroke} strokeWidth={1} />
+                                        <Text text="x" fontSize={8} fontFamily="sans-serif" fill={style.stroke} align="center" verticalAlign="middle" width={12} height={12} offsetX={6} offsetY={6} />
+                                    </Group>
                                 </Group>
                             );
                         })}

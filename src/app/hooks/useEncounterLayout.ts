@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useRef } from "react";
 import type { GroupSuggestion, BossMinionSuggestion } from "@/app/utils/encounter";
-import type { EncounterNode, EnemyNode, PartyNode, GridCoord, ManualNode, NodeKind, HazardNode, CoverNode } from "@/app/types/encounterLayout";
+import type { EncounterNode, EnemyNode, PartyNode, GridCoord, ManualNode, NodeKind, HazardNode, CoverNode, CoverLevel } from "@/app/types/encounterLayout";
 
 type Mode = "solo" | "group";
 
@@ -13,12 +13,15 @@ const MAX_SEARCH_ROWS = 1000;
 
 type State = { nodes: EncounterNode[] };
 
+type EditablePatch = { label?: string; notes?: string; coverLevel?: CoverLevel };
+
 type Action =
     | { type: "SET_FROM_SUGGESTION"; partySize: number; suggestion: GroupSuggestion | BossMinionSuggestion | null; mode: Mode }
     | { type: "MOVE_NODE"; id: string; coord: GridCoord }
     | { type: "ADD_NODE"; node: ManualNode }
-    | { type: "UPDATE_NODE"; id: string; patch: Partial<ManualNode> }
+    | { type: "UPDATE_NODE"; id: string; patch: EditablePatch }
     | { type: "REMOVE_NODE"; id: string }
+    | { type: "CLEAR_MANUAL_NODES" }
     | { type: "HYDRATE"; nodes: EncounterNode[] };
 
 function newId(): string {
@@ -95,12 +98,12 @@ function reducer(state: State, action: Action): State {
             return { nodes: [...state.nodes, action.node] };
         case "UPDATE_NODE":
             return {
-                nodes: state.nodes.map((n) =>
-                    n.id === action.id && (n.kind === "hazard" || n.kind === "cover") ? ({ ...n, ...action.patch } as EncounterNode) : n,
-                ),
+                nodes: state.nodes.map((n) => (n.id === action.id ? ({ ...n, ...action.patch } as EncounterNode) : n)),
             };
         case "REMOVE_NODE":
             return { nodes: state.nodes.filter((n) => n.id !== action.id) };
+        case "CLEAR_MANUAL_NODES":
+            return { nodes: state.nodes.filter((n) => n.kind !== "hazard" && n.kind !== "cover") };
         case "HYDRATE":
             return { nodes: action.nodes };
         default:
@@ -159,8 +162,9 @@ export function useEncounterLayout(partySize: number, suggestion: GroupSuggestio
         nodes: state.nodes,
         moveNode: (id: string, coord: GridCoord) => dispatch({ type: "MOVE_NODE", id, coord }),
         addNode,
-        updateNode: (id: string, patch: Partial<ManualNode>) => dispatch({ type: "UPDATE_NODE", id, patch }),
+        updateNode: (id: string, patch: EditablePatch) => dispatch({ type: "UPDATE_NODE", id, patch }),
         removeNode: (id: string) => dispatch({ type: "REMOVE_NODE", id }),
+        clearManualNodes: () => dispatch({ type: "CLEAR_MANUAL_NODES" }),
         isOccupied: (coord: GridCoord, excludeId?: string) => isOccupied(state.nodes, coord, excludeId),
     };
 }

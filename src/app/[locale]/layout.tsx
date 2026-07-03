@@ -44,6 +44,11 @@ export const metadata: Metadata = {
     applicationName: "CRealizr",
     category: "Game",
     manifest: "/manifest.json",
+    icons: {
+        icon: "/crealizr_favicon.svg",
+        shortcut: "/crealizr_favicon.svg",
+        apple: "/crealizr_favicon.svg",
+    },
     appleWebApp: {
         capable: true,
         statusBarStyle: "black-translucent",

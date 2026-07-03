@@ -8,6 +8,7 @@ import LanguageSwitcher from "@/app/components/atoms/LanguageSwitcher";
 import { SEASONAL_THEMES, type Season } from "@/app/lib/seasonalThemes";
 import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
+import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 import { useState, useEffect } from "react";
 
 export default function Sidebar() {
@@ -119,9 +120,10 @@ export default function Sidebar() {
         `}
       >
         {/* Logo */}
-        <div className="flex justify-end text-right p-3 border-b border-gold/20">
+        <div className="flex justify-start lg:justify-end text-right p-3 border-b border-gold/20">
             <Link href={`/${locale}`} className="text-gold">
-                <CrealizrLogo className="w-full h-8 lg:h-12" />
+                <CrealizrMark className="h-8 w-auto lg:hidden" />
+                <CrealizrLogo className="hidden lg:block w-full h-12" />
             </Link>
         </div>
 
