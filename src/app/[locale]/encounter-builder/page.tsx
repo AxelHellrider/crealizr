@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -19,7 +20,11 @@ import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 import { MonsterFilterPanel } from "./_components/MonsterFilterPanel";
-import { EncounterHexMap } from "./_components/EncounterHexMap";
+
+const EncounterHexMap = dynamic(
+    () => import("./_components/EncounterHexMap").then((mod) => mod.EncounterHexMap),
+    { ssr: false },
+);
 import {
     useEncounterBuilder,
     type EncounterMode,

@@ -7,6 +7,7 @@ import { useSidebar } from "@/app/context/SidebarContext";
 import LanguageSwitcher from "@/app/components/atoms/LanguageSwitcher";
 import { SEASONAL_THEMES, type Season } from "@/app/lib/seasonalThemes";
 import { ToggleChip } from "@/app/components/molecules/ToggleChip";
+import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
 import { useState, useEffect } from "react";
 
 export default function Sidebar() {
@@ -111,75 +112,75 @@ export default function Sidebar() {
       <aside
         id="sidebar"
         className={`
-          fixed left-0 top-0 h-screen w-72 bg-card border-r border-gold/20 z-50
+          fixed left-0 top-0 h-screen w-72 bg-card border-r border-gold/20 z-60
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           flex flex-col
         `}
       >
         {/* Logo */}
-        <div className="text-right p-6 border-b border-gold/20">
-          <Link href={`/${locale}`} className="text-2xl font-serif accent-gold">
-            CRealizr
-          </Link>
+        <div className="flex justify-end text-right p-3 border-b border-gold/20">
+            <Link href={`/${locale}`} className="text-gold">
+                <CrealizrLogo className="w-full h-8 lg:h-12" />
+            </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4">
-          <ul className="space-y-2">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => {
-                    if (window.innerWidth < 1280) setIsOpen(false);
-                  }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-semibold tracking-widest ui-link transition hover:bg-gold/10"
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="uppercase">{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4">
+              <ul className="space-y-2">
+                  {navItems.map((item) => (
+                      <li key={item.href}>
+                          <Link
+                              href={item.href}
+                              onClick={() => {
+                                  if (window.innerWidth < 1280) setIsOpen(false);
+                              }}
+                              className="flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-semibold tracking-widest ui-link transition hover:bg-gold/10"
+                          >
+                              <span className="shrink-0">{item.icon}</span>
+                              <span className="uppercase">{item.label}</span>
+                          </Link>
+                      </li>
+                  ))}
+              </ul>
+          </nav>
 
-        {/* Bottom section */}
-        <div className="p-4 border-t border-gold/20 space-y-4">
-          {/* Language Switcher */}
-          <div>
-            <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
-              {t("sidebar.language")}
-            </label>
-            <LanguageSwitcher />
-          </div>
-
-          {/* Season Selector */}
-          <div>
-            <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
-              {t("sidebar.season")}
-            </label>
-            {mounted && (
-              <div className="grid grid-cols-2 gap-2">
-                {(Object.keys(SEASONAL_THEMES) as Season[]).map((s) => (
-                  <ToggleChip key={s} isActive={season === s} onClick={() => setSeason(s)}>
-                    {s}
-                  </ToggleChip>
-                ))}
+          {/* Bottom section */}
+          <div className="p-4 border-t border-gold/20 space-y-4">
+              {/* Language Switcher */}
+              <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
+                      {t("sidebar.language")}
+                  </label>
+                  <LanguageSwitcher/>
               </div>
-            )}
-          </div>
 
-          {/* GitHub Link */}
-          <a
-            href="https://github.com/AxelHellrider"
-            target="_blank"
-            rel="noreferrer"
-            className="ui-button w-full text-center text-xs uppercase tracking-widest"
-          >
-            {t("sidebar.github")}
-          </a>
-        </div>
+              {/* Season Selector */}
+              <div>
+                  <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
+                      {t("sidebar.season")}
+                  </label>
+                  {mounted && (
+                      <div className="grid grid-cols-2 gap-2">
+                          {(Object.keys(SEASONAL_THEMES) as Season[]).map((s) => (
+                              <ToggleChip key={s} isActive={season === s} onClick={() => setSeason(s)}>
+                                  {s}
+                              </ToggleChip>
+                          ))}
+                      </div>
+                  )}
+              </div>
+
+              {/* GitHub Link */}
+              <a
+                  href="https://github.com/AxelHellrider"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ui-button w-full text-center text-xs uppercase tracking-widest"
+              >
+                  {t("sidebar.github")}
+              </a>
+          </div>
       </aside>
     </>
   );
