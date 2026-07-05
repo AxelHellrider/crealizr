@@ -25,6 +25,7 @@ export interface HazardNode extends BaseNode {
     kind: "hazard";
     source: HazardSource;
     notes?: string;
+    aoeRadius: number;
 }
 
 export interface CoverNode extends BaseNode {
@@ -35,3 +36,8 @@ export interface CoverNode extends BaseNode {
 export type EncounterNode = PartyNode | EnemyNode | HazardNode | CoverNode;
 
 export type ManualNode = HazardNode | CoverNode;
+
+export type CoverBenefit = {
+    partyLabel: string;
+    coverLevel: CoverLevel;
+};

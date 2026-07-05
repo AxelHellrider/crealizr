@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,7 +16,6 @@ import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import { FilterBadge } from "@/app/components/molecules/FilterBadge";
 import { Card } from "@/app/components/atoms/Card";
 import { SliderToggle } from "@/app/components/atoms/SliderToggle";
-import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 import { MonsterFilterPanel } from "./_components/MonsterFilterPanel";
@@ -27,6 +26,7 @@ const EncounterHexMap = dynamic(
 );
 import {
     useEncounterBuilder,
+    crTarget,
     type EncounterMode,
     type Difficulty,
     type Ruleset,
@@ -35,6 +35,7 @@ import {
     type GroupSuggestion,
 } from "@/app/hooks/useEncounterBuilder";
 import type { Monster } from "@/app/types/monster";
+import type { CoverBenefit, CoverLevel } from "@/app/types/encounterLayout";
 
 function EncounterModal({
     suggestion, mode, ruleset, catalog, filterMonsterPool, hasActiveFilter, onClose,
@@ -140,6 +141,14 @@ function EncounterModal({
     return typeof document !== "undefined" ? createPortal(modal, document.body) : null;
 }
 
+function coverBenefitText(level: CoverLevel): string {
+    switch (level) {
+        case "half":          return "+2 AC & Dex saves";
+        case "three-quarter": return "+5 AC & Dex saves";
+        case "full":          return "Cannot be targeted";
+    }
+}
+
 function BudgetBar({ fit, accent = "gold" }: { fit: number; accent?: "gold" | "silver" }) {
     return (
         <div className={`mt-2.5 h-px w-full ${accent === "silver" ? "bg-silver/10" : "bg-gold/10"} rounded-full overflow-hidden`}>
@@ -160,7 +169,7 @@ export default function CombatBalancerPage() {
         catalog, budget,
         suggestions, safeSelectedIdx, mapSuggestion, expandedSuggestion,
         knownGenera, filterMonsterPool, hasActiveFilter, activeFilterLabel,
-        showRelationControls,
+        showRelationControls, useXP,
     } = useEncounterBuilder();
 
     // Lock body scroll on desktop — mobile uses normal stacked layout
@@ -187,6 +196,8 @@ export default function CombatBalancerPage() {
         return s.minions.length ? `${b} + ${s.minions.map((m) => `${m.count} × CR ${formatCR(m.cr)}`).join(", ")}` : b;
     };
 
+    const [coverBenefits, setCoverBenefits] = useState<CoverBenefit[]>([]);
+
     const primaryFit = mapSuggestion?.fit;
     const primaryStatus = primaryFit !== undefined ? budgetStatus(primaryFit) : null;
 
@@ -195,10 +206,7 @@ export default function CombatBalancerPage() {
 
             <div className="shrink-0 p-4 lg:px-8 lg:pt-8 lg:pb-6">
                 <PageHeader title={t("title")} description={t("description")}>
-                    <div>
-                        <p className="text-xs text-muted">{t("rulesetNote")}</p>
-                        <WhyDifferent className="mt-3" />
-                    </div>
+                    <p className="text-xs text-muted">{t("rulesetNote")}</p>
                     <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic">
                         {t("viewDocs")}
                     </Link>
@@ -258,10 +266,16 @@ export default function CombatBalancerPage() {
 
                         <div className="mt-5 pt-4 border-t border-gold/10">
                             <div className="flex items-center justify-between gap-2">
-                                <span className="text-xs uppercase tracking-widest text-muted">{t("totalXPBudget")}</span>
-                                <span className="accent-gold font-bold text-xl">{budget.toLocaleString()} XP</span>
+                                <span className="text-xs uppercase tracking-widest text-muted">
+                                    {useXP ? t("totalXPBudget") : "Max Beatable CR"}
+                                </span>
+                                <span className="accent-gold font-bold text-xl">
+                                    {useXP
+                                        ? `${budget.toLocaleString()} XP`
+                                        : `CR ${formatCR(crTarget(state.avgLevel, state.difficulty) * (state.partySize / 4))}`}
+                                </span>
                             </div>
-                            {primaryStatus && (
+                            {useXP && primaryStatus && (
                                 <div className="mt-2">
                                     <FilterBadge active className={primaryStatus.color}>
                                         {primaryStatus.label}
@@ -269,6 +283,23 @@ export default function CombatBalancerPage() {
                                 </div>
                             )}
                         </div>
+
+                        {coverBenefits.length > 0 && (
+                            <div className="mt-5 pt-4 border-t border-sky-400/20">
+                                <span className="text-xs uppercase tracking-widest text-sky-400/80 font-bold">Advantages / Disadvantages</span>
+                                <ul className="mt-2 flex flex-col gap-1.5">
+                                    {coverBenefits.map((b, i) => (
+                                        <li key={i} className="flex items-baseline justify-between gap-2 text-xs">
+                                            <span className="text-foreground/80 font-medium truncate">{b.partyLabel}</span>
+                                            <span className="text-sky-400 shrink-0 text-right">
+                                                {coverBenefitText(b.coverLevel)}
+                                                <span className="ml-1 font-bold opacity-70">C</span>
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </Card>
 
                     <p className="text-xs text-muted italic text-center shrink-0 pb-2">{t("calculationsNote")}</p>
@@ -278,7 +309,13 @@ export default function CombatBalancerPage() {
                 <div className="min-h-0 flex flex-col lg:overflow-hidden">
                     <Card className="flex-1 flex flex-col p-5 border-gold/10 min-h-0">
                         <SectionHeader className="mb-3! shrink-0">Battlefield</SectionHeader>
-                        <EncounterHexMap partySize={state.partySize} suggestion={mapSuggestion} mode={state.mode} />
+                        <EncounterHexMap
+                                    partySize={state.partySize}
+                                    suggestion={mapSuggestion}
+                                    mode={state.mode}
+                                    onPartyChange={(newSize) => dispatch({ type: "SET_PARTY_SIZE", payload: newSize })}
+                                    onCoverBenefits={setCoverBenefits}
+                                />
                         {mapSuggestion && (
                             <div className="shrink-0 mt-3 rounded-sm border border-gold/15 bg-gold/3 p-3">
                                 <SubLabel className="mb-1">{t("recommendedMix")}</SubLabel>
@@ -287,7 +324,7 @@ export default function CombatBalancerPage() {
                                         ? formatBossMinions(mapSuggestion as BossMinionSuggestion)
                                         : formatGroupMembers((mapSuggestion as GroupSuggestion).members)}
                                 </div>
-                                {primaryStatus && (
+                                {useXP && primaryStatus && (
                                     <div className={`text-[10px] mt-1 font-bold uppercase tracking-widest ${primaryStatus.color}`}>
                                         {primaryStatus.label} · {(mapSuggestion.fit * 100).toFixed(0)}%
                                     </div>
@@ -302,6 +339,32 @@ export default function CombatBalancerPage() {
                     <Card className="p-6 border-gold/10 shrink-0">
                         <SectionHeader>Encounter</SectionHeader>
                         <div className="flex flex-col gap-4">
+                            <FormField label="Calculation Mode">
+                                <SliderToggle
+                                    value={useXP ? "xp" : "cr"}
+                                    onChange={(v) => dispatch({ type: "SET_USE_XP", payload: v === "xp" })}
+                                    options={[
+                                        {
+                                            value: "xp" as const, title: "XP Budget",
+                                            icon: (
+                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <circle cx="12" cy="12" r="9"/>
+                                                    <path d="M12 7v10M9 9.5C9 8.1 10.3 7 12 7s3 1.1 3 2.5c0 3-6 3-6 5.5S10.8 17 12 17s3-1.1 3-2.5"/>
+                                                </svg>
+                                            ),
+                                        },
+                                        {
+                                            value: "cr" as const, title: "CR Match",
+                                            icon: (
+                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>
+                                                </svg>
+                                            ),
+                                        },
+                                    ]}
+                                />
+                            </FormField>
+
                             <FormField label={t("formation")}>
                                 <SliderToggle value={state.mode} onChange={(v) => dispatch({ type: "SET_MODE", payload: v as EncounterMode })} options={[
                                     {
@@ -324,7 +387,7 @@ export default function CombatBalancerPage() {
                                 ]} />
                             </FormField>
 
-                            <FormField label={t("budgetType")}>
+                            {useXP && <FormField label={t("budgetType")}>
                                 <SliderToggle value={state.budgetMode} onChange={(v) => dispatch({ type: "SET_BUDGET_MODE", payload: v as BudgetMode })} options={[
                                     {
                                         value: "encounter" as BudgetMode, title: t("encounterBudget"),
@@ -348,7 +411,7 @@ export default function CombatBalancerPage() {
                                         ),
                                     },
                                 ]} />
-                            </FormField>
+                            </FormField>}
 
                             {state.mode === "solo" && (
                                 <FormField label={t("includeMinions")}>
@@ -410,7 +473,9 @@ export default function CombatBalancerPage() {
                     <Card className="p-5 shrink-0">
                         <div className="flex items-baseline justify-between gap-2 mb-3">
                             <h2 className="font-serif text-lg accent-gold uppercase tracking-wide">{t("suggestedEncounters")}</h2>
-                            <span className="text-xs font-bold accent-gold shrink-0">{budget.toLocaleString()} XP</span>
+                            <span className="text-xs font-bold accent-gold shrink-0">
+                                {useXP ? `${budget.toLocaleString()} XP` : `CR ${formatCR(budget)}`}
+                            </span>
                         </div>
 
                         <div className="flex flex-wrap gap-1 mb-4">
@@ -462,20 +527,26 @@ export default function CombatBalancerPage() {
                                                         ))}
                                                     </div>
                                                     <div className="shrink-0 flex items-center gap-1.5">
-                                                        <span className="text-muted text-[10px] font-bold uppercase">{suggestion.adjustedXP.toLocaleString()} XP</span>
+                                                        {useXP && (
+                                                            <span className="text-muted text-[10px] font-bold uppercase">
+                                                                {suggestion.adjustedXP.toLocaleString()} XP
+                                                            </span>
+                                                        )}
                                                         <button
                                                             type="button"
                                                             onClick={(e) => { e.stopPropagation(); dispatch({ type: "SET_EXPANDED_IDX", payload: i }); }}
-                                                            className="text-[10px] text-gold/40 hover:text-gold transition-colors uppercase tracking-widest px-1 py-0.5 border border-gold/10 hover:border-gold/30 rounded-sm"
+                                                            className="text-[10px] text-background font-bold uppercase tracking-widest px-2 py-1 bg-gold/70 hover:bg-gold transition-colors rounded-sm"
                                                             aria-label="View monster options"
                                                         >
-                                                            Monsters
+                                                            Check Monsters
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div className={`mt-0.5 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
-                                                    {budgetStatus(suggestion.fit).label} · {(suggestion.fit * 100).toFixed(0)}%
-                                                </div>
+                                                {useXP && (
+                                                    <div className={`mt-0.5 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
+                                                        {budgetStatus(suggestion.fit).label} · {(suggestion.fit * 100).toFixed(0)}%
+                                                    </div>
+                                                )}
                                                 <BudgetBar fit={suggestion.fit} accent={state.mode === "solo" ? "gold" : "silver"} />
                                             </div>
                                         </Card>

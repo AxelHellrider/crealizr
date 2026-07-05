@@ -3,13 +3,29 @@ import { getTranslations } from "next-intl/server";
 import { ContactForm } from "./ContactForm";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
+import { buildHreflang } from "@/app/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Contact | CRealizr",
-  description: "Contact the CRealizr project team.",
-  alternates: {
-    canonical: "/contact",
-  },
+    title: "Contact the CRealizr Team",
+    description: "Get in touch with the CRealizr team — feedback, bug reports, feature requests, or just to say hello.",
+    alternates: {
+        canonical: "/contact",
+        languages: buildHreflang("/contact"),
+    },
+    openGraph: {
+        title: "Contact | CRealizr",
+        description: "Get in touch with the CRealizr team — feedback, bug reports, feature requests, or just to say hello.",
+        url: "/contact",
+        type: "website",
+        siteName: "CRealizr",
+        images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Contact | CRealizr",
+        description: "Get in touch with the CRealizr team — feedback, bug reports, or feature requests.",
+        images: ["/og-default.svg"],
+    },
 };
 
 export default async function ContactPage() {

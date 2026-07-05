@@ -10,7 +10,7 @@ interface NodeEditorPopoverProps {
     node: EncounterNode;
     x: number;
     y: number;
-    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel }) => void;
+    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number }) => void;
     onRemove: () => void;
     onClose: () => void;
 }
@@ -50,13 +50,25 @@ export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: N
                 />
 
                 {node.kind === "hazard" && (
-                    <textarea
-                        className="ui-input w-full text-xs min-h-16 bg-surface border-silver/30 text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold"
-                        placeholder="Notes"
-                        value={node.notes ?? ""}
-                        onChange={(e) => onChange({ notes: e.target.value })}
-                        aria-label="Hazard notes"
-                    />
+                    <>
+                        <textarea
+                            className="ui-input w-full text-xs min-h-16 bg-surface border-silver/30 text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold"
+                            placeholder="Notes"
+                            value={node.notes ?? ""}
+                            onChange={(e) => onChange({ notes: e.target.value })}
+                            aria-label="Hazard notes"
+                        />
+                        <Select
+                            value={node.aoeRadius}
+                            onChange={(e) => onChange({ aoeRadius: Number(e.target.value) })}
+                            aria-label="AoE radius"
+                        >
+                            <option value={0}>No AoE (single hex)</option>
+                            <option value={1}>Radius 1 (7 hexes)</option>
+                            <option value={2}>Radius 2 (19 hexes)</option>
+                            <option value={3}>Radius 3 (37 hexes)</option>
+                        </Select>
+                    </>
                 )}
 
                 {node.kind === "cover" && (
@@ -65,9 +77,9 @@ export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: N
                         onChange={(e) => onChange({ coverLevel: e.target.value as CoverLevel })}
                         aria-label="Cover level"
                     >
-                        <option value="half">Half cover</option>
-                        <option value="three-quarter">Three-quarter cover</option>
-                        <option value="full">Full cover</option>
+                        <option value="half">Half Cover (+2 AC &amp; Dex saves)</option>
+                        <option value="three-quarter">Three-Quarters Cover (+5 AC &amp; Dex saves)</option>
+                        <option value="full">Full Cover (can&apos;t be targeted)</option>
                     </Select>
                 )}
 

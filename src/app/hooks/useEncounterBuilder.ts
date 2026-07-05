@@ -13,10 +13,12 @@ import {
     type BudgetMode,
     type BossMinionSuggestion,
     type GroupSuggestion,
+    crTarget,
 } from "@/app/services/encounterService";
 import type { Monster, Terrain, Affiliation } from "@/app/types/monster";
 
 export type { RelationCriteria, EncounterMode, Difficulty, Ruleset, BudgetMode, BossMinionSuggestion, GroupSuggestion };
+export { crTarget };
 
 type State = {
     partySize: number;
@@ -27,6 +29,7 @@ type State = {
     budgetMode: BudgetMode;
     groupTypes: number;
     includeMinions: boolean;
+    useXP: boolean;
     relationCriteria: RelationCriteria;
     filterTerrain: Terrain | "";
     filterAffiliation: Affiliation | "";
@@ -44,6 +47,7 @@ type Action =
     | { type: "SET_BUDGET_MODE"; payload: BudgetMode }
     | { type: "SET_GROUP_TYPES"; payload: number }
     | { type: "SET_INCLUDE_MINIONS"; payload: boolean }
+    | { type: "SET_USE_XP"; payload: boolean }
     | { type: "SET_RELATION_CRITERIA"; payload: RelationCriteria }
     | { type: "SET_FILTER_TERRAIN"; payload: Terrain | "" }
     | { type: "SET_FILTER_AFFILIATION"; payload: Affiliation | "" }
@@ -61,6 +65,7 @@ function reducer(state: State, action: Action): State {
         case "SET_BUDGET_MODE":      return { ...state, budgetMode: action.payload, selectedIdx: 0 };
         case "SET_GROUP_TYPES":      return { ...state, groupTypes: action.payload, selectedIdx: 0 };
         case "SET_INCLUDE_MINIONS":  return { ...state, includeMinions: action.payload, selectedIdx: 0 };
+        case "SET_USE_XP":           return { ...state, useXP: action.payload, selectedIdx: 0 };
         case "SET_RELATION_CRITERIA":return { ...state, relationCriteria: action.payload, selectedIdx: 0 };
         case "SET_FILTER_TERRAIN":   return { ...state, filterTerrain: action.payload, selectedIdx: 0 };
         case "SET_FILTER_AFFILIATION":return { ...state, filterAffiliation: action.payload, selectedIdx: 0 };
@@ -84,6 +89,7 @@ function initState(searchParams: URLSearchParams): State {
         budgetMode: "encounter",
         groupTypes: 2,
         includeMinions: false,
+        useXP: true,
         relationCriteria: (["any", "terrain", "affiliation", "genus"].includes(relation ?? "") ? relation : "any") as RelationCriteria,
         filterTerrain: (searchParams.get("filterTerrain") as Terrain) || "",
         filterAffiliation: "",
@@ -115,6 +121,7 @@ export function useEncounterBuilder() {
         includeMinions: state.includeMinions,
         groupTypes: state.groupTypes,
         relationCriteria: state.relationCriteria,
+        useXP: state.useXP,
     };
 
     const { budget, soloSuggestions, groupSuggestions } = useMemo(
@@ -124,7 +131,7 @@ export function useEncounterBuilder() {
         [
             state.avgLevel, state.partySize, state.difficulty, state.ruleset,
             state.budgetMode, state.includeMinions, state.groupTypes,
-            state.relationCriteria, catalog,
+            state.relationCriteria, state.useXP, catalog,
         ],
     );
 
@@ -174,5 +181,6 @@ export function useEncounterBuilder() {
         hasActiveFilter,
         activeFilterLabel,
         showRelationControls,
+        useXP: state.useXP,
     };
 }

@@ -32,12 +32,22 @@ export function SeoJsonLd() {
     operatingSystem: "Web",
     url: baseUrl,
     description:
-      "Encounter builder, monster scaler, and artifact forge for D&D 5e with 2014/2024 rules support.",
+      "Free D&D 5e toolkit for dungeon masters: build balanced encounters with a live hex battlefield, scale monsters by CR, generate travel encounters, and forge magic items. Supports 2014 and 2024 rulesets.",
+    keywords: "D&D encounter builder, monster scaler, 5e DM tools, encounter calculator, CR scaling",
     offers: {
       "@type": "Offer",
       price: "0",
       priceCurrency: "USD",
     },
+    featureList: [
+      "Encounter builder with XP budget and CR match modes",
+      "Interactive hex battlefield with AoE hazards and cover rules",
+      "Monster CR scaler with statblock export",
+      "Travel encounter generator by terrain",
+      "Magic item and artifact forge",
+      "Custom homebrew monster library",
+      "D&D 2014 and 2024 ruleset support",
+    ],
   });
 
   const data = [website, software];

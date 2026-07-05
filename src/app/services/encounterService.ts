@@ -1,7 +1,11 @@
 import {
     partyBudget,
+    crTarget,
+    crBudgetForParty,
     suggestBossWithMinions,
+    suggestBossWithMinionsCR,
     suggestGroupEncounters,
+    suggestGroupEncountersCR,
     type Difficulty,
     type Ruleset,
     type BudgetMode,
@@ -25,6 +29,7 @@ export type EncounterServiceOpts = {
     includeMinions: boolean;
     groupTypes: number;
     relationCriteria: RelationCriteria;
+    useXP: boolean;
 };
 
 export type EncounterServiceResult = {
@@ -37,6 +42,29 @@ export function buildEncounterSuggestions(
     opts: EncounterServiceOpts,
     catalog: readonly Monster[],
 ): EncounterServiceResult {
+    if (!opts.useXP) {
+        const budget = crBudgetForParty(opts.level, opts.size, opts.difficulty);
+        const soloSuggestions = suggestBossWithMinionsCR({
+            level: opts.level,
+            size: opts.size,
+            difficulty: opts.difficulty,
+            ruleset: opts.ruleset,
+            includeMinions: opts.includeMinions,
+            relationCriteria: opts.relationCriteria,
+            catalog,
+        });
+        const groupSuggestions = suggestGroupEncountersCR({
+            level: opts.level,
+            size: opts.size,
+            difficulty: opts.difficulty,
+            ruleset: opts.ruleset,
+            maxTypes: opts.groupTypes,
+            relationCriteria: opts.relationCriteria,
+            catalog,
+        });
+        return { budget, soloSuggestions, groupSuggestions };
+    }
+
     const budget = partyBudget({
         level: opts.level,
         size: opts.size,
@@ -69,3 +97,5 @@ export function buildEncounterSuggestions(
 
     return { budget, soloSuggestions, groupSuggestions };
 }
+
+export { crTarget };

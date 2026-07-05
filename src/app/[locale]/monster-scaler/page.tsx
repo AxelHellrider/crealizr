@@ -11,7 +11,6 @@ import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
 import { InfoGrid } from "@/app/components/molecules/InfoGrid";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
-import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
@@ -64,8 +63,9 @@ export default function ScalePage() {
             {!scaledMonster && (
                 <div className="grid gap-8">
                     <PageHeader title={t("title")} description={t("description")}>
-                        <WhyDifferent className="mt-3 lg:mt-0" />
-                        <a href="/monster-scaler/docs" className="ui-link text-sm italic">{t("viewDocs")}</a>
+                        <Link href={'/monster-scaler/docs'} className="ui-link text-sm italic">
+                            {t("viewDocs")}
+                        </Link>
                     </PageHeader>
 
                     <Card className="p-6 border-gold/10">
@@ -266,7 +266,7 @@ export default function ScalePage() {
             )}
 
             <div className="hidden lg:block pt-4">
-                <a href="/monster-scaler/docs" className="ui-link text-sm italic inline-flex justify-center w-full">{t("viewDocs")}</a>
+                <Link href={'/monster-scaler/docs'} className={"ui-link text-sm italic inline-flex justify-center w-full"}>{t("viewDocs")}</Link>
             </div>
         </PageSection>
     );

@@ -1,4 +1,5 @@
 import type {Metadata} from "next";
+import { buildHreflang } from "@/app/lib/seo";
 import {Geist, Geist_Mono, Cinzel} from "next/font/google";
 import {GoogleAnalytics} from "@next/third-parties/google";
 import {NextIntlClientProvider} from 'next-intl';
@@ -37,43 +38,51 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://crealizr.net";
 
-export const metadata: Metadata = {
-    metadataBase: new URL(siteUrl),
-    title: "CRealizr | Dungeons & Dragons Toolkit",
-    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
-    applicationName: "CRealizr",
-    category: "Game",
-    manifest: "/manifest.json",
-    icons: {
-        icon: "/crealizr_favicon.svg",
-        shortcut: "/crealizr_favicon.svg",
-        apple: "/crealizr_favicon.svg",
-    },
-    appleWebApp: {
-        capable: true,
-        statusBarStyle: "black-translucent",
-        title: "CRealizr",
-    },
-    alternates: {
-        canonical: "/",
-    },
-    openGraph: {
-        type: "website",
-        url: "/",
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+    return {
+        metadataBase: new URL(siteUrl),
         title: "CRealizr | Dungeons & Dragons Toolkit",
-        description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
-        images: [{url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr Toolkit"}],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "CRealizr | Dungeons & Dragons Toolkit",
-        description: "DM-first D&D toolkit to build encounters, scale monsters, and forge artifacts with export-ready outputs.",
-        images: ["/og-default.svg"],
-    },
-    other: {
-        "mobile-web-app-capable": "yes",
-    },
-};
+        description: "DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.",
+        applicationName: "CRealizr",
+        category: "Game",
+        manifest: "/manifest.json",
+        icons: {
+            icon: "/crealizr_favicon.svg",
+            shortcut: "/crealizr_favicon.svg",
+            apple: "/crealizr_favicon.svg",
+        },
+        appleWebApp: {
+            capable: true,
+            statusBarStyle: "black-translucent",
+            title: "CRealizr",
+        },
+        alternates: {
+            canonical: `/${locale}`,
+            languages: buildHreflang("/"),
+        },
+        openGraph: {
+            type: "website",
+            url: `/${locale}`,
+            title: "CRealizr | Dungeons & Dragons Toolkit",
+            description: "DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.",
+            images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr Toolkit" }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "CRealizr | Dungeons & Dragons Toolkit",
+            description: "DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.",
+            images: ["/og-default.svg"],
+        },
+        other: {
+            "mobile-web-app-capable": "yes",
+        },
+    };
+}
 
 export default async function LocaleLayout({
                                                children,

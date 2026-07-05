@@ -48,7 +48,14 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-    reactCompiler: process.env.REACT_COMPILER === "true",
+    // React Compiler: on in production, opt-in in dev via env var
+    reactCompiler: process.env.NODE_ENV === "production" || process.env.REACT_COMPILER === "true",
+    poweredByHeader: false,
+    compress: true,
+    experimental: {
+        // Tree-shake heavy packages to reduce client bundle
+        optimizePackageImports: ["framer-motion"],
+    },
     async redirects() {
         return [
             { source: "/scale",               destination: "/monster-scaler",       permanent: true },

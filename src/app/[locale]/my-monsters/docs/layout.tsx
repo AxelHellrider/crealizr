@@ -1,39 +1,49 @@
 import type { Metadata } from "next";
+import { buildHreflang } from "@/app/lib/seo";
 
-const title = "My Monsters Docs – Field Reference | CRealizr";
+const title = "My Monsters – Field Reference | CRealizr";
 const description =
-  "Documentation for the My Monsters page: what each field means, how monsters integrate with other CRealizr tools, and import/export guidance.";
+    "Field reference for the CRealizr custom monster library: stat fields, terrain and affiliation tags, JSON import/export format, and integration with other tools.";
 
-export const metadata: Metadata = {
-  title,
-  description,
-  keywords: [
-    "my monsters docs",
-    "homebrew monster fields",
-    "D&D 5e monster creator",
-    "CRealizr monster reference",
-  ],
-  alternates: {
-    canonical: "/my-monsters/docs",
-  },
-  openGraph: {
-    title,
-    description,
-    url: "/my-monsters/docs",
-    type: "website",
-    siteName: "CRealizr",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title,
+        description,
+        keywords: [
+            "homebrew monster fields D&D",
+            "custom monster creator docs",
+            "D&D 5e monster JSON",
+            "CRealizr monster reference",
+            "homebrew statblock fields",
+        ],
+        alternates: {
+            canonical: "/my-monsters/docs",
+            languages: buildHreflang("/my-monsters/docs"),
+        },
+        openGraph: {
+            title,
+            description,
+            url: "/my-monsters/docs",
+            type: "website",
+            siteName: "CRealizr",
+            images: [
+                {
+                    url: "/og-default.svg",
+                    width: 1200,
+                    height: 630,
+                    alt: "CRealizr My Monsters field reference",
+                },
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: ["/og-default.svg"],
+        },
+    };
+}
 
-export default function MyMonstersDocsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function MyMonstersDocsLayout({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
 }

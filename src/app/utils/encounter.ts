@@ -395,6 +395,166 @@ export function suggestBossWithMinions(opts: {
         .slice(0, 12);
 }
 
+// ── Shared combinatorics helpers ────────────────────────────────────────────
+function buildCompositions(total: number, parts: number, min = 1): number[][] {
+    if (parts === 1) return total >= min ? [[total]] : [];
+    const combos: number[][] = [];
+    for (let i = min; i <= total - (parts - 1) * min; i++) {
+        buildCompositions(total - i, parts - 1, min).forEach(tail => combos.push([i, ...tail]));
+    }
+    return combos;
+}
+
+function buildCombinations<T>(arr: T[], size: number, start = 0, path: T[] = [], out: T[][] = []): T[][] {
+    if (path.length === size) { out.push([...path]); return out; }
+    for (let i = start; i <= arr.length - (size - path.length); i++) {
+        path.push(arr[i]);
+        buildCombinations(arr, size, i + 1, path, out);
+        path.pop();
+    }
+    return out;
+}
+
+// ── CR-based encounter math ──────────────────────────────────────────────────
+const CR_DIFFICULTY_OFFSET: Record<Difficulty, number> = {
+    easy: -2, medium: 0, hard: 1, deadly: 3,
+};
+
+/** Target CR for a single-monster encounter at the given level and difficulty. */
+export function crTarget(level: number, difficulty: Difficulty): number {
+    return Math.max(0.125, level + CR_DIFFICULTY_OFFSET[difficulty]);
+}
+
+/**
+ * Threat weight of an encounter expressed in CR units.
+ * Mirrors the XP adjusted-XP formula but in CR space (no XP lookup needed).
+ */
+export function crEncounterWeight(members: { cr: number; count: number }[]): number {
+    const totalCount = members.reduce((s, m) => s + m.count, 0);
+    const totalCR    = members.reduce((s, m) => s + m.cr * m.count, 0);
+    return totalCR * Math.sqrt(encounterMultiplier(totalCount));
+}
+
+/**
+ * CR-mode "budget": the CR threat level this party can handle for the given
+ * difficulty, scaled by party size relative to the canonical 4-player baseline.
+ */
+export function crBudgetForParty(level: number, size: number, difficulty: Difficulty): number {
+    return crTarget(level, difficulty) * (size / 4);
+}
+
+export function suggestBossWithMinionsCR(opts: {
+    level: number;
+    size: number;
+    difficulty: Difficulty;
+    ruleset: Ruleset;
+    includeMinions: boolean;
+    relationCriteria?: "terrain" | "affiliation" | "genus" | "any";
+    catalog?: readonly Monster[];
+}): BossMinionSuggestion[] {
+    const target = crTarget(opts.level, opts.difficulty);
+    const budget = crBudgetForParty(opts.level, opts.size, opts.difficulty);
+    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
+    const allCRs = Object.keys(rulesetXP).map(Number).sort((a, b) => a - b);
+
+    // Boss CRs: slightly above target up to +4, and slightly below (min 0.125)
+    const bossCRs = allCRs.filter(cr => cr >= Math.max(0.125, target - 1) && cr <= target + 4);
+    const results: BossMinionSuggestion[] = [];
+
+    for (const bossCR of bossCRs) {
+        const xpEach = rulesetXP[String(bossCR)];
+
+        if (!opts.includeMinions) {
+            const weight = crEncounterWeight([{ cr: bossCR, count: 1 }]);
+            const fit = Math.min(budget, weight) / Math.max(budget, weight);
+            if (fit >= 0.5) {
+                results.push({ boss: { cr: bossCR, count: 1, xpEach }, minions: [], totalCount: 1, adjustedXP: Math.round(weight * 100) / 100, fit });
+            }
+            continue;
+        }
+
+        const bossMonster = pickMonsterManualBenchmark(bossCR, opts.level * 31, opts.ruleset, opts.catalog);
+        const related = getRelatedMonsters(bossMonster, opts.relationCriteria ?? "any", opts.ruleset, opts.catalog);
+        const minionCRs = [...new Set(related.map(m => m.cr))]
+            .filter(cr => cr < bossCR && cr >= 0.125 && rulesetXP[String(cr)] !== undefined)
+            .sort((a, b) => a - b);
+
+        for (const minionCR of minionCRs) {
+            const minionXP = rulesetXP[String(minionCR)];
+            for (let n = 1; n <= opts.size + 2; n++) {
+                const members = [{ cr: bossCR, count: 1 }, { cr: minionCR, count: n }];
+                const weight = crEncounterWeight(members);
+                const fit = Math.min(budget, weight) / Math.max(budget, weight);
+                if (fit >= 0.5) {
+                    results.push({ boss: { cr: bossCR, count: 1, xpEach }, minions: [{ cr: minionCR, count: n, xpEach: minionXP }], totalCount: 1 + n, adjustedXP: Math.round(weight * 100) / 100, fit });
+                }
+            }
+        }
+    }
+
+    return results
+        .sort((a, b) => (b.fit - a.fit) || (a.totalCount - b.totalCount))
+        .slice(0, 12);
+}
+
+export function suggestGroupEncountersCR(opts: {
+    level: number;
+    size: number;
+    difficulty: Difficulty;
+    ruleset: Ruleset;
+    maxTypes?: number;
+    relationCriteria?: "terrain" | "affiliation" | "genus" | "any";
+    catalog?: readonly Monster[];
+}): GroupSuggestion[] {
+    const target = crTarget(opts.level, opts.difficulty);
+    const budget = crBudgetForParty(opts.level, opts.size, opts.difficulty);
+    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
+
+    // Candidates: CRs within a ×4 range of the target
+    let candidates = Object.entries(rulesetXP)
+        .map(([cr, xp]) => ({ cr: Number(cr), xp }))
+        .filter(({ cr }) => cr >= Math.max(0.125, target * 0.25) && cr <= target * 4);
+
+    if (candidates.length === 0) return [];
+
+    const relationCriteria = opts.relationCriteria ?? "any";
+    if (relationCriteria !== "any") {
+        const baseMonster = pickMonsterManualBenchmark(candidates[0].cr, opts.level * 31, opts.ruleset, opts.catalog);
+        const related = getRelatedMonsters(baseMonster, relationCriteria, opts.ruleset, opts.catalog);
+        const relatedCRs = new Set(related.map(m => m.cr));
+        candidates = candidates.filter(c => relatedCRs.has(c.cr));
+        if (candidates.length === 0) return [];
+    }
+
+    const results: GroupSuggestion[] = [];
+    const seen = new Set<string>();
+    const maxTypes = Math.min(5, Math.max(2, opts.maxTypes ?? 2));
+
+    for (let n = 2; n <= 8; n++) {
+        for (let typeCount = 2; typeCount <= Math.min(maxTypes, n, candidates.length); typeCount++) {
+            const crCombos = buildCombinations(candidates, typeCount);
+            const compositions = buildCompositions(n, typeCount);
+            for (const combo of crCombos) {
+                for (const counts of compositions) {
+                    const members = combo.map((entry, idx) => ({ cr: entry.cr, count: counts[idx], xpEach: entry.xp }));
+                    const weight = crEncounterWeight(members);
+                    const fit = Math.min(budget, weight) / Math.max(budget, weight);
+                    if (fit >= 0.5) {
+                        const key = members.map(m => `${m.cr}x${m.count}`).join("|");
+                        if (seen.has(key)) continue;
+                        seen.add(key);
+                        results.push({ members, totalCount: n, adjustedXP: Math.round(weight * 100) / 100, fit });
+                    }
+                }
+            }
+        }
+    }
+
+    return results
+        .sort((a, b) => (b.fit - a.fit) || (a.adjustedXP - b.adjustedXP))
+        .slice(0, 12);
+}
+
 export function suggestGroupEncounters(opts: {
     level: number;
     size: number;
@@ -413,31 +573,6 @@ export function suggestGroupEncounters(opts: {
     const seen = new Set<string>();
     const maxTypes = Math.min(5, Math.max(2, opts.maxTypes ?? 2));
     const relationCriteria = opts.relationCriteria || "any";
-
-    const buildCompositions = (total: number, parts: number, min: number = 1): number[][] => {
-        if (parts === 1) {
-            return total >= min ? [[total]] : [];
-        }
-        const combos: number[][] = [];
-        for (let i = min; i <= total - (parts - 1) * min; i += 1) {
-            const tails = buildCompositions(total - i, parts - 1, min);
-            tails.forEach((tail) => combos.push([i, ...tail]));
-        }
-        return combos;
-    };
-
-    const buildCombinations = <T>(arr: T[], size: number, start = 0, path: T[] = [], out: T[][] = []) => {
-        if (path.length === size) {
-            out.push([...path]);
-            return out;
-        }
-        for (let i = start; i <= arr.length - (size - path.length); i += 1) {
-            path.push(arr[i]);
-            buildCombinations(arr, size, i + 1, path, out);
-            path.pop();
-        }
-        return out;
-    };
 
     for (let n = 2; n <= 8; n++) {
         const multiplier = encounterMultiplier(n);

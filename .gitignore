@@ -3,6 +3,10 @@
 # dependencies
 /node_modules
 /.pnp
+/.agents
+/.claude
+/.codex
+/.idea
 .pnp.*
 .yarn/*
 !.yarn/patches

@@ -11,7 +11,6 @@ import { Tag } from "@/app/components/molecules/Tag";
 import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
-import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { ItemPreviewCard } from "./_components/ItemPreviewCard";
@@ -73,7 +72,6 @@ export default function ItemCreatorPage() {
     return (
         <PageSection>
             <PageHeader title={t("title")} description={t("description")}>
-                <WhyDifferent className="mt-3 lg:mt-0" />
                 <a href="/artifact-forge/docs" className="ui-link text-sm italic">{t("viewDocs")}</a>
             </PageHeader>
 

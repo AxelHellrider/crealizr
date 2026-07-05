@@ -6,7 +6,6 @@ import { Select } from "@/app/components/atoms/Select";
 import { Button } from "@/app/components/atoms/Button";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
-import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { useTravelEncounters, TERRAINS, type EncounterType } from "@/app/hooks/useTravelEncounters";
@@ -28,7 +27,6 @@ export default function EncountersEnRoutePage() {
     return (
         <PageSection>
             <PageHeader title={t("title")} description={t("description")}>
-                <WhyDifferent className="mt-3 lg:mt-0" />
             </PageHeader>
 
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">

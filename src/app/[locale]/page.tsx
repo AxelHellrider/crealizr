@@ -1,39 +1,44 @@
 import {Metadata, Viewport} from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { buildHreflang } from "@/app/lib/seo";
 
 import { Card } from "@/app/components/atoms/Card";
 import { Button } from "@/app/components/atoms/Button";
-import { WhyDifferent } from "@/app/components/atoms/WhyDifferent";
 
 export const metadata: Metadata = {
-    title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
-    description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
+    title: "CRealizr — Free D&D 5e DM Toolkit | Encounter Builder, Monster Scaler",
+    description: "Free D&D 5e toolkit for dungeon masters. Build balanced encounters with a live hex battlefield, scale monsters by CR, generate travel encounters, and forge magic items. Supports 2014 and 2024 rulesets.",
     keywords: [
-      "D&D encounter builder",
-      "monster scaler",
-      "5e encounter balance",
-      "DM tools",
-      "D&D 2014 rules",
-      "D&D 2024 rules",
-      "magic item generator",
-      "statblock export",
+        "D&D encounter builder",
+        "D&D encounter calculator",
+        "monster CR scaler",
+        "5e encounter balance tool",
+        "dungeon master tools free",
+        "D&D DM toolkit",
+        "D&D 2014 rules",
+        "D&D 2024 rules",
+        "magic item generator 5e",
+        "D&D encounter difficulty",
+        "hex map D&D",
     ],
     alternates: {
-      canonical: "/",
+        canonical: "/",
+        languages: buildHreflang("/"),
     },
     openGraph: {
-      title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
-      description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
-      url: "/",
-      type: "website",
-      images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr D&D toolkit preview" }],
+        title: "CRealizr — Free D&D 5e DM Toolkit",
+        description: "Free D&D 5e toolkit for dungeon masters. Build balanced encounters with a live hex battlefield, scale monsters by CR, and forge magic items.",
+        url: "/",
+        type: "website",
+        siteName: "CRealizr",
+        images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr — free D&D 5e DM toolkit" }],
     },
     twitter: {
-      card: "summary_large_image",
-      title: "CRealizr D&D Toolkit | Encounters, Scaling, Items",
-      description: "DM-first D&D toolkit to build encounters, scale monsters, and forge magic items with export-ready outputs and 2014/2024 support.",
-      images: ["/og-default.svg"],
+        card: "summary_large_image",
+        title: "CRealizr — Free D&D 5e DM Toolkit",
+        description: "Free D&D 5e toolkit: encounter builder, monster scaler, travel encounters, and artifact forge. Supports 2014 and 2024 rules.",
+        images: ["/og-default.svg"],
     },
 };
 
@@ -64,7 +69,6 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
           <p className="mt-6 text-base lg:text-2xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-light">
             {t("home.hero.description")}
           </p>
-          <WhyDifferent className="mt-6" />
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link href={`/${locale}/encounter-builder`}>
               <Button variant="primary" className="px-10 py-4 text-base lg:text-lg uppercase font-serif tracking-widest">

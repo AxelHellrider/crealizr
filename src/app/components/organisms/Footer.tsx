@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import {useLocale} from 'next-intl';
+import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
+import { version } from "../../../../package.json";
 
 export default function Footer() {
     const locale = useLocale();
@@ -12,7 +14,7 @@ export default function Footer() {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     {/* Brand */}
                     <div className="space-y-2">
-                        <h2 className="text-xl font-serif accent-gold uppercase tracking-[0.2em]">CRealizr</h2>
+                        <CrealizrLogo className="hidden lg:block w-full h-12" />
                         <p className="text-sm text-muted">
                             DM-first D&D toolkit
                         </p>
@@ -24,16 +26,17 @@ export default function Footer() {
                         <Link href={`/${locale}/monster-scaler`} className="ui-link transition uppercase hover:text-gold">Monster Scaler</Link>
                         <Link href={`/${locale}/travel-encounters`} className="ui-link transition uppercase hover:text-gold">Travel Encounters</Link>
                         <Link href={`/${locale}/artifact-forge`} className="ui-link transition uppercase hover:text-gold">Artifact Forge</Link>
+                        <Link href={`/${locale}/my-monsters`} className="ui-link transition uppercase hover:text-gold">My Monsters</Link>
                         <a href="https://github.com/AxelHellrider" target="_blank" rel="noreferrer" className="ui-link transition uppercase hover:text-gold">GitHub</a>
                     </nav>
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-gold/10 flex flex-col lg:flex-row justify-between items-center gap-4">
                     <p className="text-xs text-muted">
-                        Version 0.9 · Validated for 2014 & 2024 SRD
+                        v{version} · Validated for 2014 & 2024 SRD – Not affiliated with Wizards of the Coast
                     </p>
                     <p className="text-xs text-muted">
-                        © {new Date().getFullYear()} Alexandros Nomikos — All Rights Reserved
+                        © {new Date().getFullYear()} CRealizr — All Rights Reserved
                     </p>
                 </div>
             </div>
