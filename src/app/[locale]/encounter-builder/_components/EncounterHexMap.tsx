@@ -130,6 +130,20 @@ function nodeLabel(node: EncounterNode): string {
     }
 }
 
+// ── Marquee selection box overlay ────────────────────────────────────────────
+function MarqueeBox({ marquee }: { marquee: { x0: number; y0: number; x1: number; y1: number } }) {
+    const left   = Math.min(marquee.x0, marquee.x1);
+    const top    = Math.min(marquee.y0, marquee.y1);
+    const width  = Math.abs(marquee.x1 - marquee.x0);
+    const height = Math.abs(marquee.y1 - marquee.y0);
+    return (
+        <div
+            className="absolute pointer-events-none border border-gold/70 bg-gold/10"
+            style={{ left, top, width, height }}
+        />
+    );
+}
+
 // ── Keyboard legend overlay (desktop only) ──────────────────────────────────
 function KeyboardLegend({ mode, cameraLocked }: { mode: MapMode; cameraLocked: boolean }) {
     const items = [
@@ -139,6 +153,8 @@ function KeyboardLegend({ mode, cameraLocked }: { mode: MapMode; cameraLocked: b
         { keys: "C",   label: "Cover",         active: mode === "place-cover" },
         { keys: "L",   label: "Lock Cam",     active: cameraLocked },
         { keys: "+/−", label: "Zoom",         active: false },
+        { keys: "⇧+drag", label: "Multi-select", active: false },
+        { keys: "Del", label: "Delete sel.",  active: false },
         { keys: "Esc", label: "Reset",        active: false },
     ];
     return (
@@ -179,6 +195,21 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
     const dragStartPos    = useRef<Map<string, { x: number; y: number }>>(new Map());
     const isDraggingMulti = useRef(false);
     const resizeObserver  = useRef<ResizeObserver | null>(null);
+
+    // Marquee (rubber-band) multiselect — drag with Shift held over empty canvas.
+    const [marquee, setMarquee] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+    const marqueeActive    = useRef(false);
+    const justMarqueedRef  = useRef(false);
+
+    // Kept fresh via effects so the mount-only keydown handler can read current values.
+    const selectedIdsRef   = useRef(selectedIds);
+    const nodesRef         = useRef(layout.nodes);
+    const editingIdRef     = useRef(editingId);
+    const onPartyChangeRef = useRef(onPartyChange);
+    useEffect(() => { selectedIdsRef.current = selectedIds; }, [selectedIds]);
+    useEffect(() => { nodesRef.current = layout.nodes; }, [layout.nodes]);
+    useEffect(() => { editingIdRef.current = editingId; }, [editingId]);
+    useEffect(() => { onPartyChangeRef.current = onPartyChange; }, [onPartyChange]);
 
     // Callback ref — properly tears down / re-attaches ResizeObserver as the
     // normal container mounts/unmounts (e.g. when entering fullscreen).
@@ -235,6 +266,28 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                     setMapMode("select");
                     setCameraLocked(false);
                     break;
+                case "Delete": case "Backspace": {
+                    const ids = selectedIdsRef.current;
+                    if (ids.size === 0) break;
+                    e.preventDefault();
+                    let removedParty = 0;
+                    for (const id of ids) {
+                        const n = nodesRef.current.find(nd => nd.id === id);
+                        if (n?.kind === "party") removedParty++;
+                        nodeGroupRefs.current.delete(id);
+                        layout.removeNode(id);
+                    }
+                    if (removedParty > 0) {
+                        const count = nodesRef.current.filter(nd => nd.kind === "party").length;
+                        onPartyChangeRef.current?.(Math.max(1, count - removedParty));
+                    }
+                    if (editingIdRef.current && ids.has(editingIdRef.current)) {
+                        setEditingId(null);
+                        setPopoverPos(null);
+                    }
+                    setSelectedIds(new Set());
+                    break;
+                }
             }
         };
         document.addEventListener("keydown", onKey);
@@ -353,10 +406,61 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
     };
 
     const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
+        if (justMarqueedRef.current) { justMarqueedRef.current = false; return; }
         if (e.target !== e.target.getStage()) return;
         setSelectedIds(new Set());
         setEditingId(null);
         setPopoverPos(null);
+    };
+
+    // ── Marquee (shift + drag) multiselect ───────────────────────────────────
+    const handleStageMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+        if (e.target !== e.target.getStage() || !e.evt.shiftKey) return;
+        const stage = e.target.getStage();
+        const pos = stage?.getPointerPosition();
+        if (!stage || !pos) return;
+        e.evt.preventDefault();
+        stage.draggable(false);
+        marqueeActive.current = true;
+        setMarquee({ x0: pos.x, y0: pos.y, x1: pos.x, y1: pos.y });
+    };
+
+    const handleStageMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+        if (!marqueeActive.current) return;
+        const pos = e.target.getStage()?.getPointerPosition();
+        if (!pos) return;
+        setMarquee(m => (m ? { ...m, x1: pos.x, y1: pos.y } : m));
+    };
+
+    const endMarquee = (e: KonvaEventObject<MouseEvent>) => {
+        if (!marqueeActive.current) return;
+        marqueeActive.current = false;
+        const stage = e.target.getStage();
+        stage?.draggable(!isPinching && !cameraLocked);
+
+        setMarquee(current => {
+            if (current) {
+                const left   = Math.min(current.x0, current.x1);
+                const right  = Math.max(current.x0, current.x1);
+                const top    = Math.min(current.y0, current.y1);
+                const bottom = Math.max(current.y0, current.y1);
+                const wLeft   = (left   - stagePos.x) / scale;
+                const wRight  = (right  - stagePos.x) / scale;
+                const wTop    = (top    - stagePos.y) / scale;
+                const wBottom = (bottom - stagePos.y) / scale;
+                const hitIds = layout.nodes
+                    .filter(n => {
+                        const [cx, cy] = hexCenter(n.coord.col, n.coord.row);
+                        return cx >= wLeft && cx <= wRight && cy >= wTop && cy <= wBottom;
+                    })
+                    .map(n => n.id);
+                if (hitIds.length) {
+                    justMarqueedRef.current = true;
+                    setSelectedIds(prev => new Set([...prev, ...hitIds]));
+                }
+            }
+            return null;
+        });
     };
 
     const handleBackgroundClick = (coord: GridCoord, e: KonvaEventObject<Event>) => {
@@ -489,6 +593,10 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
             onWheel={handleWheel}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onMouseDown={handleStageMouseDown}
+            onMouseMove={handleStageMouseMove}
+            onMouseUp={endMarquee}
+            onMouseLeave={endMarquee}
         >
             <Layer>
                 {bgCells.map(({ coord, cx, cy }) => (
@@ -603,6 +711,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                         className="relative flex-1 min-h-0 overflow-hidden rounded-sm border border-gold/10 bg-black/10 touch-none"
                     >
                         {stageJSX}
+                        {marquee && <MarqueeBox marquee={marquee} />}
                         <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} />
                         {mapMode !== "select" && (
                             <div className="absolute bottom-2 left-2 pointer-events-none select-none text-[8px] text-muted/50 italic hidden sm:block">
@@ -659,6 +768,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                     {/* Canvas */}
                     <div className="flex-1 min-h-0 relative overflow-hidden touch-none">
                         {stageJSX}
+                        {marquee && <MarqueeBox marquee={marquee} />}
                         <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} />
                     </div>
 

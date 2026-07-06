@@ -125,10 +125,6 @@ h1, h2, h3, h4, .font-serif {
   position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.neo-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
-}
 .neo-card::after {
   content: "";
   position: absolute;
@@ -226,10 +222,6 @@ h1, h2, h3, h4, .font-serif {
 }
 
 /* ─── Performance ──────────────────────────────────────────────────────── */
-section, .neo-card {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 200px;
-}
 
 /* ─── Route progress bar ───────────────────────────────────────────────── */
 .top-progress {

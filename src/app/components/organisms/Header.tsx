@@ -17,6 +17,7 @@ export default function Header() {
                 </Link>
                 <button
                     type="button"
+                    data-sidebar-toggle
                     onClick={toggle}
                     aria-label={isOpen ? "Close menu" : "Open menu"}
                     aria-expanded={isOpen}

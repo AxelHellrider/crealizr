@@ -1,6 +1,6 @@
 {
   "name": "crealizr",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "release": "node scripts/release.js",
+    "release:dry": "node scripts/release.js --dry-run"
   },
   "engines": {
     "node": ">=20 <=22.x"

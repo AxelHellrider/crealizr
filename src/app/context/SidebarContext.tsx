@@ -22,16 +22,19 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
-  // Close sidebar when clicking outside
+  // Close sidebar when clicking outside.
+  // Any toggle button (desktop SidebarToggle, mobile Header hamburger) must
+  // carry data-sidebar-toggle so its own mousedown isn't treated as "outside" —
+  // otherwise mousedown closes the sidebar here and the button's own click
+  // handler immediately reopens it (only reproducible where mousedown fires
+  // ahead of click, e.g. iOS Safari's synthetic tap event order).
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
       const sidebar = document.getElementById("sidebar");
-      const toggle = document.getElementById("sidebar-toggle");
-      if (sidebar && toggle &&
-          !sidebar.contains(e.target as Node) &&
-          !toggle.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+      if (!sidebar || sidebar.contains(target)) return;
+      if ((target as Element).closest?.("[data-sidebar-toggle]")) return;
+      setIsOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);

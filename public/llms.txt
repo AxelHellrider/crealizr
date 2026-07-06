@@ -1,0 +1,26 @@
+# CRealizr
+
+> DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.
+
+CRealizr is a free browser-based toolkit for Dungeons & Dragons Dungeon Masters. It offers deterministic, rules-accurate calculations (no LLM guessing) for encounter balancing, monster scaling, and magic item generation.
+
+## Tools
+
+- [Encounter Builder](https://crealizr.net/en/encounter-builder): Build balanced combat encounters with XP budgeting, difficulty thresholds, and a visual battle-map editor supporting AoE hazards and cover.
+- [Monster Scaler](https://crealizr.net/en/monster-scaler): Scale a monster's stat block up or down to a target Challenge Rating while preserving its identity.
+- [Travel Encounters](https://crealizr.net/en/travel-encounters): Generate random travel/exploration encounters filtered by terrain and type.
+- [Artifact Forge](https://crealizr.net/en/artifact-forge): Generate custom magic items with balanced rarity and properties.
+- [My Monsters](https://crealizr.net/en/my-monsters): Create, store, and manage custom monster stat blocks locally.
+
+## Documentation
+
+- [Encounter Builder docs](https://crealizr.net/en/encounter-builder/docs)
+- [Monster Scaler docs](https://crealizr.net/en/monster-scaler/docs)
+- [Artifact Forge docs](https://crealizr.net/en/artifact-forge/docs)
+- [My Monsters docs](https://crealizr.net/en/my-monsters/docs)
+
+## Notes
+
+- Available in 6 locales: en, el, ru, de, fr, it (URL-prefixed, e.g. /en, /de).
+- Supports both the 2014 and 2024 D&D 5e rulesets.
+- Sitemap: https://crealizr.net/sitemap.xml
