@@ -14,6 +14,19 @@ const fs = require("fs");
 const path = require("path");
 
 const dryRun = process.argv.includes("--dry-run");
+// On CI/deploy platforms (Vercel, generic CI) we only want the version bump
+// baked into the build output — there's no point (and often no permission)
+// to commit/tag from an ephemeral, detached-HEAD checkout.
+const isCI = Boolean(process.env.CI || process.env.VERCEL);
+// "build" runs this via the `prebuild` hook on every local build too — only
+// auto-bump there when we're actually on a CI/deploy platform. A dev running
+// `npm run build` locally to sanity-check a production build shouldn't get
+// a surprise commit; `npm run release` (this same script, run directly)
+// still works locally regardless of lifecycle event.
+if (process.env.npm_lifecycle_event === "prebuild" && !isCI) {
+    console.log("Skipping auto-release: local build (not CI). Run `npm run release` manually when ready.");
+    process.exit(0);
+}
 const pkgPath = path.join(__dirname, "..", "package.json");
 
 function sh(cmd) {
@@ -75,6 +88,11 @@ function main() {
 
     pkg.version = nextVersion;
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+
+    if (isCI) {
+        console.log(`\nCI build — bumped package.json to ${nextTag} for this build only (no commit/tag).`);
+        return;
+    }
 
     sh(`git add "${pkgPath}"`);
     sh(`git commit -m "chore(release): ${nextTag}"`);

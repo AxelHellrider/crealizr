@@ -767,8 +767,6 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         {marquee && <MarqueeBox marquee={marquee} />}
                     </div>
 
-                    <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} onReset={resetView} />
-
                     {/* Bottom toolbar */}
                     <MapToolbar {...toolbarProps} isFullscreen={true} onFullscreenToggle={() => setIsFullscreen(false)} />
                 </div>,
