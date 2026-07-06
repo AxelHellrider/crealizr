@@ -17,7 +17,7 @@ const dryRun = process.argv.includes("--dry-run");
 // On CI/deploy platforms (Vercel, generic CI) we only want the version bump
 // baked into the build output — there's no point (and often no permission)
 // to commit/tag from an ephemeral, detached-HEAD checkout.
-const isCI = Boolean(process.env.CI || process.env.VERCEL);
+const isCI = Boolean(process.env.CI || process.env.VERCEL || process.env.NODE_ENV === "production");
 // "build" runs this via the `prebuild` hook on every local build too — only
 // auto-bump there when we're actually on a CI/deploy platform. A dev running
 // `npm run build` locally to sanity-check a production build shouldn't get
