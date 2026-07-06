@@ -1,9 +1,10 @@
 {
   "name": "crealizr",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/release.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
