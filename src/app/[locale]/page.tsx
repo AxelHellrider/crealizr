@@ -56,7 +56,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
   return (
     <div className="flex flex-col gap-16 lg:gap-20">
       {/* Hero Section */}
-      <section className="relative glass-panel p-5 lg:p-24 flex flex-col items-center text-center overflow-hidden min-h-screen justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+      <section className="relative glass-panel p-5 lg:p-24 flex flex-col items-center text-center overflow-hidden h-[calc(100svh-3.5rem)] justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
         <div className="pointer-events-none absolute inset-0 opacity-20">
           <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full" style={{background:"radial-gradient(circle, rgba(197,160,89,0.3), transparent 70%)"}} />
           <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full" style={{background:"radial-gradient(circle, rgba(44,62,80,0.4), transparent 70%)"}} />

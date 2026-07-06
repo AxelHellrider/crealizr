@@ -1,7 +1,6 @@
 import type {Metadata} from "next";
 import { buildHreflang } from "@/app/lib/seo";
 import {Geist, Geist_Mono, Cinzel} from "next/font/google";
-import {GoogleAnalytics} from "@next/third-parties/google";
 import Script from "next/script";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
@@ -155,7 +154,6 @@ export default async function LocaleLayout({
                     </CustomMonstersProvider>
                 </SidebarProvider>
             </ThemeProvider>
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!}/>
         </NextIntlClientProvider>
         </body>
         </html>
