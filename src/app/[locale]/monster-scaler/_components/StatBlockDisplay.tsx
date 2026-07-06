@@ -36,9 +36,9 @@ export const StatBlockDisplay = forwardRef<HTMLDivElement, StatBlockDisplayProps
                 className={`neo-card p-10 fantasy-border shadow-2xl relative overflow-hidden bg-card ${className}`}
             >
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-gold" />
-                <h1 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
+                <h2 className="text-4xl font-serif pb-4 border-b border-gold/30 mb-6 accent-gold uppercase tracking-tighter">
                     {monster.name || l.fallbackName}
-                </h1>
+                </h2>
                 <div className="grid gap-1 mb-6 italic text-muted font-serif">
                     <div>{monster.size} {monster.type}, {monster.alignment}</div>
                 </div>
