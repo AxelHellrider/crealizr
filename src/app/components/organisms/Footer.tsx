@@ -4,6 +4,7 @@ import Link from "next/link";
 import {useLocale} from 'next-intl';
 import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
 import { version } from "../../../../package.json";
+import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 
 export default function Footer() {
     const locale = useLocale();
@@ -14,7 +15,7 @@ export default function Footer() {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     {/* Brand */}
                     <div className="space-y-2">
-                        <CrealizrLogo className="hidden lg:block w-full h-12" />
+                        <CrealizrLogo className="block w-full h-12" />
                         <p className="text-sm text-muted">
                             DM-first D&D toolkit
                         </p>
