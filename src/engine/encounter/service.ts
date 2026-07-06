@@ -1,20 +1,27 @@
+// engine/encounter/service.ts
+// Public orchestration facade: picks XP-mode vs CR-mode math and returns a
+// single normalized result shape, so callers don't need to know which mode
+// is active.
+
 import {
     partyBudget,
-    crTarget,
-    crBudgetForParty,
+    type Difficulty,
+    type Ruleset,
+    type BudgetMode,
+} from "./xpTables";
+import { crTarget, crBudgetForParty } from "./crMath";
+import {
     suggestBossWithMinions,
     suggestBossWithMinionsCR,
     suggestGroupEncounters,
     suggestGroupEncountersCR,
-    type Difficulty,
-    type Ruleset,
-    type BudgetMode,
     type GroupSuggestion,
     type BossMinionSuggestion,
-} from "@/app/utils/encounter";
+} from "./suggestions";
 import type { Monster } from "@/app/types/monster";
 
 export type { Difficulty, Ruleset, BudgetMode, GroupSuggestion, BossMinionSuggestion };
+export { crTarget };
 
 export type RelationCriteria = "terrain" | "affiliation" | "genus" | "any";
 export type EncounterMode = "solo" | "group";
@@ -97,5 +104,3 @@ export function buildEncounterSuggestions(
 
     return { budget, soloSuggestions, groupSuggestions };
 }
-
-export { crTarget };

@@ -2,10 +2,7 @@ import type { MonsterBase, MonsterAction } from "@/app/types/monster";
 import { CR_MATRIX, ABILITY_SCORE_MODIFIERS } from "@/app/data/constants";
 import { CR_MATRIX_2024, ABILITY_SCORE_MODIFIERS_2024 } from "@/app/data/constants2024";
 import type { Edition } from "@/app/types/monster";
-
-function clamp(n: number, min: number, max: number) {
-    return Math.max(min, Math.min(max, n));
-}
+import { clamp } from "@/app/lib/number";
 
 function abilityModifier(score: number) {
     return Math.floor((score - 10) / 2);

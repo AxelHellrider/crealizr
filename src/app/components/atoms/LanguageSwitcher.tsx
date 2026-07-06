@@ -3,6 +3,7 @@
 import {useLocale} from 'next-intl';
 import {useRouter, usePathname} from 'next/navigation';
 import {locales, localeNames, defaultLocale, type Locale} from '@/i18n/config';
+import {Select} from '@/app/components/atoms/Select';
 
 export default function LanguageSwitcher() {
   const locale = useLocale();
@@ -19,17 +20,17 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <select
+    <Select
       value={validLocale}
       onChange={(e) => handleChange(e.target.value as Locale)}
       aria-label="Select language"
-      className="px-3 py-2 text-sm border border-gold/20 rounded-sm bg-card text-foreground focus:outline-none focus:border-gold/50 cursor-pointer"
+      className="text-sm rounded-sm"
     >
       {locales.map((loc) => (
         <option key={loc} value={loc}>
           {localeNames[loc]}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }

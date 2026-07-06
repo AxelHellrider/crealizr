@@ -1,3 +1,5 @@
+import { clamp } from "@/app/lib/number";
+
 export type ItemType = "Weapon" | "Armor" | "Wand" | "Wondrous";
 export type ItemRarity = "Common" | "Uncommon" | "Rare" | "Very Rare" | "Legendary";
 
@@ -62,7 +64,7 @@ const ITEM_TUNING: RulesetConfig = {
 };
 
 function clampLevel(level: number) {
-  return Math.max(1, Math.min(20, Math.round(level)));
+  return clamp(Math.round(level), 1, 20);
 }
 
 export function rarityForLevel(level: number): ItemRarity {

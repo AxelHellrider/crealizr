@@ -15,6 +15,7 @@ async function clearBestiaryDB(page: Page) {
     }));
 }
 
+
 // ---------------------------------------------------------------------------
 // 1. Navigation – home → every tool → back
 // ---------------------------------------------------------------------------
@@ -88,7 +89,7 @@ test.describe("Monster Scaler", () => {
 
     test("load from bestiary pre-fills the form", async ({ page }) => {
         // Type a known SRD monster into the autocomplete
-        const autocomplete = page.locator('[role="combobox"]').first();
+        const autocomplete = page.locator('input[role="combobox"]').first();
         await autocomplete.fill("Goblin");
         // Wait for dropdown option and click it
         const option = page.locator('[role="option"]', { hasText: "Goblin" }).first();

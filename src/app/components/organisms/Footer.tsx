@@ -4,7 +4,6 @@ import Link from "next/link";
 import {useLocale} from 'next-intl';
 import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
 import { version } from "../../../../package.json";
-import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 
 export default function Footer() {
     const locale = useLocale();

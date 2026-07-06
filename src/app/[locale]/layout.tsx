@@ -15,6 +15,8 @@ import {SidebarProvider} from "@/app/context/SidebarContext";
 import {CustomMonstersProvider} from "@/app/context/CustomMonstersContext";
 import {NumpadProvider} from "@/app/context/NumpadContext";
 import {Numpad} from "@/app/components/organisms/Numpad";
+import {PickerProvider} from "@/app/context/PickerContext";
+import {Picker} from "@/app/components/organisms/Picker";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 import {Locale} from "@/i18n/config";
@@ -102,7 +104,7 @@ export default async function LocaleLayout({
             '--surface-card':   '#15151e',
             '--surface-glass':  'rgba(26, 26, 35, 0.8)',
             '--text-base':       '#e2e8f0',
-            '--text-secondary':  '#64748b',
+            '--text-secondary':  '#94a3b8',
             '--accent-primary':  '#c5a059',
             '--accent-secondary':'#a8b2c1',
             '--accent-tertiary': '#dc2626',
@@ -142,14 +144,17 @@ export default async function LocaleLayout({
                 <SidebarProvider>
                     <CustomMonstersProvider>
                         <NumpadProvider>
-                            <Sidebar/>
-                            <Header/>
-                            <div className="hidden xl:block"><SidebarToggle/></div>
-                            <MainContent>
-                                {children}
-                                <Footer/>
-                            </MainContent>
-                            <Numpad/>
+                            <PickerProvider>
+                                <Sidebar/>
+                                <Header/>
+                                <div className="hidden xl:block"><SidebarToggle/></div>
+                                <MainContent>
+                                    {children}
+                                    <Footer/>
+                                </MainContent>
+                                <Numpad/>
+                                <Picker/>
+                            </PickerProvider>
                         </NumpadProvider>
                     </CustomMonstersProvider>
                 </SidebarProvider>

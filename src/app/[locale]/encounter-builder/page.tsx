@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { getMonstersForCR } from "@/app/utils/encounter";
+import { getMonstersForCR } from "@/engine/encounter";
 import { formatCR } from "@/app/lib/format";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
@@ -35,7 +35,7 @@ import {
     type GroupSuggestion,
 } from "@/app/hooks/useEncounterBuilder";
 import type { Monster } from "@/app/types/monster";
-import type { CoverBenefit, CoverLevel } from "@/app/types/encounterLayout";
+import type { CoverBenefit, CoverLevel, HazardEffect } from "@/app/types/encounterLayout";
 
 function EncounterModal({
     suggestion, mode, ruleset, catalog, filterMonsterPool, hasActiveFilter, onClose,
@@ -197,6 +197,7 @@ export default function CombatBalancerPage() {
     };
 
     const [coverBenefits, setCoverBenefits] = useState<CoverBenefit[]>([]);
+    const [hazardEffects, setHazardEffects] = useState<HazardEffect[]>([]);
 
     const primaryFit = mapSuggestion?.fit;
     const primaryStatus = primaryFit !== undefined ? budgetStatus(primaryFit) : null;
@@ -284,17 +285,36 @@ export default function CombatBalancerPage() {
                             )}
                         </div>
 
-                        {coverBenefits.length > 0 && (
+                        {(coverBenefits.length > 0 || hazardEffects.length > 0) && (
                             <div className="mt-5 pt-4 border-t border-sky-400/20">
                                 <span className="text-xs uppercase tracking-widest text-sky-400/80 font-bold">Advantages / Disadvantages</span>
                                 <ul className="mt-2 flex flex-col gap-1.5">
                                     {coverBenefits.map((b, i) => (
-                                        <li key={i} className="flex items-baseline justify-between gap-2 text-xs">
+                                        <li key={`cover-${i}`} className="flex items-baseline justify-between gap-2 text-xs">
                                             <span className="text-foreground/80 font-medium truncate">{b.partyLabel}</span>
                                             <span className="text-sky-400 shrink-0 text-right">
                                                 {coverBenefitText(b.coverLevel)}
                                                 <span className="ml-1 font-bold opacity-70">C</span>
                                             </span>
+                                        </li>
+                                    ))}
+                                    {hazardEffects.map((h, i) => (
+                                        <li key={`hazard-${i}`} className="flex flex-col gap-0.5 text-xs" title={h.notes}>
+                                            <div className="flex items-baseline justify-between gap-2">
+                                                <span className="text-foreground/80 font-medium truncate">
+                                                    {h.creatureLabel}
+                                                    <span className="ml-1.5 text-[9px] uppercase tracking-widest text-muted/60">
+                                                        {h.creatureKind === "party" ? "PC" : "NPC"}
+                                                    </span>
+                                                </span>
+                                                <span className={`shrink-0 text-right ${h.source === "spell" ? "text-purple-400" : "text-amber-500"}`}>
+                                                    {h.hazardLabel}
+                                                    <span className="ml-1 font-bold opacity-70">{h.source === "spell" ? "S" : "E"}</span>
+                                                </span>
+                                            </div>
+                                            {h.notes && (
+                                                <span className="text-muted/60 italic truncate">{h.notes}</span>
+                                            )}
                                         </li>
                                     ))}
                                 </ul>
@@ -313,8 +333,10 @@ export default function CombatBalancerPage() {
                                     partySize={state.partySize}
                                     suggestion={mapSuggestion}
                                     mode={state.mode}
+                                    ruleset={state.ruleset}
                                     onPartyChange={(newSize) => dispatch({ type: "SET_PARTY_SIZE", payload: newSize })}
                                     onCoverBenefits={setCoverBenefits}
+                                    onHazardEffects={setHazardEffects}
                                 />
                         {mapSuggestion && (
                             <div className="shrink-0 mt-3 rounded-sm border border-gold/15 bg-gold/3 p-3">

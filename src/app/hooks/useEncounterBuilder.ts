@@ -14,7 +14,7 @@ import {
     type BossMinionSuggestion,
     type GroupSuggestion,
     crTarget,
-} from "@/app/services/encounterService";
+} from "@/engine/encounter";
 import type { Monster, Terrain, Affiliation } from "@/app/types/monster";
 
 export type { RelationCriteria, EncounterMode, Difficulty, Ruleset, BudgetMode, BossMinionSuggestion, GroupSuggestion };

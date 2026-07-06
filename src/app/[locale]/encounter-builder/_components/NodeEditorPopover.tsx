@@ -5,12 +5,17 @@ import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { formatCR } from "@/app/lib/format";
 import type { EncounterNode, CoverLevel } from "@/app/types/encounterLayout";
+import type { ConditionId } from "@/app/data/conditions";
+import { getConditions } from "@/app/data/conditions";
+import { getHazardPresets } from "@/app/data/hazards";
+import type { Ruleset } from "@/engine/encounter";
 
 interface NodeEditorPopoverProps {
     node: EncounterNode;
     x: number;
     y: number;
-    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number }) => void;
+    ruleset: Ruleset;
+    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; conditions?: ConditionId[] }) => void;
     onRemove: () => void;
     onClose: () => void;
 }
@@ -24,14 +29,19 @@ function nodeTitle(node: EncounterNode): string {
     }
 }
 
-export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: NodeEditorPopoverProps) {
+export function NodeEditorPopover({ node, x, y, ruleset, onChange, onRemove, onClose }: NodeEditorPopoverProps) {
     if (typeof document === "undefined") return null;
+
+    const toggleCondition = (id: ConditionId, current: ConditionId[]) => {
+        const next = current.includes(id) ? current.filter(c => c !== id) : [...current, id];
+        onChange({ conditions: next });
+    };
 
     return createPortal(
         <>
             <div className="fixed inset-0 z-40" onClick={onClose} />
             <div
-                className="fixed z-50 w-56 rounded-sm border border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2
+                className="fixed z-50 w-56 rounded-sm border border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2 max-h-[80vh] overflow-y-auto
                     max-sm:!left-1/2 max-sm:!top-1/2 max-sm:!-translate-x-1/2 max-sm:!-translate-y-1/2"
                 style={{ left: x, top: y }}
             >
@@ -51,6 +61,20 @@ export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: N
 
                 {node.kind === "hazard" && (
                     <>
+                        <Select
+                            value=""
+                            onChange={(e) => {
+                                const preset = getHazardPresets(node.source).find(p => p.id === e.target.value);
+                                if (preset) onChange({ label: preset.name, notes: preset.description, aoeRadius: preset.aoeRadius });
+                            }}
+                            aria-label="Hazard preset"
+                        >
+                            <option value="" disabled>Load from hazard table…</option>
+                            {getHazardPresets(node.source).map(p => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </Select>
+
                         <textarea
                             className="ui-input w-full text-xs min-h-16 bg-surface border-silver/30 text-foreground focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold"
                             placeholder="Notes"
@@ -81,6 +105,33 @@ export function NodeEditorPopover({ node, x, y, onChange, onRemove, onClose }: N
                         <option value="three-quarter">Three-Quarters Cover (+5 AC &amp; Dex saves)</option>
                         <option value="full">Full Cover (can&apos;t be targeted)</option>
                     </Select>
+                )}
+
+                {(node.kind === "party" || node.kind === "enemy") && (
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-[10px] uppercase tracking-widest text-gold/60 font-bold">Conditions</span>
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                            {getConditions(ruleset).map(c => {
+                                const active = (node.conditions ?? []).includes(c.id);
+                                return (
+                                    <button
+                                        key={c.id}
+                                        type="button"
+                                        title={c.description}
+                                        onClick={() => toggleCondition(c.id, node.conditions ?? [])}
+                                        aria-pressed={active}
+                                        className={`text-left text-[10px] uppercase tracking-wide px-1.5 py-1 rounded-sm border transition-colors truncate ${
+                                            active
+                                                ? "border-gold bg-gold/15 text-gold"
+                                                : "border-gold/15 text-muted hover:text-gold hover:border-gold/40"
+                                        }`}
+                                    >
+                                        {c.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
                 )}
 
                 <button

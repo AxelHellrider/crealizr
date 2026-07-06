@@ -14,15 +14,12 @@ import { FormField } from "@/app/components/molecules/FormField";
 import { MONSTER_MANUAL_2014_CATALOG, MONSTER_MANUAL_2024_CATALOG } from "@/app/data/monsters";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
 import { formatCR } from "@/app/lib/format";
+import { clamp } from "@/app/lib/number";
 
 const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar", "any"];
 const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant", "any"];
 const SIZES: MonsterSize[] = ["Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"];
 const CR_OPTIONS = [0, 0.125, 0.25, 0.5, ...Array.from({ length: 30 }, (_, i) => i + 1)];
-
-function clamp(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, value));
-}
 
 type Props = {
     initial?: Monster;

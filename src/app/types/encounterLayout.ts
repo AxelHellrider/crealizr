@@ -1,3 +1,5 @@
+import type { ConditionId } from "@/app/data/conditions";
+
 export type GridCoord = { col: number; row: number };
 
 export type NodeKind = "party" | "enemy" | "hazard" | "cover";
@@ -13,12 +15,14 @@ interface BaseNode {
 
 export interface PartyNode extends BaseNode {
     kind: "party";
+    conditions?: ConditionId[];
 }
 
 export interface EnemyNode extends BaseNode {
     kind: "enemy";
     cr: number;
     isBoss: boolean;
+    conditions?: ConditionId[];
 }
 
 export interface HazardNode extends BaseNode {
@@ -40,4 +44,12 @@ export type ManualNode = HazardNode | CoverNode;
 export type CoverBenefit = {
     partyLabel: string;
     coverLevel: CoverLevel;
+};
+
+export type HazardEffect = {
+    creatureLabel: string;
+    creatureKind: "party" | "enemy";
+    hazardLabel: string;
+    source: HazardSource;
+    notes?: string;
 };

@@ -7,10 +7,17 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { MapToolbar, type MapMode } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
-import type { GroupSuggestion, BossMinionSuggestion } from "@/app/utils/encounter";
-import type { EncounterNode, GridCoord, HazardNode, HazardSource, CoverNode, PartyNode, CoverLevel, CoverBenefit } from "@/app/types/encounterLayout";
+import type { GroupSuggestion, BossMinionSuggestion, Ruleset } from "@/engine/encounter";
+import {
+    R, W, ROW_H, SX, SY, HORIZ_GRID_W, VERT_GRID_W, CELL_BUFFER, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP,
+    HEX_OUTLINE, HEX_FILL, HEX_SELECT, HEX_AOE,
+    hexCenter, hexDistance, hexesInRadius, nearestCoord,
+} from "@/engine/encounter";
+import type { EncounterNode, GridCoord, HazardNode, HazardSource, CoverNode, PartyNode, EnemyNode, CoverLevel, CoverBenefit, HazardEffect } from "@/app/types/encounterLayout";
 import type { ArmedTool } from "./GridToolbar";
 import { formatCR } from "@/app/lib/format";
+import { clamp } from "@/app/lib/number";
+import { getConditions } from "@/app/data/conditions";
 
 type EncounterMode = "solo" | "group";
 
@@ -18,84 +25,20 @@ interface EncounterHexMapProps {
     partySize: number;
     suggestion: GroupSuggestion | BossMinionSuggestion | null;
     mode: EncounterMode;
+    ruleset: Ruleset;
     onPartyChange?: (newSize: number) => void;
     onCoverBenefits?: (benefits: CoverBenefit[]) => void;
+    onHazardEffects?: (effects: HazardEffect[]) => void;
 }
 
-// ── Grid constants ──────────────────────────────────────────────────────────
-const R = 25;
-const W = Math.sqrt(3) * R;
-const ROW_H = R * 1.5;
-const SX = R + 4;
-const SY = R + 8;
-
-const HORIZ_GRID_W = Math.round(SX + 7 * W + W / 2 + R + 4);
-const VERT_GRID_W  = Math.round(SX + 3 * W + W / 2 + R + 4);
-
-const CELL_BUFFER = 2;
-const MIN_ZOOM    = 0.4;
-const MAX_ZOOM    = 3;
-const ZOOM_STEP   = 1.25;
-
-// ── Pure helpers ────────────────────────────────────────────────────────────
-function hexCenter(col: number, row: number): [number, number] {
-    return [SX + col * W + (row % 2) * (W / 2), SY + row * ROW_H];
-}
-
-function hexPoints(r: number): number[] {
-    const pts: number[] = [];
-    for (let i = 0; i < 6; i++) {
-        const a = (Math.PI / 3) * i - Math.PI / 6;
-        pts.push(r * Math.cos(a), r * Math.sin(a));
-    }
-    return pts;
-}
-
-const HEX_OUTLINE = hexPoints(R - 1);
-const HEX_FILL    = hexPoints(R - 2);
-const HEX_SELECT  = hexPoints(R - 0.5);
-const HEX_AOE     = hexPoints(R - 0.5);
-
-// ── Hex grid math (odd-r offset ↔ cube) ─────────────────────────────────────
-function offsetToCube(col: number, row: number): [number, number, number] {
-    const q = col - (row - (row & 1)) / 2;
-    return [q, row, -q - row];
-}
-
-function hexDistance(a: GridCoord, b: GridCoord): number {
-    const [q1, r1, s1] = offsetToCube(a.col, a.row);
-    const [q2, r2, s2] = offsetToCube(b.col, b.row);
-    return Math.max(Math.abs(q1 - q2), Math.abs(r1 - r2), Math.abs(s1 - s2));
-}
-
-function hexesInRadius(centerCol: number, centerRow: number, radius: number): GridCoord[] {
-    const [cq, cr] = offsetToCube(centerCol, centerRow);
-    const result: GridCoord[] = [];
-    for (let dq = -radius; dq <= radius; dq++) {
-        for (let dr = Math.max(-radius, -dq - radius); dr <= Math.min(radius, -dq + radius); dr++) {
-            const r = cr + dr;
-            result.push({ col: (cq + dq) + (r - (r & 1)) / 2, row: r });
-        }
-    }
-    return result;
-}
-
-function clamp(v: number, min: number, max: number) {
-    return Math.min(max, Math.max(min, v));
-}
-
-function nearestCoord(x: number, y: number): GridCoord {
-    let best: GridCoord = { col: 0, row: 0 };
-    let bestDist = Infinity;
-    const approxRow = Math.round((y - SY) / ROW_H);
-    const approxCol = Math.round((x - SX) / W);
-    for (let row = approxRow - 1; row <= approxRow + 1; row++)
-        for (let col = approxCol - 1; col <= approxCol + 1; col++) {
-            const [cx, cy] = hexCenter(col, row);
-            const d = (cx - x) ** 2 + (cy - y) ** 2;
-            if (d < bestDist) { bestDist = d; best = { col, row }; }
-        }
-    return best;
+function conditionAbbrs(node: EncounterNode, ruleset: Ruleset): string {
+    if (node.kind !== "party" && node.kind !== "enemy") return "";
+    if (!node.conditions?.length) return "";
+    const defs = getConditions(ruleset);
+    return node.conditions
+        .map(id => defs.find(c => c.id === id)?.abbr)
+        .filter(Boolean)
+        .join(" · ");
 }
 
 function toArmedTool(mode: MapMode): ArmedTool {
@@ -144,8 +87,8 @@ function MarqueeBox({ marquee }: { marquee: { x0: number; y0: number; x1: number
     );
 }
 
-// ── Keyboard legend overlay (desktop only) ──────────────────────────────────
-function KeyboardLegend({ mode, cameraLocked }: { mode: MapMode; cameraLocked: boolean }) {
+// ── Keyboard legend (rendered outside/below the canvas — not an overlay) ───
+function KeyboardLegend({ mode, cameraLocked, onReset }: { mode: MapMode; cameraLocked: boolean; onReset: () => void }) {
     const items = [
         { keys: "W",   label: "Move",         active: mode === "select" },
         { keys: "A",   label: "Env Hazard",   active: mode === "place-hazard-env" },
@@ -155,22 +98,29 @@ function KeyboardLegend({ mode, cameraLocked }: { mode: MapMode; cameraLocked: b
         { keys: "+/−", label: "Zoom",         active: false },
         { keys: "⇧+drag", label: "Multi-select", active: false },
         { keys: "Del", label: "Delete sel.",  active: false },
-        { keys: "Esc", label: "Reset",        active: false },
     ];
     return (
-        <div className="absolute bottom-3 right-3 pointer-events-none select-none hidden sm:flex flex-col items-end gap-1 bg-black/30 backdrop-blur-sm rounded-sm px-2.5 py-2">
+        <div className="select-none hidden sm:flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 py-1.5 border-t border-gold/10 mt-1">
             {items.map(({ keys, label, active }) => (
-                <div key={keys} className={`flex items-center gap-2 text-[11px] font-mono transition-colors ${active ? "text-gold" : "text-muted/60"}`}>
+                <div key={keys} className={`flex items-center gap-1.5 text-[11px] font-mono transition-colors ${active ? "text-gold" : "text-muted/60"}`}>
                     <kbd className={`border rounded px-1.5 py-0.5 leading-4 text-[10px] ${active ? "border-gold/60 bg-gold/10" : "border-white/15 bg-white/5"}`}>{keys}</kbd>
                     <span className="font-sans tracking-wide">{label}</span>
                 </div>
             ))}
+            <button
+                type="button"
+                onClick={onReset}
+                className="flex items-center gap-1.5 text-[11px] font-mono text-muted/60 hover:text-gold transition-colors"
+            >
+                <kbd className="border border-white/15 bg-white/5 rounded px-1.5 py-0.5 leading-4 text-[10px]">Esc</kbd>
+                <span className="font-sans tracking-wide underline decoration-dotted underline-offset-2">Reset view</span>
+            </button>
         </div>
     );
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
-export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, onCoverBenefits }: EncounterHexMapProps) {
+export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyChange, onCoverBenefits, onHazardEffects }: EncounterHexMapProps) {
 
     const [size, setSize]               = useState({ width: 320, height: 320 });
     const [mapMode, setMapMode]         = useState<MapMode>("select");
@@ -263,8 +213,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                 case "+": case "=": setZoom(z => clamp(z * ZOOM_STEP, MIN_ZOOM, MAX_ZOOM)); break;
                 case "-": case "_": setZoom(z => clamp(z / ZOOM_STEP, MIN_ZOOM, MAX_ZOOM)); break;
                 case "Escape":
-                    setMapMode("select");
-                    setCameraLocked(false);
+                    resetView();
                     break;
                 case "Delete": case "Backspace": {
                     const ids = selectedIdsRef.current;
@@ -303,6 +252,16 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
 
     const zoomIn  = () => setZoom(z => clamp(z * ZOOM_STEP, MIN_ZOOM, MAX_ZOOM));
     const zoomOut = () => setZoom(z => clamp(z / ZOOM_STEP, MIN_ZOOM, MAX_ZOOM));
+
+    // Full view reset: mode, camera lock, zoom, and re-centered pan.
+    // (Previously "Esc" only reset mode + camera lock — zoom/pan were left
+    // untouched, so resetting while zoomed/panned away looked like it did nothing.)
+    const resetView = useCallback(() => {
+        setMapMode("select");
+        setCameraLocked(false);
+        setZoom(1);
+        shouldCenterRef.current = true;
+    }, []);
 
     // ── Content centering ────────────────────────────────────────────────────
     useEffect(() => {
@@ -358,6 +317,30 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
         }
         return { affectedHexes, protectedKeys };
     }, [layout.nodes]);
+
+    // ── Hazard effects on creatures currently standing in an AoE ─────────────
+    const hazardEffects = useMemo<HazardEffect[]>(() => {
+        const hazards = layout.nodes.filter((n): n is HazardNode => n.kind === "hazard" && n.aoeRadius >= 0);
+        const creatures = layout.nodes.filter((n): n is PartyNode | EnemyNode => n.kind === "party" || n.kind === "enemy");
+        const effects: HazardEffect[] = [];
+        for (const creature of creatures) {
+            const key = `${creature.coord.col},${creature.coord.row}`;
+            if (aoeData.protectedKeys.has(key)) continue;
+            for (const hazard of hazards) {
+                if (hexDistance(creature.coord, hazard.coord) > hazard.aoeRadius) continue;
+                effects.push({
+                    creatureLabel: nodeLabel(creature),
+                    creatureKind: creature.kind,
+                    hazardLabel: hazard.label || (hazard.source === "spell" ? "Spell hazard" : "Env. hazard"),
+                    source: hazard.source,
+                    notes: hazard.notes,
+                });
+            }
+        }
+        return effects;
+    }, [layout.nodes, aoeData.protectedKeys]);
+
+    useEffect(() => { onHazardEffects?.(hazardEffects); }, [hazardEffects, onHazardEffects]);
 
     // ── Cover benefits for adjacent party members ────────────────────────────
     const coverBenefits = useMemo<CoverBenefit[]>(() => {
@@ -683,6 +666,15 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                                 {node.kind === "enemy" && node.isBoss && (
                                     <Text text="BOSS" fontSize={5.5} fontFamily="serif" fill="rgba(220,38,38,0.4)" align="center" width={W} offsetX={W / 2} y={6} />
                                 )}
+                                {(node.kind === "party" || node.kind === "enemy") && conditionAbbrs(node, ruleset) && (
+                                    <Text
+                                        text={conditionAbbrs(node, ruleset)}
+                                        fontSize={4.5}
+                                        fontFamily="sans-serif" fill="rgba(220,38,38,0.85)"
+                                        align="center" width={W} offsetX={W / 2}
+                                        y={node.kind === "enemy" && node.isBoss ? 12 : 6}
+                                    />
+                                )}
                                 <Group
                                     x={R * 0.62} y={-R * 0.62}
                                     onClick={e => handleQuickRemove(node, e)}
@@ -712,13 +704,16 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                     >
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
-                        <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} />
                         {mapMode !== "select" && (
                             <div className="absolute bottom-2 left-2 pointer-events-none select-none text-[8px] text-muted/50 italic hidden sm:block">
                                 Click empty hex to place
                             </div>
                         )}
                     </div>
+                )}
+
+                {!isFullscreen && (
+                    <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} onReset={resetView} />
                 )}
 
                 {/* Fullscreen placeholder — keeps the flex column height reserved */}
@@ -739,6 +734,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                         node={editingNode}
                         x={popoverPos.x}
                         y={popoverPos.y}
+                        ruleset={ruleset}
                         onChange={patch => layout.updateNode(editingNode.id, patch)}
                         onRemove={() => { layout.removeNode(editingNode.id); setEditingId(null); setPopoverPos(null); }}
                         onClose={() => { setEditingId(null); setPopoverPos(null); }}
@@ -769,8 +765,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, onPartyChange, on
                     <div className="flex-1 min-h-0 relative overflow-hidden touch-none">
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
-                        <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} />
                     </div>
+
+                    <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} onReset={resetView} />
 
                     {/* Bottom toolbar */}
                     <MapToolbar {...toolbarProps} isFullscreen={true} onFullscreenToggle={() => setIsFullscreen(false)} />

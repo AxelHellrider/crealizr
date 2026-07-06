@@ -1,4 +1,5 @@
 import type { Monster } from "@/app/types/monster";
+import { newId } from "@/app/lib/id";
 
 export type CustomMonster = Monster & { id: string };
 
@@ -45,7 +46,7 @@ export function getAllMonsters(): Promise<CustomMonster[]> {
 }
 
 export function addMonster(monster: Monster): Promise<string> {
-    const id = crypto.randomUUID();
+    const id = newId();
     const record: CustomMonster = { ...monster, id, source: "homebrew" };
     return withStore("readwrite", (store) => store.add(record)).then(() => id);
 }

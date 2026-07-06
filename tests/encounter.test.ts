@@ -11,8 +11,8 @@ import {
     crBudgetForParty,
     suggestBossWithMinionsCR,
     suggestGroupEncountersCR,
-} from "@/app/utils/encounter";
-import { buildEncounterSuggestions } from "@/app/services/encounterService";
+    buildEncounterSuggestions,
+} from "@/engine/encounter";
 
 describe("encounterMultiplier", () => {
     it("returns 1 for a single monster", () => {
