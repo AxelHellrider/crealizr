@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
             siteName: "CRealizr",
             images: [
                 {
-                    url: "/og-default.svg",
+                    url: "/og-my-monsters.svg",
                     width: 1200,
                     height: 630,
                     alt: "CRealizr My Monsters – custom monster library",
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
             card: "summary_large_image",
             title,
             description,
-            images: ["/og-default.svg"],
+            images: ["/og-my-monsters.svg"],
         },
     };
 }

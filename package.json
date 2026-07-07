@@ -21,8 +21,6 @@
   ],
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "@types/html2canvas": "^0.5.35",
-    "@types/nodemailer": "8.0.0",
     "@vitest/coverage-v8": "2.1.9",
     "eslint": "9.39.1",
     "eslint-config-next": "16.0.8",
@@ -31,7 +29,9 @@
   "dependencies": {
     "@next/third-parties": "16.2.4",
     "@tailwindcss/postcss": "4",
+    "@types/html2canvas": "^0.5.35",
     "@types/node": "24.10.2",
+    "@types/nodemailer": "8.0.0",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "babel-plugin-react-compiler": "1.0.0",

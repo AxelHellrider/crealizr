@@ -18,13 +18,13 @@ export const metadata: Metadata = {
         url: "/contact",
         type: "website",
         siteName: "CRealizr",
-        images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
+        images: [{ url: "/og-contact.svg", width: 1200, height: 630, alt: "CRealizr" }],
     },
     twitter: {
         card: "summary_large_image",
         title: "Contact | CRealizr",
         description: "Get in touch with the CRealizr team — feedback, bug reports, or feature requests.",
-        images: ["/og-default.svg"],
+        images: ["/og-contact.svg"],
     },
 };
 
