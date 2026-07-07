@@ -886,6 +886,7 @@ const TERRAIN_SEEDS: Record<Terrain, Record<EncounterType, TemplateSet>> = {
   }
 };
 
+/** Cross-multiplies every subject against every template, so a small hand-authored seed set yields `subjects.length * templates.length` unique descriptions. */
 function expandTemplates(set: TemplateSet): string[] {
   const results: string[] = [];
   for (const template of set.templates) {
@@ -896,6 +897,11 @@ function expandTemplates(set: TemplateSet): string[] {
   return results;
 }
 
+/**
+ * Builds the full entry list for a terrain by expanding each encounter type's
+ * templates, then interleaving them round-robin (one of each type per round)
+ * rather than grouping by type, so adjacent d500 ranges mix encounter types.
+ */
 function buildTerrainEntries(terrain: Terrain): EncounterSeed[] {
   const grouped = ENCOUNTER_TYPES.map((type) => {
     const set = TERRAIN_SEEDS[terrain][type];
@@ -916,6 +922,12 @@ function buildTerrainEntries(terrain: Terrain): EncounterSeed[] {
   return entries;
 }
 
+/**
+ * Divides the 1–500 roll range across `entries` as evenly as possible: every
+ * entry gets at least `RANGE_BASE`, and the remainder is spread using an
+ * even stride (`Math.floor(i * count / extra)`) rather than piling it onto
+ * the first few entries, so no single entry is disproportionately likely.
+ */
 function assignRanges(entries: EncounterSeed[]): EncounterOutcome[] {
   const total = RANGE_TOTAL;
   const base = RANGE_BASE;
@@ -957,6 +969,7 @@ function assignRanges(entries: EncounterSeed[]): EncounterOutcome[] {
 
 const _tableCache = new Map<Terrain, EncounterOutcome[]>();
 
+/** Lazily builds and memoizes a terrain's d500 table — building all 8 terrains upfront would do unnecessary work for tools that only ever roll one. */
 function getTable(terrain: Terrain): EncounterOutcome[] {
   let table = _tableCache.get(terrain);
   if (!table) {
@@ -966,6 +979,7 @@ function getTable(terrain: Terrain): EncounterOutcome[] {
   return table;
 }
 
+/** Looks and iterates like a plain `Record<Terrain, EncounterOutcome[]>`, but each terrain's table is built on first access via `getTable`, not at module load. */
 export const TRAVEL_ENCOUNTER_TABLES: Record<Terrain, EncounterOutcome[]> = new Proxy(
   {} as Record<Terrain, EncounterOutcome[]>,
   {
@@ -985,6 +999,13 @@ export const TRAVEL_ENCOUNTER_TABLES: Record<Terrain, EncounterOutcome[]> = new 
   }
 );
 
+/**
+ * Resolves a d500 roll to an encounter outcome. Without a type filter, the
+ * roll is matched directly against the table's ranges. With a filter, the
+ * roll is instead re-projected onto the filtered subset's index range —
+ * this keeps a single roll uniformly distributed across whichever types
+ * remain, rather than reusing ranges sized for the full table.
+ */
 export function getTravelEncounter(terrain: Terrain, roll: number, typeFilter: EncounterType | "all" = "all"): EncounterOutcome | null {
   const table = TRAVEL_ENCOUNTER_TABLES[terrain];
   if (typeFilter === "all") {
@@ -996,6 +1017,7 @@ export function getTravelEncounter(terrain: Terrain, roll: number, typeFilter: E
   return filteredTable[index];
 }
 
+/** Rolls 1–500 (d500), the die size backing every travel encounter table. */
 export function rollD500(): number {
   return Math.floor(Math.random() * RANGE_TOTAL) + 1;
 }

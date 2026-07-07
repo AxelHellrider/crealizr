@@ -1,10 +1,52 @@
 "use client";
 
+import Link from "next/link";
 import Script from "next/script";
-import { useTranslations } from "next-intl";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { FormEvent, useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
+
+/** Combined submit + CAPTCHA state — Turnstile callbacks and the submit flow always update these fields together. */
+type FormState = {
+  state: SubmitState;
+  error: string;
+  turnstileToken: string;
+  turnstileReady: boolean;
+};
+
+type FormAction =
+  | { type: "SUBMIT_START" }
+  | { type: "SUBMIT_SUCCESS" }
+  | { type: "SUBMIT_ERROR"; message: string }
+  | { type: "CAPTCHA_SUCCESS"; token: string }
+  | { type: "CAPTCHA_EXPIRED" }
+  | { type: "CAPTCHA_ERROR"; message: string }
+  | { type: "CAPTCHA_REQUIRED"; message: string }
+  | { type: "RESET_CAPTCHA" };
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "SUBMIT_START":
+      return { ...state, state: "submitting", error: "" };
+    case "SUBMIT_SUCCESS":
+      return { ...state, state: "success" };
+    case "SUBMIT_ERROR":
+      return { ...state, state: "error", error: action.message };
+    case "CAPTCHA_SUCCESS":
+      return { ...state, turnstileToken: action.token, turnstileReady: true, error: "" };
+    case "CAPTCHA_EXPIRED":
+      return { ...state, turnstileToken: "", turnstileReady: false };
+    case "CAPTCHA_ERROR":
+      return { ...state, turnstileToken: "", turnstileReady: false, error: action.message, state: "error" };
+    case "CAPTCHA_REQUIRED":
+      return { ...state, state: "error", error: action.message };
+    case "RESET_CAPTCHA":
+      return { ...state, turnstileToken: "", turnstileReady: false };
+    default:
+      return state;
+  }
+}
 
 declare global {
   interface Window {
@@ -27,13 +69,16 @@ declare global {
 
 export function ContactForm() {
   const t = useTranslations("contact.form");
+  const locale = useLocale();
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
   const turnstileEnabled = Boolean(turnstileSiteKey);
 
-  const [state, setState] = useState<SubmitState>("idle");
-  const [error, setError] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [turnstileReady, setTurnstileReady] = useState(!turnstileEnabled);
+  const [{ state, error, turnstileToken, turnstileReady }, dispatch] = useReducer(formReducer, {
+    state: "idle",
+    error: "",
+    turnstileToken: "",
+    turnstileReady: !turnstileEnabled,
+  });
   const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
 
   const startedAt = useRef(Date.now()).current;
@@ -48,30 +93,23 @@ export function ContactForm() {
       sitekey: turnstileSiteKey,
       theme: "auto",
       callback: (token: string) => {
-        setTurnstileToken(token);
-        setTurnstileReady(true);
-        setError("");
+        dispatch({ type: "CAPTCHA_SUCCESS", token });
       },
       "expired-callback": () => {
-        setTurnstileToken("");
-        setTurnstileReady(false);
+        dispatch({ type: "CAPTCHA_EXPIRED" });
       },
       "error-callback": () => {
-        setTurnstileToken("");
-        setTurnstileReady(false);
-        setError(t("captchaError"));
-        setState("error");
+        dispatch({ type: "CAPTCHA_ERROR", message: t("captchaError") });
       },
     });
-  }, [turnstileEnabled, turnstileScriptLoaded, turnstileSiteKey]);
+  }, [turnstileEnabled, turnstileScriptLoaded, turnstileSiteKey, t]);
 
   function resetTurnstile() {
     if (!turnstileEnabled) return;
     if (window.turnstile && widgetIdRef.current) {
       window.turnstile.reset(widgetIdRef.current);
     }
-    setTurnstileToken("");
-    setTurnstileReady(false);
+    dispatch({ type: "RESET_CAPTCHA" });
   }
 
   useEffect(() => {
@@ -90,8 +128,7 @@ export function ContactForm() {
     event.preventDefault();
 
     if (turnstileEnabled && !turnstileToken) {
-      setState("error");
-      setError(t("captchaRequired"));
+      dispatch({ type: "CAPTCHA_REQUIRED", message: t("captchaRequired") });
       return;
     }
 
@@ -107,8 +144,7 @@ export function ContactForm() {
       turnstileToken,
     };
 
-    setState("submitting");
-    setError("");
+    dispatch({ type: "SUBMIT_START" });
 
     try {
       const response = await fetch("/api/contact", {
@@ -124,13 +160,15 @@ export function ContactForm() {
         throw new Error(body.error || t("submitError"));
       }
 
-      setState("success");
+      dispatch({ type: "SUBMIT_SUCCESS" });
       form.reset();
       resetTurnstile();
       return;
     } catch (submitError) {
-      setState("error");
-      setError(submitError instanceof Error ? submitError.message : "Unexpected error.");
+      dispatch({
+        type: "SUBMIT_ERROR",
+        message: submitError instanceof Error ? submitError.message : "Unexpected error.",
+      });
       resetTurnstile();
     }
   }
@@ -193,6 +231,16 @@ export function ContactForm() {
               <div ref={widgetRef} className="overflow-x-hidden max-w-full" />
             </div>
           )}
+
+          <p className="text-xs text-muted">
+            {t.rich("privacyNotice", {
+              link: (chunks) => (
+                <Link href={`/${locale}/privacy`} className="ui-link">
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
 
           <button
               type="submit"

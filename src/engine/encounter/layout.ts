@@ -52,6 +52,7 @@ export function isOccupied(nodes: EncounterNode[], coord: GridCoord, excludeId?:
     });
 }
 
+/** Scans the manual-placement zone (columns reserved outside the party/enemy auto-slots) for the first coordinate not already occupied by a same-kind node. */
 export function firstFreeCoord(nodes: EncounterNode[], orientation: Orientation, kind: "hazard" | "cover"): GridCoord {
     if (orientation === "h") {
         for (let row = 0; row < MAX_SEARCH_ROWS; row++)
@@ -69,6 +70,14 @@ export function firstFreeCoord(nodes: EncounterNode[], orientation: Orientation,
     return { col: 2, row: 2 };
 }
 
+/**
+ * Rebuilds party/enemy nodes from the current suggestion while preserving
+ * manual placements (hazards, cover) and, when the orientation hasn't
+ * changed, each surviving node's manually-dragged coordinate — only new or
+ * orientation-displaced nodes get auto-slotted via `slotCoordAuto`.
+ * `removedEnemyCount` trims from the end of the roster so a DM who deleted
+ * the last 2 minions doesn't see them reappear on the next suggestion tweak.
+ */
 function regenerateAutoNodes(
     existing: EncounterNode[],
     prevOrientation: Orientation,

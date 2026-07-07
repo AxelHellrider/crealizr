@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import {useLocale} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
 import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
+import { useCookieConsent } from "@/app/context/CookieConsentContext";
 import { version } from "../../../../package.json";
 
 export default function Footer() {
     const locale = useLocale();
+    const t = useTranslations("cookieBanner");
+    const { openPreferences } = useCookieConsent();
 
     return (
         <footer className="w-full mt-24 border-t border-gold/20 bg-card/30 backdrop-blur-sm">
@@ -35,6 +38,12 @@ export default function Footer() {
                     <p className="text-xs text-muted">
                         v{version} · Validated for 2014 & 2024 SRD – Not affiliated with Wizards of the Coast
                     </p>
+                    <nav className="flex flex-wrap gap-4 text-xs">
+                        <Link href={`/${locale}/terms`} className="ui-link transition hover:text-gold">Terms of Use</Link>
+                        <Link href={`/${locale}/disclaimer`} className="ui-link transition hover:text-gold">Disclaimer</Link>
+                        <Link href={`/${locale}/privacy`} className="ui-link transition hover:text-gold">Privacy Policy</Link>
+                        <button type="button" onClick={openPreferences} className="ui-link transition hover:text-gold">{t("manage")}</button>
+                    </nav>
                     <p className="text-xs text-muted">
                         © {new Date().getFullYear()} CRealizr — All Rights Reserved
                     </p>

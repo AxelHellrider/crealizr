@@ -8,6 +8,7 @@ function abilityModifier(score: number) {
     return Math.floor((score - 10) / 2);
 }
 
+/** Finds the highest CR_MATRIX row whose `cr` does not exceed the given CR (rows are sparse, not one-per-CR). */
 function findCRRow(matrix: typeof CR_MATRIX, cr: number) {
     for (let i = matrix.length - 1; i >= 0; i--) {
         if (matrix[i].cr <= cr) return matrix[i];
@@ -15,6 +16,11 @@ function findCRRow(matrix: typeof CR_MATRIX, cr: number) {
     return matrix[0];
 }
 
+/**
+ * Estimates average damage-per-round from a monster's action damage strings
+ * (e.g. "2d6+3"). Falls back to 1 when there are no actions, since a DPR of 0
+ * would divide-by-zero downstream in `scaleMonster`'s dprScale ratio.
+ */
 function estimateDPR(monster: MonsterBase) {
     if (!monster.actions || monster.actions.length === 0) return 1;
     let total = 0;
@@ -38,6 +44,11 @@ function estimateDPR(monster: MonsterBase) {
     return Math.max(1, Math.round(total));
 }
 
+/**
+ * Maps an ability score to its nearest equivalent at a new CR by shifting the
+ * ability modifier by half the CR delta, then snapping to the closest score
+ * that actually produces that modifier in the edition's modifier table.
+ */
 function scaleAbilityScore(base: number, crDiff: number, modifiers: Record<string, readonly number[]>) {
     const mod = abilityModifier(base);
     const modIncrease = Math.floor(crDiff / 2);
@@ -48,6 +59,14 @@ function scaleAbilityScore(base: number, crDiff: number, modifiers: Record<strin
     return possibleScores.reduce((a, b) => Math.abs(a - base) <= Math.abs(b - base) ? a : b);
 }
 
+/**
+ * Rescales a monster's stat block from its current CR to `targetCR`, using
+ * the edition's CR matrix as the target baseline (HP, AC, attack bonus, save
+ * DC, DPR) and preserving the monster's original CR-relative deviation from
+ * that baseline rather than overwriting it outright. `_advice` on the result
+ * surfaces the intermediate figures (suggested attack bonus/DC, DPR ratios)
+ * so the caller can show the DM what changed and why.
+ */
 function scaleMonster(
     monster: MonsterBase,
     targetCR: number,
@@ -133,6 +152,7 @@ function scaleMonster(
     return scaled;
 }
 
+/** Scales `monster` to `targetCR` using the 2014 SRD CR matrix and ability modifier tables. */
 export function scaleMonster2014(
     monster: MonsterBase,
     targetCR: number,
@@ -145,6 +165,7 @@ export function scaleMonster2014(
     return scaleMonster(monster, targetCR, "2014", options);
 }
 
+/** Scales `monster` to `targetCR` using the 2024 SRD CR matrix and ability modifier tables. */
 export function scaleMonster2024(
     monster: MonsterBase,
     targetCR: number,

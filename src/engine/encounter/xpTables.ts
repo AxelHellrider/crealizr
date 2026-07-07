@@ -79,6 +79,7 @@ export const XP_PER_CR: Record<Ruleset, Record<string, number>> = {
     },
 };
 
+/** DMG "number of monsters" XP multiplier — more enemies punch above the sum of their individual XP values because of action economy. */
 export function encounterMultiplier(count: number) {
     if (count <= 1) return 1;
     if (count === 2) return 1.5;
@@ -88,6 +89,12 @@ export function encounterMultiplier(count: number) {
     return 4;
 }
 
+/**
+ * Total XP budget for the whole party at a difficulty. `size` scales the
+ * per-character threshold linearly (DMG has no group discount for size).
+ * `mode: "daily"` converts a single-encounter budget into a full adventuring
+ * day's budget using the DMG's ~3.4x day-to-encounter ratio.
+ */
 export function partyBudget(opts: {
     level: number;
     size: number;

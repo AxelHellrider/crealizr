@@ -67,6 +67,7 @@ function clampLevel(level: number) {
   return clamp(Math.round(level), 1, 20);
 }
 
+/** Maps a character level to the item rarity a DM would typically award at that point in a campaign. */
 export function rarityForLevel(level: number): ItemRarity {
   for (const band of ITEM_TUNING.rarityByLevel) {
     if (level <= band.maxLevel) return band.rarity;
@@ -74,6 +75,10 @@ export function rarityForLevel(level: number): ItemRarity {
   return ITEM_TUNING.rarityByLevel[ITEM_TUNING.rarityByLevel.length - 1].rarity;
 }
 
+/**
+ * Suggests mechanical bonuses for an item's rarity, filtered to the fields
+ * relevant to its type (e.g. only Wands get a save DC, only Armor gets AC).
+ */
 export function suggestedBonuses(level: number, type: ItemType) {
   const rarity = rarityForLevel(level);
   const bonus = ITEM_TUNING.bonusByRarity[rarity];
@@ -91,6 +96,7 @@ export function suggestedBonuses(level: number, type: ItemType) {
   };
 }
 
+/** Assembles a complete `ItemBlueprint` from raw form input, deriving rarity and bonuses from level and type. */
 export function buildItem(opts: {
   name: string;
   type: ItemType;

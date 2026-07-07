@@ -21,10 +21,12 @@ export const MAX_ZOOM    = 3;
 export const ZOOM_STEP   = 1.25;
 
 // ── Pixel projection ─────────────────────────────────────────────────────────
+/** Projects odd-r offset grid coordinates to pixel space; odd rows are shifted right by half a hex width to interlock with even rows. */
 export function hexCenter(col: number, row: number): [number, number] {
     return [SX + col * W + (row % 2) * (W / 2), SY + row * ROW_H];
 }
 
+/** Flat-top hexagon vertex offsets (relative to center) for a given radius, used as Konva `points` for outline/fill/select/AoE polygons. */
 export function hexPoints(r: number): number[] {
     const pts: number[] = [];
     for (let i = 0; i < 6; i++) {
@@ -40,17 +42,20 @@ export const HEX_SELECT  = hexPoints(R - 0.5);
 export const HEX_AOE     = hexPoints(R - 0.5);
 
 // ── Hex grid math (odd-r offset ↔ cube) ─────────────────────────────────────
+/** Converts odd-r offset coordinates to cube coordinates (q, r, s) — offset math can't express hex distance/radius directly, cube math can. */
 export function offsetToCube(col: number, row: number): [number, number, number] {
     const q = col - (row - (row & 1)) / 2;
     return [q, row, -q - row];
 }
 
+/** Distance in hex steps between two grid cells, via cube-coordinate Chebyshev distance. */
 export function hexDistance(a: GridCoord, b: GridCoord): number {
     const [q1, r1, s1] = offsetToCube(a.col, a.row);
     const [q2, r2, s2] = offsetToCube(b.col, b.row);
     return Math.max(Math.abs(q1 - q2), Math.abs(r1 - r2), Math.abs(s1 - s2));
 }
 
+/** All grid cells within `radius` hex-steps of the center, used for hazard AoE templates. */
 export function hexesInRadius(centerCol: number, centerRow: number, radius: number): GridCoord[] {
     const [cq, cr] = offsetToCube(centerCol, centerRow);
     const result: GridCoord[] = [];

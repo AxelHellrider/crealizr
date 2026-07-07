@@ -315,6 +315,13 @@
     "filter": "Filter",
     "openInEncounterBuilder": "Open in Encounter Builder"
   },
+  "cookieBanner": {
+    "title": "Cookies",
+    "description": "We'd like to use Google Tag Manager to understand how visitors use CRealizr. It only loads if you accept, and you can change your mind anytime. See our <link>Privacy Policy</link> for details.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "manage": "Cookie Preferences"
+  },
   "contact": {
     "title": "Contact",
     "description": "Questions, bug reports, feature requests, and collaboration inquiries.",
@@ -335,7 +342,8 @@
       "success": "Message sent successfully.",
       "captchaError": "Captcha failed to load. Please refresh and try again.",
       "captchaRequired": "Please complete the captcha before sending.",
-      "submitError": "Unable to send message right now."
+      "submitError": "Unable to send message right now.",
+      "privacyNotice": "By submitting this form, you agree that we may use your name, email, and message to respond to your inquiry, as described in our <link>Privacy Policy</link>."
     }
   },
   "myMonsters": {
@@ -390,5 +398,216 @@
       "nameRequired": "Name is required.",
       "nameDuplicate": "A monster with this name already exists."
     }
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "description": "Please read these terms carefully before using CRealizr.",
+    "updated": "Last updated: July 7, 2026",
+    "sections": [
+      {
+        "heading": "1. Acceptance of Terms",
+        "body": [
+          "By accessing or using CRealizr (\"the Service\"), you agree to be bound by these Terms of Use. If you do not agree with any part of these terms, please do not use the Service."
+        ]
+      },
+      {
+        "heading": "2. Description of Service",
+        "body": [
+          "CRealizr is a free, fan-made toolkit for Dungeon Masters running Dungeons & Dragons 5th Edition games, offering an Encounter Builder, Monster Scaler, Travel Encounters generator, and Artifact Forge. The Service supports both the 2014 and 2024 rulesets and is provided for personal, non-commercial tabletop preparation use."
+        ]
+      },
+      {
+        "heading": "3. Not an Official Product",
+        "body": [
+          "CRealizr is an independent, unofficial project and is not affiliated with, endorsed by, or sponsored by Wizards of the Coast. Rules content is derived from the applicable System Reference Document (SRD) under its open gaming license. \"Dungeons & Dragons\" and related trademarks are the property of Wizards of the Coast LLC."
+        ]
+      },
+      {
+        "heading": "4. Your Content",
+        "body": [
+          "Custom monsters, homebrew content, and other data you create (\"User Content\") are stored locally in your browser and are never transmitted to our servers. You are solely responsible for backing up your User Content using the export feature — clearing your browser data or switching devices will permanently remove it.",
+          "You retain all rights to your User Content. By using the Service you confirm that your User Content does not infringe on the rights of any third party."
+        ]
+      },
+      {
+        "heading": "5. Acceptable Use",
+        "body": [
+          "You agree not to misuse the Service, including attempting to disrupt its operation, reverse-engineer it for malicious purposes, or use it to generate or distribute unlawful, infringing, or harmful content."
+        ]
+      },
+      {
+        "heading": "6. Intellectual Property",
+        "body": [
+          "The CRealizr name, logo, original code, and design elements are the property of the CRealizr team. Game content derived from the SRD remains subject to its respective open gaming license."
+        ]
+      },
+      {
+        "heading": "7. No Warranty",
+        "body": [
+          "The Service is provided \"as is\" and \"as available\" without warranties of any kind, express or implied, including but not limited to accuracy, reliability, or fitness for a particular purpose. Encounter difficulty, XP budgets, and scaled statistics are computational aids and should always be reviewed by the Dungeon Master before use at the table."
+        ]
+      },
+      {
+        "heading": "8. Limitation of Liability",
+        "body": [
+          "To the fullest extent permitted by law, the CRealizr team shall not be liable for any indirect, incidental, or consequential damages arising from your use of, or inability to use, the Service, including loss of locally stored data."
+        ]
+      },
+      {
+        "heading": "9. Changes to These Terms",
+        "body": [
+          "We may update these Terms of Use from time to time. Continued use of the Service after changes are posted constitutes acceptance of the revised terms."
+        ]
+      },
+      {
+        "heading": "10. Contact",
+        "body": [
+          "Questions about these terms can be sent to contact@crealizr.net."
+        ]
+      }
+    ]
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "description": "Important information about the nature and limitations of CRealizr.",
+    "updated": "Last updated: July 7, 2026",
+    "sections": [
+      {
+        "heading": "Fan-Made, Unofficial Content",
+        "body": [
+          "CRealizr is a fan-made toolkit created by and for Dungeons & Dragons players and Dungeon Masters. It is not affiliated with, endorsed by, sponsored by, or associated with Wizards of the Coast in any way. \"Dungeons & Dragons\", \"D&D\", and all related logos and trademarks are the property of Wizards of the Coast LLC.",
+          "Rules and reference content used by the tools are drawn from the System Reference Document (SRD), made available under the applicable Open Gaming License / Creative Commons license."
+        ]
+      },
+      {
+        "heading": "No Artificial Intelligence",
+        "body": [
+          "CRealizr does not use artificial intelligence, machine learning, or generative AI models anywhere in its tools. Every encounter suggestion, monster scaling calculation, travel encounter, and item blueprint is produced by deterministic, rule-based logic written and reviewed by human developers — the same kind of math a DM would do by hand, just faster.",
+          "None of the data you enter is sent to an AI service or third-party model. The toolkit is, and will remain, 100% human-made."
+        ]
+      },
+      {
+        "heading": "Not Professional or Rules-Authoritative Advice",
+        "body": [
+          "Encounter difficulty ratings, experience point budgets, monster scaling, and item generation are computational estimates intended to speed up game preparation. They are not a substitute for the official rulebooks or the Dungeon Master's own judgment, and should be adjusted as needed for your table."
+        ]
+      },
+      {
+        "heading": "Accuracy of Content",
+        "body": [
+          "While we strive for accuracy across both the 2014 and 2024 rulesets, CRealizr is provided without any guarantee that outputs are complete, error-free, or perfectly balanced for every table. Use generated content at your own discretion."
+        ]
+      },
+      {
+        "heading": "Local Data Storage",
+        "body": [
+          "Custom monsters and similar user-created data are stored only in your browser's local storage. We do not host, back up, or have access to this data. Clearing your browser data, using a different browser, or switching devices will remove it — export your library regularly to keep a backup."
+        ]
+      },
+      {
+        "heading": "External Links",
+        "body": [
+          "The Service may link to third-party sites, such as GitHub. We are not responsible for the content, accuracy, or practices of any linked external site."
+        ]
+      },
+      {
+        "heading": "No Warranty & Limitation of Liability",
+        "body": [
+          "CRealizr is provided free of charge, \"as is\", without warranty of any kind. To the fullest extent permitted by law, the CRealizr team disclaims liability for any damages or losses arising from use of the Service."
+        ]
+      },
+      {
+        "heading": "Contact",
+        "body": [
+          "If you have questions about this disclaimer, reach out at contact@crealizr.net."
+        ]
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "What personal data CRealizr processes, why, and your rights under GDPR.",
+    "updated": "Last updated: July 7, 2026",
+    "sections": [
+      {
+        "heading": "1. Who We Are",
+        "body": [
+          "CRealizr is an independent, fan-made D&D toolkit. For the purposes of data protection law, the CRealizr team acts as the data controller for any personal data processed through this site. You can reach us at contact@crealizr.net for any privacy question or request."
+        ]
+      },
+      {
+        "heading": "2. What We Collect",
+        "body": [
+          "<strong>Contact form:</strong> when you use the contact form, we process the name, email address, and message you submit, solely to respond to your inquiry.",
+          "<strong>Automatically, for abuse prevention:</strong> when you submit the contact form, our server briefly reads your IP address and browser user-agent string to rate-limit repeated submissions and (if enabled) verify a Cloudflare Turnstile CAPTCHA challenge. This information is kept only in server memory for up to 10 minutes, is never written to a database or disk, and is lost whenever the server restarts.",
+          "<strong>Only if you accept our cookie banner:</strong> we load Google Tag Manager, which may collect analytics data (such as pages visited and general usage patterns) via cookies. This never loads before you accept, and you can decline or withdraw consent at any time. See Section 7 (Cookies) below for details.",
+          "Beyond the above, we do not use tracking pixels or advertising scripts anywhere on this site, and we do not sell or build advertising profiles of visitors."
+        ]
+      },
+      {
+        "heading": "3. Legal Basis for Processing",
+        "body": [
+          "We process contact form submissions based on your consent, given by voluntarily submitting the form (Art. 6(1)(a) GDPR), and on our legitimate interest in responding to inquiries and keeping the form free of spam and abuse (Art. 6(1)(f) GDPR)."
+        ]
+      },
+      {
+        "heading": "4. Who We Share Data With",
+        "body": [
+          "<strong>Email delivery:</strong> your contact form submission is sent via an SMTP email provider to our inbox. That message is then subject to that provider's and our own mailbox's normal retention practices — we do not separately store a copy in a database.",
+          "<strong>Cloudflare Turnstile:</strong> when CAPTCHA verification is enabled, your IP address and the CAPTCHA token are sent to Cloudflare to confirm you are not a bot. Cloudflare acts as an independent processor for this check; see <a href=\"https://www.cloudflare.com/privacypolicy/\" target=\"_blank\" rel=\"noreferrer\" class=\"ui-link\">Cloudflare's Privacy Policy</a> for details.",
+          "<strong>Google Tag Manager:</strong> only if you accept our cookie banner, usage data is shared with Google as described in <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noreferrer\" class=\"ui-link\">Google's Privacy Policy</a>. Declining or withdrawing consent stops this sharing going forward.",
+          "We do not sell personal data, and we do not share it with any other third party."
+        ]
+      },
+      {
+        "heading": "5. International Transfers",
+        "body": [
+          "Cloudflare and Google both operate global networks, which may process the data described above outside your country of residence, including outside the European Economic Area. Both providers offer Standard Contractual Clauses and other safeguards for such transfers."
+        ]
+      },
+      {
+        "heading": "6. Data Retention",
+        "body": [
+          "Rate-limiting data (IP address, user-agent) is held in server memory for at most 10 minutes and is never persisted. Contact form emails remain in our inbox for as long as reasonably needed to handle your inquiry, unless you ask us to delete them sooner."
+        ]
+      },
+      {
+        "heading": "7. Cookies",
+        "body": [
+          "By default, CRealizr sets no cookies at all — no analytics cookies, no advertising cookies, and no session cookies. The language you browse in is stored in the page URL (e.g. /en/, /de/), not in a cookie.",
+          "If you click \"Accept\" on our cookie banner, we load Google Tag Manager, which may set analytics cookies (such as Google Analytics) to help us understand how visitors use CRealizr. Nothing is loaded until you accept, and you can withdraw your consent at any time via \"Cookie Preferences\" in the footer, which stops future cookies but does not automatically delete ones already set by your browser — clear them via your browser's settings if needed."
+        ]
+      },
+      {
+        "heading": "8. Local Storage on Your Device",
+        "body": [
+          "Your theme and seasonal display preference, your saved encounter battle-map layouts, and any homebrew monsters you create in My Bestiary are stored only in your own browser's local storage or IndexedDB. This data never leaves your device, is not visible to us, and is entirely under your control — clear your browser data at any time to remove it."
+        ]
+      },
+      {
+        "heading": "9. Your Rights Under GDPR",
+        "body": [
+          "If you are in the European Economic Area (or a jurisdiction with equivalent protections), you have the right to access, correct, or delete your personal data, restrict or object to its processing, request a copy in a portable format, and withdraw consent at any time. To exercise any of these rights, contact us at contact@crealizr.net. You also have the right to lodge a complaint with your local data protection supervisory authority."
+        ]
+      },
+      {
+        "heading": "10. Children's Privacy",
+        "body": [
+          "CRealizr is not directed at children under 16, and we do not knowingly collect personal data from them. If you believe a child has submitted personal data to us, please contact us and we will delete it."
+        ]
+      },
+      {
+        "heading": "11. Changes to This Policy",
+        "body": [
+          "We may update this Privacy Policy from time to time. Continued use of the Service after changes are posted constitutes acceptance of the revised policy."
+        ]
+      },
+      {
+        "heading": "12. Contact",
+        "body": [
+          "Questions about this Privacy Policy or your data can be sent to contact@crealizr.net."
+        ]
+      }
+    ]
   }
 }

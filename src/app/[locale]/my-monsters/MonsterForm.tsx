@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useReducer } from "react";
 import { useTranslations } from "next-intl";
 import type { Monster, Terrain, Affiliation, Edition, MonsterSize, MonsterAction } from "@/app/types/monster";
 import { Button } from "@/app/components/atoms/Button";
@@ -28,6 +28,136 @@ type Props = {
     onCancel: () => void;
 };
 
+type FormState = {
+    name: string;
+    cr: number;
+    edition: Edition;
+    terrain: Terrain[];
+    affiliation: Affiliation;
+    genus: string;
+    showStats: boolean;
+    size: MonsterSize;
+    type: string;
+    alignment: string;
+    ac: number;
+    hp: number;
+    speed: string;
+    abilityScores: AbilityScores;
+    dprMin: number;
+    dprMax: number;
+    dprRange: string;
+    xp: number;
+    actions: MonsterAction[];
+    error: string;
+};
+
+function initFormState(initial?: Monster): FormState {
+    return {
+        name: initial?.name ?? "",
+        cr: initial?.cr ?? 1,
+        edition: initial?.edition ?? "2014",
+        terrain: initial?.terrain ?? ["any"],
+        affiliation: initial?.affiliation ?? "humanoid",
+        genus: initial?.genus ?? "",
+        showStats: !!initial?.stats,
+        size: initial?.size ?? "Medium",
+        type: initial?.type ?? "",
+        alignment: initial?.alignment ?? "",
+        ac: initial?.stats?.ac ?? 10,
+        hp: initial?.stats?.hp ?? 10,
+        speed: initial?.stats?.speed ?? "30 ft",
+        abilityScores: {
+            str: initial?.stats?.str ?? 10,
+            dex: initial?.stats?.dex ?? 10,
+            con: initial?.stats?.con ?? 10,
+            int: initial?.stats?.int ?? 10,
+            wis: initial?.stats?.wis ?? 10,
+            cha: initial?.stats?.cha ?? 10,
+        },
+        dprMin: initial?.dpr?.min ?? 0,
+        dprMax: initial?.dpr?.max ?? 0,
+        dprRange: initial?.dpr?.range ?? "",
+        xp: initial?.xp ?? 0,
+        actions: initial?.actions ?? [],
+        error: "",
+    };
+}
+
+type Action =
+    | { type: "SET_NAME"; value: string }
+    | { type: "SET_CR"; value: number }
+    | { type: "SET_EDITION"; value: Edition }
+    | { type: "SET_TERRAIN"; value: Terrain[] }
+    | { type: "SET_AFFILIATION"; value: Affiliation }
+    | { type: "SET_GENUS"; value: string }
+    | { type: "SET_SIZE"; value: MonsterSize }
+    | { type: "SET_TYPE"; value: string }
+    | { type: "SET_ALIGNMENT"; value: string }
+    | { type: "SET_AC"; value: number }
+    | { type: "SET_HP"; value: number }
+    | { type: "SET_SPEED"; value: string }
+    | { type: "SET_ABILITY_SCORE"; key: keyof AbilityScores; value: number }
+    | { type: "SET_DPR_MIN"; value: number }
+    | { type: "SET_DPR_MAX"; value: number }
+    | { type: "SET_DPR_RANGE"; value: string }
+    | { type: "SET_XP"; value: number }
+    | { type: "UPDATE_ACTION"; index: number; patch: Partial<MonsterAction> }
+    | { type: "REMOVE_ACTION"; index: number }
+    | { type: "ADD_ACTION" }
+    | { type: "SET_ERROR"; value: string };
+
+function formReducer(state: FormState, action: Action): FormState {
+    switch (action.type) {
+        case "SET_NAME":
+            return { ...state, name: action.value, error: "" };
+        case "SET_CR":
+            return { ...state, cr: action.value };
+        case "SET_EDITION":
+            return { ...state, edition: action.value };
+        case "SET_TERRAIN":
+            return { ...state, terrain: action.value };
+        case "SET_AFFILIATION":
+            return { ...state, affiliation: action.value };
+        case "SET_GENUS":
+            return { ...state, genus: action.value };
+        case "SET_SIZE":
+            return { ...state, size: action.value, showStats: true };
+        case "SET_TYPE":
+            return { ...state, type: action.value };
+        case "SET_ALIGNMENT":
+            return { ...state, alignment: action.value };
+        case "SET_AC":
+            return { ...state, ac: clamp(action.value, 0, 30), showStats: true };
+        case "SET_HP":
+            return { ...state, hp: Math.max(0, action.value), showStats: true };
+        case "SET_SPEED":
+            return { ...state, speed: action.value, showStats: true };
+        case "SET_ABILITY_SCORE":
+            return { ...state, abilityScores: { ...state.abilityScores, [action.key]: action.value }, showStats: true };
+        case "SET_DPR_MIN":
+            return { ...state, dprMin: Math.max(0, action.value) };
+        case "SET_DPR_MAX":
+            return { ...state, dprMax: Math.max(0, action.value) };
+        case "SET_DPR_RANGE":
+            return { ...state, dprRange: action.value };
+        case "SET_XP":
+            return { ...state, xp: Math.max(0, action.value) };
+        case "UPDATE_ACTION": {
+            const actions = [...state.actions];
+            actions[action.index] = { ...actions[action.index], ...action.patch };
+            return { ...state, actions };
+        }
+        case "REMOVE_ACTION":
+            return { ...state, actions: state.actions.filter((_, j) => j !== action.index) };
+        case "ADD_ACTION":
+            return { ...state, actions: [...state.actions, { name: "" }] };
+        case "SET_ERROR":
+            return { ...state, error: action.value };
+        default:
+            return state;
+    }
+}
+
 export default function MonsterForm({ initial, existingNames, onSave, onCancel }: Props) {
     const t = useTranslations("myMonsters");
     const { customMonsters } = useCustomMonsters();
@@ -37,49 +167,26 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
         return [...new Set(all.map((m) => m.genus).filter(Boolean) as string[])].sort();
     }, [customMonsters]);
 
-    const [name, setName] = useState(initial?.name ?? "");
-    const [cr, setCr] = useState(initial?.cr ?? 1);
-    const [edition, setEdition] = useState<Edition>(initial?.edition ?? "2014");
-    const [terrain, setTerrain] = useState<Terrain[]>(initial?.terrain ?? ["any"]);
-    const [affiliation, setAffiliation] = useState<Affiliation>(initial?.affiliation ?? "humanoid");
-    const [genus, setGenus] = useState(initial?.genus ?? "");
-
-    const [showStats, setShowStats] = useState(!!initial?.stats);
-    const [size, setSize] = useState<MonsterSize>(initial?.size ?? "Medium");
-    const [type, setType] = useState(initial?.type ?? "");
-    const [alignment, setAlignment] = useState(initial?.alignment ?? "");
-    const [ac, setAc] = useState(initial?.stats?.ac ?? 10);
-    const [hp, setHp] = useState(initial?.stats?.hp ?? 10);
-    const [speed, setSpeed] = useState(initial?.stats?.speed ?? "30 ft");
-    const [abilityScores, setAbilityScores] = useState<AbilityScores>({
-        str: initial?.stats?.str ?? 10,
-        dex: initial?.stats?.dex ?? 10,
-        con: initial?.stats?.con ?? 10,
-        int: initial?.stats?.int ?? 10,
-        wis: initial?.stats?.wis ?? 10,
-        cha: initial?.stats?.cha ?? 10,
-    });
-    const [dprMin, setDprMin] = useState(initial?.dpr?.min ?? 0);
-    const [dprMax, setDprMax] = useState(initial?.dpr?.max ?? 0);
-    const [dprRange, setDprRange] = useState(initial?.dpr?.range ?? "");
-    const [xp, setXp] = useState(initial?.xp ?? 0);
-    const [actions, setActions] = useState<MonsterAction[]>(initial?.actions ?? []);
-
-    const [error, setError] = useState("");
+    const [state, dispatch] = useReducer(formReducer, initial, initFormState);
+    const {
+        name, cr, edition, terrain, affiliation, genus,
+        showStats, size, type, alignment, ac, hp, speed, abilityScores,
+        dprMin, dprMax, dprRange, xp, actions, error,
+    } = state;
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const trimmed = name.trim();
         if (!trimmed) {
-            setError(t("form.nameRequired"));
+            dispatch({ type: "SET_ERROR", value: t("form.nameRequired") });
             return;
         }
         if (!initial && existingNames.has(trimmed.toLowerCase())) {
-            setError(t("form.nameDuplicate"));
+            dispatch({ type: "SET_ERROR", value: t("form.nameDuplicate") });
             return;
         }
         if (initial && trimmed.toLowerCase() !== initial.name.toLowerCase() && existingNames.has(trimmed.toLowerCase())) {
-            setError(t("form.nameDuplicate"));
+            dispatch({ type: "SET_ERROR", value: t("form.nameDuplicate") });
             return;
         }
 
@@ -125,7 +232,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     <Input
                         data-testid="homebrew-name"
                         value={name}
-                        onChange={(e) => { setName(e.target.value); setError(""); }}
+                        onChange={(e) => dispatch({ type: "SET_NAME", value: e.target.value })}
                         className="text-2xl font-serif py-3"
                         placeholder="e.g. Dire Owlbear"
                     />
@@ -134,15 +241,15 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                 {/* Size / Type / Alignment — italic subtitle line */}
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField label={t("form.size")}>
-                        <Select value={size} onChange={(e) => { setSize(e.target.value as MonsterSize); if (!showStats) setShowStats(true); }}>
+                        <Select value={size} onChange={(e) => dispatch({ type: "SET_SIZE", value: e.target.value as MonsterSize })}>
                             {SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                         </Select>
                     </FormField>
                     <FormField label={t("form.type")}>
-                        <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. monstrosity" />
+                        <Input value={type} onChange={(e) => dispatch({ type: "SET_TYPE", value: e.target.value })} placeholder="e.g. monstrosity" />
                     </FormField>
                     <FormField label={t("form.alignment")}>
-                        <Input value={alignment} onChange={(e) => setAlignment(e.target.value)} placeholder="e.g. chaotic evil" />
+                        <Input value={alignment} onChange={(e) => dispatch({ type: "SET_ALIGNMENT", value: e.target.value })} placeholder="e.g. chaotic evil" />
                     </FormField>
                 </div>
 
@@ -152,21 +259,21 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                         <div className="flex gap-4 min-h-11 items-center">
                             {(["2014", "2024"] as Edition[]).map((ed) => (
                                 <label key={ed} className="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="edition" checked={edition === ed} onChange={() => setEdition(ed)} className="accent-gold" />
+                                    <input type="radio" name="edition" checked={edition === ed} onChange={() => dispatch({ type: "SET_EDITION", value: ed })} className="accent-gold" />
                                     <span className="text-sm">{ed}</span>
                                 </label>
                             ))}
                         </div>
                     </FormField>
                     <FormField label={t("form.cr")}>
-                        <Select value={cr} onChange={(e) => setCr(Number(e.target.value))}>
+                        <Select value={cr} onChange={(e) => dispatch({ type: "SET_CR", value: Number(e.target.value) })}>
                             {CR_OPTIONS.map((c) => (
                                 <option key={c} value={c}>{formatCR(c)}</option>
                             ))}
                         </Select>
                     </FormField>
                     <FormField label={t("form.xp")}>
-                        <Input type="number" min={0} value={xp} onChange={(e) => setXp(Math.max(0, Number(e.target.value)))} />
+                        <Input type="number" min={0} value={xp} onChange={(e) => dispatch({ type: "SET_XP", value: Number(e.target.value) })} />
                     </FormField>
                 </div>
             </Card>
@@ -181,15 +288,15 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="flex items-center gap-4">
                             <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.ac")}</span>
-                            <Input type="number" min={0} max={20} value={ac} onChange={(e) => { setAc(clamp(Number(e.target.value), 0, 30)); if (!showStats) setShowStats(true); }} />
+                            <Input type="number" min={0} max={20} value={ac} onChange={(e) => dispatch({ type: "SET_AC", value: Number(e.target.value) })} />
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.hp")}</span>
-                            <Input type="number" min={0} value={hp} onChange={(e) => { setHp(Math.max(0, Number(e.target.value))); if (!showStats) setShowStats(true); }} />
+                            <Input type="number" min={0} value={hp} onChange={(e) => dispatch({ type: "SET_HP", value: Number(e.target.value) })} />
                         </div>
                         <div className="flex items-center gap-4">
                             <span className="font-serif uppercase tracking-widest text-gold/80 text-sm w-20 shrink-0">{t("form.speed")}</span>
-                            <Input value={speed} onChange={(e) => { setSpeed(e.target.value); if (!showStats) setShowStats(true); }} />
+                            <Input value={speed} onChange={(e) => dispatch({ type: "SET_SPEED", value: e.target.value })} />
                         </div>
                     </div>
                 </div>
@@ -197,10 +304,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                 <div className="mb-6">
                     <AbilityScoreGrid
                         values={abilityScores}
-                        onChange={(key, value) => {
-                            setAbilityScores((prev) => ({ ...prev, [key]: value }));
-                            if (!showStats) setShowStats(true);
-                        }}
+                        onChange={(key, value) => dispatch({ type: "SET_ABILITY_SCORE", key, value })}
                         labels={{ str: t("form.str"), dex: t("form.dex"), con: t("form.con"), int: t("form.int"), wis: t("form.wis"), cha: t("form.cha") }}
                     />
                 </div>
@@ -208,13 +312,13 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                 {/* DPR */}
                 <div className="grid grid-cols-3 gap-4">
                     <FormField label={t("form.dprMin")}>
-                        <Input type="number" min={0} value={dprMin} onChange={(e) => setDprMin(Math.max(0, Number(e.target.value)))} />
+                        <Input type="number" min={0} value={dprMin} onChange={(e) => dispatch({ type: "SET_DPR_MIN", value: Number(e.target.value) })} />
                     </FormField>
                     <FormField label={t("form.dprMax")}>
-                        <Input type="number" min={0} value={dprMax} onChange={(e) => setDprMax(Math.max(0, Number(e.target.value)))} />
+                        <Input type="number" min={0} value={dprMax} onChange={(e) => dispatch({ type: "SET_DPR_MAX", value: Number(e.target.value) })} />
                     </FormField>
                     <FormField label={t("form.dprRange")}>
-                        <Input value={dprRange} onChange={(e) => setDprRange(e.target.value)} placeholder="e.g. 2d8+4" />
+                        <Input value={dprRange} onChange={(e) => dispatch({ type: "SET_DPR_RANGE", value: e.target.value })} placeholder="e.g. 2d8+4" />
                     </FormField>
                 </div>
             </Card>
@@ -230,24 +334,16 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                             <Input
                                 value={action.name}
                                 placeholder={t("form.actionName")}
-                                onChange={(e) => {
-                                    const updated = [...actions];
-                                    updated[i] = { ...updated[i], name: e.target.value };
-                                    setActions(updated);
-                                }}
+                                onChange={(e) => dispatch({ type: "UPDATE_ACTION", index: i, patch: { name: e.target.value } })}
                             />
                             <Input
                                 value={action.damage ?? ""}
                                 placeholder={t("form.actionDamage")}
-                                onChange={(e) => {
-                                    const updated = [...actions];
-                                    updated[i] = { ...updated[i], damage: e.target.value || undefined };
-                                    setActions(updated);
-                                }}
+                                onChange={(e) => dispatch({ type: "UPDATE_ACTION", index: i, patch: { damage: e.target.value || undefined } })}
                             />
                             <button
                                 type="button"
-                                onClick={() => setActions(actions.filter((_, j) => j !== i))}
+                                onClick={() => dispatch({ type: "REMOVE_ACTION", index: i })}
                                 className="text-red-400/60 hover:text-red-400 px-2 text-lg shrink-0"
                             >
                                 ✕
@@ -257,7 +353,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                 </div>
                 <button
                     type="button"
-                    onClick={() => setActions([...actions, { name: "" }])}
+                    onClick={() => dispatch({ type: "ADD_ACTION" })}
                     className="ui-link text-xs uppercase tracking-widest mt-3"
                 >
                     + {t("form.addAction")}
@@ -276,7 +372,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                         <Autocomplete
                             multiple
                             value={terrain}
-                            onChange={(val) => setTerrain(val as Terrain[])}
+                            onChange={(val) => dispatch({ type: "SET_TERRAIN", value: val as Terrain[] })}
                             options={TERRAINS}
                             placeholder="Search terrains..."
                         />
@@ -288,7 +384,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     <FormField label={t("form.affiliation")}>
                         <Autocomplete
                             value={affiliation}
-                            onChange={(val) => setAffiliation(val as Affiliation)}
+                            onChange={(val) => dispatch({ type: "SET_AFFILIATION", value: val as Affiliation })}
                             options={AFFILIATIONS}
                             placeholder="Search affiliations..."
                         />
@@ -300,7 +396,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                     <FormField label={t("form.genus")} sublabel="type or pick from existing">
                         <Autocomplete
                             value={genus}
-                            onChange={setGenus}
+                            onChange={(val) => dispatch({ type: "SET_GENUS", value: val })}
                             options={knownGenera}
                             placeholder="e.g. owlbear, dragon, goblinoid"
                         />

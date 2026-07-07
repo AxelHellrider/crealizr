@@ -25,9 +25,6 @@
      --border-accent  primary accent border
      --border-subtle  subtle / secondary border
      --border-glass   glass panel border
-
-   Static tokens:
-     --accent-teal / --accent-purple  progress bar gradient
    ────────────────────────────────────────────────────────────────────── */
 
 :root {
@@ -233,8 +230,10 @@ h1, h2, h3, h4, .font-serif {
   top: 0; left: 0;
   height: 2px;
   width: 0;
-  background: linear-gradient(90deg, var(--accent-teal), var(--accent-purple));
-  box-shadow: 0 0 12px rgba(124, 58, 237, 0.45), 0 0 8px rgba(69, 219, 170, 0.35);
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--accent-primary) 45%, transparent),
+    0 0 8px color-mix(in srgb, var(--accent-secondary) 35%, transparent);
   z-index: 80;
   transition: width 180ms ease-out, opacity 180ms ease-out;
 }

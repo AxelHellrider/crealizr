@@ -56,11 +56,18 @@ export type BossMinionSuggestion = {
 
 // ── Catalog queries ──────────────────────────────────────────────────────────
 
+/** All catalog monsters at exactly the given CR — used to populate manual pickers, not for suggestion ranking. */
 export function getMonstersForCR(cr: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]): Monster[] {
     const catalog = customCatalog ?? (ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG);
     return catalog.filter((monster) => monster.cr === cr);
 }
 
+/**
+ * Picks a representative "flavor" monster for an abstract CR value. Prefers
+ * an exact CR match, deterministically choosing among ties via `seed` so the
+ * same inputs always suggest the same monster; falls back to the catalog
+ * entry with the closest CR when none matches exactly.
+ */
 function pickMonsterManualBenchmark(cr: number, seed: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]) {
     const catalog = customCatalog ?? (ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG);
     const exactMatches = catalog.filter((monster) => monster.cr === cr);
@@ -75,6 +82,7 @@ function pickMonsterManualBenchmark(cr: number, seed: number, ruleset: Ruleset =
     });
 }
 
+/** Filters the catalog to monsters that share `baseMonster`'s terrain/affiliation/genus (or returns the whole catalog for `"any"`), for thematically coherent boss+minion or group suggestions. */
 export function getRelatedMonsters(
     baseMonster: Monster,
     criteria: "terrain" | "affiliation" | "genus" | "any",
@@ -105,6 +113,7 @@ export function getRelatedMonsters(
 
 // ── Shared combinatorics helpers ────────────────────────────────────────────
 
+/** Every way to split `total` into `parts` positive integers each ≥ `min` (order matters) — e.g. compositions of 4 into 2 parts: [1,3],[2,2],[3,1]. Used to distribute a target monster count across the chosen CR types. */
 function buildCompositions(total: number, parts: number, min = 1): number[][] {
     if (parts === 1) return total >= min ? [[total]] : [];
     const combos: number[][] = [];
@@ -114,6 +123,7 @@ function buildCompositions(total: number, parts: number, min = 1): number[][] {
     return combos;
 }
 
+/** Every unordered `size`-length subset of `arr` (order within a subset doesn't matter) — used to pick which CR tiers appear together in a group suggestion. */
 function buildCombinations<T>(arr: T[], size: number, start = 0, path: T[] = [], out: T[][] = []): T[][] {
     if (path.length === size) { out.push([...path]); return out; }
     for (let i = start; i <= arr.length - (size - path.length); i++) {
@@ -126,6 +136,11 @@ function buildCombinations<T>(arr: T[], size: number, start = 0, path: T[] = [],
 
 // ── XP-mode suggestions ──────────────────────────────────────────────────────
 
+/**
+ * XP-mode single-CR-type suggestions: for every CR in the ruleset's table,
+ * tries monster counts 1–8 and keeps combinations whose adjusted XP lands
+ * within 30% of the budget (`fit >= 0.7`), ranked by closeness to budget.
+ */
 export function suggestEncounters(opts: {
     level: number;
     size: number;
@@ -153,6 +168,11 @@ export function suggestEncounters(opts: {
         .slice(0, 12);
 }
 
+/**
+ * Wraps `suggestGroupEncounters`/`suggestBossWithMinions` and resolves each
+ * abstract CR slot to a concrete catalog monster via `pickMonsterManualBenchmark`,
+ * deduplicating suggestions that resolve to the same monster/count combo.
+ */
 export function recommendMonstersForParty(opts: {
     level: number;
     size: number;
@@ -244,6 +264,12 @@ export function recommendMonstersForParty(opts: {
     }, []);
 }
 
+/**
+ * XP-mode boss(+minion) suggestions. Boss CR is searched in [level, level+4].
+ * When minions are included, the boss is fixed to consume ~60% of the budget
+ * and minion CR/count combinations fill the rest, keeping only combos within
+ * 30% of budget (and not exceeding it by more than 30%).
+ */
 export function suggestBossWithMinions(opts: {
     level: number;
     size: number;
@@ -322,6 +348,14 @@ export function suggestBossWithMinions(opts: {
         .slice(0, 12);
 }
 
+/**
+ * XP-mode multi-CR-type group suggestions. For each total monster count
+ * (2–8), picks CR candidates closest to the per-monster XP the budget
+ * implies, then enumerates every combination of 2–`maxTypes` of those CRs
+ * crossed with every way to distribute the count across them
+ * (`buildCombinations` × `buildCompositions`), keeping combos within 30% of
+ * budget.
+ */
 export function suggestGroupEncounters(opts: {
     level: number;
     size: number;
@@ -391,6 +425,7 @@ export function suggestGroupEncounters(opts: {
 
 // ── CR-mode suggestions ──────────────────────────────────────────────────────
 
+/** CR-mode mirror of `suggestBossWithMinions` — uses `crEncounterWeight`/`crBudgetForParty` instead of XP tables, and a looser 50% fit tolerance since CR-space threat estimates are coarser than XP. */
 export function suggestBossWithMinionsCR(opts: {
     level: number;
     size: number;
@@ -445,6 +480,7 @@ export function suggestBossWithMinionsCR(opts: {
         .slice(0, 12);
 }
 
+/** CR-mode mirror of `suggestGroupEncounters` — candidate CRs are those within a ×4 range of the party's target CR rather than closest-to-target-XP, scored via `crEncounterWeight` against `crBudgetForParty`. */
 export function suggestGroupEncountersCR(opts: {
     level: number;
     size: number;

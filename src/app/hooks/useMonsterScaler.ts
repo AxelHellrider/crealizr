@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useReducer, useTransition, useMemo } from "react";
 import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { scaleMonster, type ScaleOptions } from "@/app/services/scalerService";
 import type { MonsterBase, Edition } from "@/app/types/monster";
@@ -20,18 +20,102 @@ const DEFAULT_MONSTER: MonsterBase = {
     raw_source_ref: "",
 };
 
+type AbilityBonus = ScaleOptions["abilityScoreBonus"];
+
+type State = {
+    monster: MonsterBase;
+    edition: Edition;
+    targetCR: number | null;
+    scaledMonster: MonsterBase | null;
+    acEquipment: number;
+    acRace: number;
+    abilityBonus: AbilityBonus;
+    catalogSearch: string;
+    saved: boolean;
+};
+
+const initialState: State = {
+    monster: DEFAULT_MONSTER,
+    edition: "2014",
+    targetCR: null,
+    scaledMonster: null,
+    acEquipment: 0,
+    acRace: 0,
+    abilityBonus: {},
+    catalogSearch: "",
+    saved: false,
+};
+
+type Action =
+    | { type: "SET_MONSTER"; payload: MonsterBase }
+    | { type: "SET_EDITION"; payload: Edition }
+    | { type: "SET_TARGET_CR"; payload: number | null }
+    | { type: "SET_AC_EQUIPMENT"; payload: number }
+    | { type: "SET_AC_RACE"; payload: number }
+    | { type: "SET_CATALOG_SEARCH"; payload: string }
+    | { type: "SET_SAVED"; payload: boolean }
+    | { type: "LOAD_FROM_CATALOG"; payload: Partial<MonsterBase> & { edition: Edition } }
+    | { type: "STAT_CHANGE"; payload: { stat: keyof MonsterBase["stats"]; value: number | string } }
+    | { type: "ABILITY_BONUS_CHANGE"; payload: { stat: keyof MonsterBase["stats"]; value: number } }
+    | { type: "SCALE_RESULT"; payload: MonsterBase }
+    | { type: "RESET_TO_FORM" };
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case "SET_MONSTER":
+            return { ...state, monster: action.payload };
+        case "SET_EDITION":
+            return { ...state, edition: action.payload };
+        case "SET_TARGET_CR":
+            return { ...state, targetCR: action.payload };
+        case "SET_AC_EQUIPMENT":
+            return { ...state, acEquipment: action.payload };
+        case "SET_AC_RACE":
+            return { ...state, acRace: action.payload };
+        case "SET_CATALOG_SEARCH":
+            return { ...state, catalogSearch: action.payload };
+        case "SET_SAVED":
+            return { ...state, saved: action.payload };
+        case "LOAD_FROM_CATALOG":
+            return {
+                ...state,
+                monster: { ...state.monster, ...action.payload },
+                edition: action.payload.edition,
+                targetCR: null,
+                scaledMonster: null,
+                catalogSearch: "",
+                saved: false,
+            };
+        case "STAT_CHANGE":
+            return {
+                ...state,
+                monster: {
+                    ...state.monster,
+                    stats: { ...state.monster.stats, [action.payload.stat]: action.payload.value },
+                },
+            };
+        case "ABILITY_BONUS_CHANGE":
+            return {
+                ...state,
+                abilityBonus: { ...state.abilityBonus, [action.payload.stat]: action.payload.value },
+            };
+        case "SCALE_RESULT":
+            return { ...state, scaledMonster: action.payload };
+        case "RESET_TO_FORM":
+            return { ...state, scaledMonster: null, saved: false };
+        default:
+            return state;
+    }
+}
+
 export function useMonsterScaler() {
     const { catalog2014, catalog2024 } = useMergedCatalog();
     const [isScaling, startScaling] = useTransition();
-    const [monster, setMonster] = useState<MonsterBase>(DEFAULT_MONSTER);
-    const [edition, setEdition] = useState<Edition>("2014");
-    const [targetCR, setTargetCR] = useState<number | null>(null);
-    const [scaledMonster, setScaledMonster] = useState<MonsterBase | null>(null);
-    const [acEquipment, setAcEquipment] = useState(0);
-    const [acRace, setAcRace] = useState(0);
-    const [abilityBonus, setAbilityBonus] = useState<ScaleOptions["abilityScoreBonus"]>({});
-    const [catalogSearch, setCatalogSearch] = useState("");
-    const [saved, setSaved] = useState(false);
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const {
+        monster, edition, targetCR, scaledMonster,
+        acEquipment, acRace, abilityBonus, catalogSearch, saved,
+    } = state;
 
     const allMonsters = useMemo(() => {
         const combined = [...catalog2014, ...catalog2024];
@@ -48,32 +132,29 @@ export function useMonsterScaler() {
         const match = allMonsters.find((m) => m.name === name);
         if (!match) return;
         const ed = (match.edition ?? "2014") as Edition;
-        setEdition(ed);
-        setMonster((prev) => ({
-            ...prev,
-            name: match.name,
-            type: match.type ?? match.affiliation ?? prev.type,
-            cr: match.cr,
-            edition: ed,
-            terrain: match.terrain,
-            affiliation: match.affiliation,
-            genus: match.genus,
-            size: match.size ?? prev.size,
-            stats: match.stats ?? prev.stats,
-            actions: match.actions ?? prev.actions,
-        }));
-        setTargetCR(null);
-        setScaledMonster(null);
-        setCatalogSearch("");
-        setSaved(false);
+        dispatch({
+            type: "LOAD_FROM_CATALOG",
+            payload: {
+                name: match.name,
+                type: match.type ?? match.affiliation ?? monster.type,
+                cr: match.cr,
+                edition: ed,
+                terrain: match.terrain,
+                affiliation: match.affiliation,
+                genus: match.genus,
+                size: match.size ?? monster.size,
+                stats: match.stats ?? monster.stats,
+                actions: match.actions ?? monster.actions,
+            },
+        });
     };
 
     const handleStatChange = (stat: keyof MonsterBase["stats"], value: number | string) => {
-        setMonster((prev) => ({ ...prev, stats: { ...prev.stats, [stat]: value } }));
+        dispatch({ type: "STAT_CHANGE", payload: { stat, value } });
     };
 
     const handleAbilityBonusChange = (stat: keyof MonsterBase["stats"], value: number) => {
-        setAbilityBonus((prev) => ({ ...prev, [stat]: value }));
+        dispatch({ type: "ABILITY_BONUS_CHANGE", payload: { stat, value } });
     };
 
     const handleScale = () => {
@@ -85,25 +166,22 @@ export function useMonsterScaler() {
                 edition,
                 { acEquipment, acRace, abilityScoreBonus: abilityBonus },
             );
-            setScaledMonster(result);
+            dispatch({ type: "SCALE_RESULT", payload: result });
         });
     };
 
-    const resetToForm = () => {
-        setScaledMonster(null);
-        setSaved(false);
-    };
+    const resetToForm = () => dispatch({ type: "RESET_TO_FORM" });
 
     return {
-        monster, setMonster,
-        edition, setEdition,
-        targetCR, setTargetCR,
+        monster, setMonster: (payload: MonsterBase) => dispatch({ type: "SET_MONSTER", payload }),
+        edition, setEdition: (payload: Edition) => dispatch({ type: "SET_EDITION", payload }),
+        targetCR, setTargetCR: (payload: number | null) => dispatch({ type: "SET_TARGET_CR", payload }),
         scaledMonster,
-        acEquipment, setAcEquipment,
-        acRace, setAcRace,
+        acEquipment, setAcEquipment: (payload: number) => dispatch({ type: "SET_AC_EQUIPMENT", payload }),
+        acRace, setAcRace: (payload: number) => dispatch({ type: "SET_AC_RACE", payload }),
         abilityBonus,
-        catalogSearch, setCatalogSearch,
-        saved, setSaved,
+        catalogSearch, setCatalogSearch: (payload: string) => dispatch({ type: "SET_CATALOG_SEARCH", payload }),
+        saved, setSaved: (payload: boolean) => dispatch({ type: "SET_SAVED", payload }),
         allMonsters,
         isScaling,
         handleLoadFromCatalog,

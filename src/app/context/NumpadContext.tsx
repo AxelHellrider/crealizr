@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useRef, ReactNode } from "react";
+import { createContext, useContext, useReducer, useCallback, ReactNode } from "react";
 
 export interface NumpadConfig {
     value: number;
@@ -24,48 +24,62 @@ interface NumpadContextValue {
 
 const NumpadContext = createContext<NumpadContextValue | null>(null);
 
-export function NumpadProvider({ children }: { children: ReactNode }) {
-    const [config, setConfig] = useState<NumpadConfig | null>(null);
-    const [displayValue, setDisplayValue] = useState("0");
-    const freshRef = useRef(false);
+/** `fresh` marks that the display still shows the seed value from `open()` — the next digit replaces it instead of appending. */
+type NumpadState = {
+    config: NumpadConfig | null;
+    displayValue: string;
+    fresh: boolean;
+};
 
-    const open = useCallback((cfg: NumpadConfig) => {
-        setConfig(cfg);
-        setDisplayValue(String(cfg.value));
-        freshRef.current = true;
-    }, []);
+type NumpadAction =
+    | { type: "OPEN"; config: NumpadConfig }
+    | { type: "CLOSE" }
+    | { type: "APPEND"; digit: string }
+    | { type: "BACKSPACE" }
+    | { type: "TOGGLE_SIGN" };
 
-    const close = useCallback(() => {
-        setConfig(null);
-    }, []);
+const initialState: NumpadState = { config: null, displayValue: "0", fresh: false };
 
-    const append = useCallback((digit: string) => {
-        setDisplayValue((prev) => {
-            if (freshRef.current) {
-                freshRef.current = false;
-                // preserve sign if present
+function numpadReducer(state: NumpadState, action: NumpadAction): NumpadState {
+    switch (action.type) {
+        case "OPEN":
+            return { config: action.config, displayValue: String(action.config.value), fresh: true };
+        case "CLOSE":
+            return { ...state, config: null };
+        case "APPEND": {
+            const prev = state.displayValue;
+            if (state.fresh) {
                 const sign = prev.startsWith("-") ? "-" : "";
-                return sign + digit;
+                return { ...state, displayValue: sign + action.digit, fresh: false };
             }
-            if (prev === "0" || prev === "-0") return prev.startsWith("-") ? "-" + digit : digit;
-            return prev + digit;
-        });
-    }, []);
-
-    const backspace = useCallback(() => {
-        freshRef.current = false;
-        setDisplayValue((prev) => {
+            if (prev === "0" || prev === "-0") {
+                return { ...state, displayValue: prev.startsWith("-") ? "-" + action.digit : action.digit };
+            }
+            return { ...state, displayValue: prev + action.digit };
+        }
+        case "BACKSPACE": {
+            const prev = state.displayValue;
             const stripped = prev.length <= 1 || (prev.length === 2 && prev[0] === "-");
-            return stripped ? "0" : prev.slice(0, -1);
-        });
-    }, []);
+            return { ...state, fresh: false, displayValue: stripped ? "0" : prev.slice(0, -1) };
+        }
+        case "TOGGLE_SIGN": {
+            const prev = state.displayValue;
+            if (prev === "0") return state;
+            return { ...state, displayValue: prev.startsWith("-") ? prev.slice(1) : "-" + prev };
+        }
+        default:
+            return state;
+    }
+}
 
-    const toggleSign = useCallback(() => {
-        setDisplayValue((prev) => {
-            if (prev === "0") return "0";
-            return prev.startsWith("-") ? prev.slice(1) : "-" + prev;
-        });
-    }, []);
+export function NumpadProvider({ children }: { children: ReactNode }) {
+    const [{ config, displayValue }, dispatch] = useReducer(numpadReducer, initialState);
+
+    const open = useCallback((cfg: NumpadConfig) => dispatch({ type: "OPEN", config: cfg }), []);
+    const close = useCallback(() => dispatch({ type: "CLOSE" }), []);
+    const append = useCallback((digit: string) => dispatch({ type: "APPEND", digit }), []);
+    const backspace = useCallback(() => dispatch({ type: "BACKSPACE" }), []);
+    const toggleSign = useCallback(() => dispatch({ type: "TOGGLE_SIGN" }), []);
 
     const commit = useCallback(() => {
         if (!config) return;
