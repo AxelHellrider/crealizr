@@ -1,18 +1,24 @@
 #!/usr/bin/env node
 /**
- * Bumps package.json's version based on commit messages since the last
- * "chore(release): vX.Y.Z" commit, following this repo's existing prefix
- * convention:
+ * Bumps package.json's version, following this repo's existing commit
+ * prefix convention:
  *   - "BREAKING" anywhere in the message           -> major
  *   - "feature(...)" / "feat(...)" / "feat:"        -> minor
  *   - anything else (fix, bugfix, refactor, chore…) -> patch
- * Highest-precedence bump wins. Then commits package.json and tags it.
+ * Highest-precedence bump wins.
  *
- * The boundary is the last release *commit* rather than a git tag: tags
- * aren't pushed by default (`git push` alone doesn't push them), so a
- * shallow/tagless clone on a deploy host would otherwise see no previous
- * release and re-derive the bump from the entire history every build,
- * repeatedly landing on the same version instead of advancing.
+ * Locally (`npm run release`), the range scanned is every commit since the
+ * last "chore(release): vX.Y.Z" commit, then the bump is committed and
+ * tagged so the base version in git actually advances.
+ *
+ * On CI/deploy hosts, only the single HEAD commit is classified and bumped
+ * once on top of whatever version is already committed in package.json —
+ * deliberately not a git-log range. Deploy hosts commonly do a shallow
+ * clone, where neither `git describe --tags` nor `git log --grep` across
+ * history can see far enough back; relying on either re-derives the bump
+ * from scratch every build and can never advance past one step from the
+ * hardcoded base. HEAD's message is the one thing guaranteed present even
+ * at clone depth 1, so that's the only thing CI trusts.
  *
  * Usage: node scripts/release.js [--dry-run]
  */
@@ -71,7 +77,31 @@ function bumpVersion(version, level) {
     return `${major}.${minor}.${patch + 1}`;
 }
 
-function main() {
+function mainCI() {
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+    let head;
+    try {
+        head = sh("git log -1 --format=%s");
+    } catch {
+        console.log("Could not read HEAD commit — leaving version as-is.");
+        return;
+    }
+
+    const level = classify([head]) ?? "patch";
+    const nextVersion = bumpVersion(pkg.version, level);
+    console.log(`${pkg.version} -> v${nextVersion}  [${level} bump, from HEAD: "${head}"]`);
+
+    if (dryRun) {
+        console.log("\nDry run — no files changed.");
+        return;
+    }
+
+    pkg.version = nextVersion;
+    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+    console.log(`\nCI build — bumped package.json to v${nextVersion} for this build only (no commit/tag).`);
+}
+
+function mainLocal() {
     const releaseCommit = lastReleaseCommit();
     const subjects = commitsSince(releaseCommit);
 
@@ -96,16 +126,19 @@ function main() {
     pkg.version = nextVersion;
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
-    if (isCI) {
-        console.log(`\nCI build — bumped package.json to ${nextTag} for this build only (no commit/tag).`);
-        return;
-    }
-
     sh(`git add "${pkgPath}"`);
     sh(`git commit -m "chore(release): ${nextTag}"`);
     sh(`git tag -a ${nextTag} -m "${nextTag}"`);
 
     console.log(`\nCommitted and tagged ${nextTag}. Push with: git push && git push origin ${nextTag}`);
+}
+
+function main() {
+    if (isCI) {
+        mainCI();
+    } else {
+        mainLocal();
+    }
 }
 
 main();
