@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 /**
  * Bumps package.json's version based on commit messages since the last
- * "vX.Y.Z" git tag, following this repo's existing prefix convention:
+ * "chore(release): vX.Y.Z" commit, following this repo's existing prefix
+ * convention:
  *   - "BREAKING" anywhere in the message           -> major
  *   - "feature(...)" / "feat(...)" / "feat:"        -> minor
  *   - anything else (fix, bugfix, refactor, chore…) -> patch
  * Highest-precedence bump wins. Then commits package.json and tags it.
+ *
+ * The boundary is the last release *commit* rather than a git tag: tags
+ * aren't pushed by default (`git push` alone doesn't push them), so a
+ * shallow/tagless clone on a deploy host would otherwise see no previous
+ * release and re-derive the bump from the entire history every build,
+ * repeatedly landing on the same version instead of advancing.
  *
  * Usage: node scripts/release.js [--dry-run]
  */
@@ -33,16 +40,16 @@ function sh(cmd) {
     return execSync(cmd, { encoding: "utf8" }).trim();
 }
 
-function lastTag() {
+function lastReleaseCommit() {
     try {
-        return sh("git describe --tags --match \"v[0-9]*.[0-9]*.[0-9]*\" --abbrev=0");
+        return sh('git log --grep="^chore(release):" -1 --format=%H') || null;
     } catch {
         return null;
     }
 }
 
-function commitsSince(tag) {
-    const range = tag ? `${tag}..HEAD` : "HEAD";
+function commitsSince(commit) {
+    const range = commit ? `${commit}..HEAD` : "HEAD";
     const log = sh(`git log ${range} --format=%s`);
     return log ? log.split("\n") : [];
 }
@@ -65,11 +72,11 @@ function bumpVersion(version, level) {
 }
 
 function main() {
-    const tag = lastTag();
-    const subjects = commitsSince(tag);
+    const releaseCommit = lastReleaseCommit();
+    const subjects = commitsSince(releaseCommit);
 
     if (subjects.length === 0) {
-        console.log(tag ? `No commits since ${tag} — nothing to release.` : "No commits found.");
+        console.log(releaseCommit ? `No commits since ${releaseCommit.slice(0, 7)} — nothing to release.` : "No commits found.");
         return;
     }
 
@@ -78,7 +85,7 @@ function main() {
     const nextVersion = bumpVersion(pkg.version, level);
     const nextTag = `v${nextVersion}`;
 
-    console.log(`${tag ?? "(no previous tag)"} -> ${nextTag}  [${level} bump, ${subjects.length} commit(s)]`);
+    console.log(`${releaseCommit ? releaseCommit.slice(0, 7) : "(no previous release)"} -> ${nextTag}  [${level} bump, ${subjects.length} commit(s)]`);
     subjects.forEach(s => console.log(`  - ${s}`));
 
     if (dryRun) {
