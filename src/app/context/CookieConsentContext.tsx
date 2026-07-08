@@ -49,36 +49,42 @@ interface CookieConsentContextValue {
 
 const CookieConsentContext = createContext<CookieConsentContextValue | null>(null);
 
+function pushConsentUpdate(status: "granted" | "denied") {
+    window.gtag?.("consent", "update", {
+        ad_storage: status,
+        ad_user_data: status,
+        ad_personalization: status,
+        analytics_storage: status,
+    });
+}
+
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
     const [state, dispatch] = useReducer(reducer, { status: "unset", bannerVisible: false });
 
     // Reads the prior decision from localStorage after mount only, so the
     // banner never flashes on the server-rendered pass before hydration.
+    // ConsentDefault always primes gtag with "denied" on every fresh load
+    // (SSR can't know a returning visitor's choice), so a prior "granted"
+    // decision has to be re-pushed here — otherwise a returning visitor who
+    // already consented stays stuck at denied until they hit the banner again,
+    // which they never will since it won't even show for them.
     useEffect(() => {
         const stored = window.localStorage.getItem(STORAGE_KEY);
-        dispatch({ type: "HYDRATE", status: stored === "granted" || stored === "denied" ? stored : "unset" });
+        const status = stored === "granted" || stored === "denied" ? stored : "unset";
+        dispatch({ type: "HYDRATE", status });
+        if (status === "granted") pushConsentUpdate("granted");
     }, []);
 
     const grant = () => {
         window.localStorage.setItem(STORAGE_KEY, "granted");
         dispatch({ type: "GRANT" });
-        window.gtag?.("consent", "update", {
-            ad_storage: "granted",
-            ad_user_data: "granted",
-            ad_personalization: "granted",
-            analytics_storage: "granted",
-        });
+        pushConsentUpdate("granted");
     };
 
     const deny = () => {
         window.localStorage.setItem(STORAGE_KEY, "denied");
         dispatch({ type: "DENY" });
-        window.gtag?.("consent", "update", {
-            ad_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-            analytics_storage: "denied",
-        });
+        pushConsentUpdate("denied");
     };
 
     const openPreferences = () => dispatch({ type: "OPEN_PREFERENCES" });
