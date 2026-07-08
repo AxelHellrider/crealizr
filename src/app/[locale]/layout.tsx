@@ -19,6 +19,7 @@ import {Picker} from "@/app/components/organisms/Picker";
 import {CookieConsentProvider} from "@/app/context/CookieConsentContext";
 import CookieBanner from "@/app/components/organisms/CookieBanner";
 import ConsentedGTM from "@/app/components/ConsentedGTM";
+import ConsentDefault from "@/app/components/ConsentDefault";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 import {Locale} from "@/i18n/config";
@@ -117,6 +118,8 @@ export default async function LocaleLayout({
         } as React.CSSProperties}>
         <body
             className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
+        <ConsentDefault/>
+        <ConsentedGTM/>
         <NextIntlClientProvider messages={messages}>
             <CookieConsentProvider>
                 <ThemeProvider>
@@ -144,7 +147,6 @@ export default async function LocaleLayout({
                     </SidebarProvider>
                 </ThemeProvider>
                 <CookieBanner/>
-                <ConsentedGTM/>
             </CookieConsentProvider>
         </NextIntlClientProvider>
         </body>

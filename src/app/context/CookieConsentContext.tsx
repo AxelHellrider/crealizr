@@ -6,6 +6,12 @@ export type ConsentStatus = "unset" | "granted" | "denied";
 
 const STORAGE_KEY = "cookie-consent";
 
+declare global {
+    interface Window {
+        gtag?: (...args: unknown[]) => void;
+    }
+}
+
 type State = {
     status: ConsentStatus;
     bannerVisible: boolean;
@@ -56,18 +62,23 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     const grant = () => {
         window.localStorage.setItem(STORAGE_KEY, "granted");
         dispatch({ type: "GRANT" });
+        window.gtag?.("consent", "update", {
+            ad_storage: "granted",
+            ad_user_data: "granted",
+            ad_personalization: "granted",
+            analytics_storage: "granted",
+        });
     };
 
     const deny = () => {
-        // Google Tag Manager's script/dataLayer, once injected, keeps running
-        // in memory for the rest of the session — unmounting the component
-        // that rendered it doesn't tear it down. A reload is the only way to
-        // make a revoked decision take effect immediately rather than after
-        // the visitor's next navigation.
-        const wasGranted = state.status === "granted";
         window.localStorage.setItem(STORAGE_KEY, "denied");
         dispatch({ type: "DENY" });
-        if (wasGranted) window.location.reload();
+        window.gtag?.("consent", "update", {
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+            analytics_storage: "denied",
+        });
     };
 
     const openPreferences = () => dispatch({ type: "OPEN_PREFERENCES" });
