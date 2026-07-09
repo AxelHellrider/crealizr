@@ -609,5 +609,16 @@
         ]
       }
     ]
+  },
+  "footer": {
+    "tagline": "Toolkit D&D per Dungeon Master",
+    "versionNote": "Convalidato per SRD 2014 e 2024 – Non affiliato a Wizards of the Coast",
+    "copyright": "© {year} CRealizr — Tutti i diritti riservati"
+  },
+  "pwaInstall": {
+    "title": "Installa CRealizr",
+    "description": "Aggiungilo alla schermata Home per un accesso rapido, anche offline, al tavolo.",
+    "install": "Installa",
+    "dismiss": "Non ora"
   }
 }

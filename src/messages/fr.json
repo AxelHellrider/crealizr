@@ -609,5 +609,16 @@
         ]
       }
     ]
+  },
+  "footer": {
+    "tagline": "Boîte à outils D&D pour maîtres du jeu",
+    "versionNote": "Validé pour le SRD 2014 et 2024 – Non affilié à Wizards of the Coast",
+    "copyright": "© {year} CRealizr — Tous droits réservés"
+  },
+  "pwaInstall": {
+    "title": "Installer CRealizr",
+    "description": "Ajoutez-le à votre écran d'accueil pour un accès rapide, même hors ligne, à table.",
+    "install": "Installer",
+    "dismiss": "Plus tard"
   }
 }

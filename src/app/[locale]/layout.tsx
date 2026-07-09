@@ -18,6 +18,7 @@ import {PickerProvider} from "@/app/context/PickerContext";
 import {Picker} from "@/app/components/organisms/Picker";
 import {CookieConsentProvider} from "@/app/context/CookieConsentContext";
 import CookieBanner from "@/app/components/organisms/CookieBanner";
+import PwaInstallPrompt from "@/app/components/organisms/PwaInstallPrompt";
 import ConsentedGTM from "@/app/components/ConsentedGTM";
 import ConsentDefault from "@/app/components/ConsentDefault";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
@@ -147,6 +148,7 @@ export default async function LocaleLayout({
                     </SidebarProvider>
                 </ThemeProvider>
                 <CookieBanner/>
+                <PwaInstallPrompt/>
             </CookieConsentProvider>
         </NextIntlClientProvider>
         </body>

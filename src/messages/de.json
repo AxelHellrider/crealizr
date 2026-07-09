@@ -609,5 +609,16 @@
         ]
       }
     ]
+  },
+  "footer": {
+    "tagline": "D&D-Toolkit für Spielleiter",
+    "versionNote": "Validiert für SRD 2014 & 2024 – Nicht verbunden mit Wizards of the Coast",
+    "copyright": "© {year} CRealizr — Alle Rechte vorbehalten"
+  },
+  "pwaInstall": {
+    "title": "CRealizr installieren",
+    "description": "Zum Startbildschirm hinzufügen für schnellen, offline-fähigen Zugriff am Spieltisch.",
+    "install": "Installieren",
+    "dismiss": "Nicht jetzt"
   }
 }

@@ -609,5 +609,16 @@
         ]
       }
     ]
+  },
+  "footer": {
+    "tagline": "DM-first D&D toolkit",
+    "versionNote": "Validated for 2014 & 2024 SRD – Not affiliated with Wizards of the Coast",
+    "copyright": "© {year} CRealizr — All Rights Reserved"
+  },
+  "pwaInstall": {
+    "title": "Install CRealizr",
+    "description": "Add it to your home screen for quick, offline-ready access at the table.",
+    "install": "Install",
+    "dismiss": "Not now"
   }
 }

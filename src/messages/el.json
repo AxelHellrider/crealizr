@@ -609,5 +609,16 @@
         ]
       }
     ]
+  },
+  "footer": {
+    "tagline": "Εργαλειοθήκη D&D για Dungeon Masters",
+    "versionNote": "Επικυρωμένο για SRD 2014 & 2024 – Χωρίς επίσημη σχέση με τη Wizards of the Coast",
+    "copyright": "© {year} CRealizr — Με επιφύλαξη παντός δικαιώματος"
+  },
+  "pwaInstall": {
+    "title": "Εγκατάσταση CRealizr",
+    "description": "Προσθέστε το στην αρχική οθόνη για γρήγορη πρόσβαση, ακόμη και χωρίς σύνδεση, στο τραπέζι.",
+    "install": "Εγκατάσταση",
+    "dismiss": "Όχι τώρα"
   }
 }
