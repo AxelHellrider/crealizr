@@ -56,17 +56,17 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
   return (
     <div className="flex flex-col gap-16 lg:gap-20">
       {/* Hero Section */}
-      <section className="relative glass-panel p-5 lg:p-24 flex flex-col items-center text-center overflow-hidden h-[calc(100svh-3.5rem)] justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
-        <div className="pointer-events-none absolute inset-0 opacity-20">
+      <section className="relative glass-panel p-5 lg:p-24 flex flex-col items-center text-center min-h-[calc(100svh-3.5rem)] justify-center fantasy-border lg:rounded-none lg:border-x-0 lg:border-t-0">
+        <div className="pointer-events-none absolute inset-0 opacity-20 overflow-hidden">
           <div className="absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full" style={{background:"radial-gradient(circle, rgba(197,160,89,0.3), transparent 70%)"}} />
           <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full" style={{background:"radial-gradient(circle, rgba(44,62,80,0.4), transparent 70%)"}} />
         </div>
 
         <div className="relative z-10 max-w-4xl lg:max-w-5xl">
-          <h1 className="text-2xl lg:text-5xl font-serif tracking-tight text-foreground drop-shadow-sm">
+          <h1 className="text-xl leading-tight lg:text-5xl lg:leading-tight font-serif tracking-tight text-foreground drop-shadow-sm">
             {t("home.hero.title")}
           </h1>
-          <p className="mt-6 text-base lg:text-2xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="mt-6 text-sm lg:text-2xl text-muted-foreground max-w-2xl lg:max-w-3xl mx-auto leading-relaxed font-light">
             {t("home.hero.description")}
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
