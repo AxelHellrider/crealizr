@@ -208,7 +208,7 @@ export default function CombatBalancerPage() {
             <div className="shrink-0 p-4 lg:px-8 lg:pt-8 lg:pb-6">
                 <PageHeader title={t("title")} description={t("description")}>
                     <p className="text-xs text-muted">{t("rulesetNote")}</p>
-                    <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-sm italic">
+                    <Link href={`/${locale}/encounter-builder/docs`} scroll={false} className="ui-link text-sm italic">
                         {t("viewDocs")}
                     </Link>
                 </PageHeader>
@@ -579,7 +579,7 @@ export default function CombatBalancerPage() {
                     </Card>
 
                     <div className="shrink-0 pb-2">
-                        <Link href={`/${locale}/encounter-builder/docs`} className="ui-link text-xs italic">
+                        <Link href={`/${locale}/encounter-builder/docs`} scroll={false} className="ui-link text-xs italic">
                             {t("viewDocs")}
                         </Link>
                     </div>

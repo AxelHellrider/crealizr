@@ -96,7 +96,7 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div className="flex justify-start lg:justify-end text-right p-3 border-b border-gold/20">
-            <Link href={`/${locale}`} className="text-gold">
+            <Link href={`/${locale}`} scroll={false} className="text-gold">
                 <CrealizrMark className="h-8 w-auto lg:hidden" />
                 <CrealizrLogo className="hidden lg:block w-full h-12" />
             </Link>
@@ -109,6 +109,7 @@ export default function Sidebar() {
                       <li key={item.href}>
                           <Link
                               href={item.href}
+                              scroll={false}
                               onClick={() => {
                                   if (window.innerWidth < 1280) setIsOpen(false);
                               }}

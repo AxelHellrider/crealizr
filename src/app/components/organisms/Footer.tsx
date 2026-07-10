@@ -25,11 +25,11 @@ export default function Footer() {
 
                     {/* Links */}
                     <nav className="flex flex-wrap gap-6 text-sm font-semibold tracking-widest">
-                        <Link href={`/${locale}/encounter-builder`} className="ui-link transition uppercase hover:text-gold">{t("nav.encounterBuilder")}</Link>
-                        <Link href={`/${locale}/monster-scaler`} className="ui-link transition uppercase hover:text-gold">{t("nav.monsterScaler")}</Link>
-                        <Link href={`/${locale}/travel-encounters`} className="ui-link transition uppercase hover:text-gold">{t("nav.travelEncounters")}</Link>
-                        <Link href={`/${locale}/artifact-forge`} className="ui-link transition uppercase hover:text-gold">{t("nav.artifactForge")}</Link>
-                        <Link href={`/${locale}/my-monsters`} className="ui-link transition uppercase hover:text-gold">{t("nav.myMonsters")}</Link>
+                        <Link href={`/${locale}/encounter-builder`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.encounterBuilder")}</Link>
+                        <Link href={`/${locale}/monster-scaler`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.monsterScaler")}</Link>
+                        <Link href={`/${locale}/travel-encounters`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.travelEncounters")}</Link>
+                        <Link href={`/${locale}/artifact-forge`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.artifactForge")}</Link>
+                        <Link href={`/${locale}/my-monsters`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.myMonsters")}</Link>
                         <a href="https://github.com/AxelHellrider" target="_blank" rel="noreferrer" className="ui-link transition uppercase hover:text-gold">{t("sidebar.github")}</a>
                     </nav>
                 </div>
@@ -39,9 +39,9 @@ export default function Footer() {
                         v{version} · {t("footer.versionNote")}
                     </p>
                     <nav className="flex flex-wrap gap-4 text-xs">
-                        <Link href={`/${locale}/terms`} className="ui-link transition hover:text-gold">{t("terms.title")}</Link>
-                        <Link href={`/${locale}/disclaimer`} className="ui-link transition hover:text-gold">{t("disclaimer.title")}</Link>
-                        <Link href={`/${locale}/privacy`} className="ui-link transition hover:text-gold">{t("privacy.title")}</Link>
+                        <Link href={`/${locale}/terms`} scroll={false} className="ui-link transition hover:text-gold">{t("terms.title")}</Link>
+                        <Link href={`/${locale}/disclaimer`} scroll={false} className="ui-link transition hover:text-gold">{t("disclaimer.title")}</Link>
+                        <Link href={`/${locale}/privacy`} scroll={false} className="ui-link transition hover:text-gold">{t("privacy.title")}</Link>
                         <button type="button" onClick={openPreferences} className="ui-link transition hover:text-gold">{t("cookieBanner.manage")}</button>
                     </nav>
                     <p className="text-xs text-muted">

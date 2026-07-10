@@ -12,7 +12,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 w-full h-14 bg-background border-b border-gold/20 xl:hidden">
             <div className="flex h-full items-center justify-between px-4">
-                <Link href={`/${locale}`} className="accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm">
+                <Link href={`/${locale}`} scroll={false} className="accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm">
                     <CrealizrMark className="h-7 w-auto" />
                 </Link>
                 <button

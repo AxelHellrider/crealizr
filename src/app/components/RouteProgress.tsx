@@ -45,6 +45,19 @@ export default function RouteProgress() {
     typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
   ).current;
 
+  // Nav links use scroll={false} so App Router doesn't jump straight to
+  // (0,0) — an instant scrollTop drop is what makes mobile browsers snap
+  // their collapsible URL bar back open mid-navigation. Scrolling smoothly
+  // here instead lands at the same place without the abrupt jump.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  }, [pathname, prefersReducedMotion]);
+
   useEffect(() => {
     // start progress on route key change
     // clear any pending timers

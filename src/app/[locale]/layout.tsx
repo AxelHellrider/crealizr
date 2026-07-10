@@ -21,6 +21,7 @@ import CookieBanner from "@/app/components/organisms/CookieBanner";
 import PwaInstallPrompt from "@/app/components/organisms/PwaInstallPrompt";
 import ConsentedGTM from "@/app/components/ConsentedGTM";
 import ConsentDefault from "@/app/components/ConsentDefault";
+import { SerwistProvider } from "@serwist/turbopack/react";
 import {SeoJsonLd} from "@/app/components/atoms/SeoJsonLd";
 import {runStartupEnvCheck} from "@/app/lib/startupEnvCheck";
 import {Locale} from "@/i18n/config";
@@ -121,6 +122,7 @@ export default async function LocaleLayout({
             className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
         <ConsentDefault/>
         <ConsentedGTM/>
+        <SerwistProvider swUrl="/sw.js/sw.js" register={process.env.NODE_ENV === "production"} reloadOnOnline={false}>
         <NextIntlClientProvider messages={messages}>
             <CookieConsentProvider>
                 <ThemeProvider>
@@ -151,6 +153,7 @@ export default async function LocaleLayout({
                 <PwaInstallPrompt/>
             </CookieConsentProvider>
         </NextIntlClientProvider>
+        </SerwistProvider>
         </body>
         </html>
     );

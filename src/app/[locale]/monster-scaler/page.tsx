@@ -63,7 +63,7 @@ export default function ScalePage() {
             {!scaledMonster && (
                 <div className="grid gap-8">
                     <PageHeader title={t("title")} description={t("description")}>
-                        <Link href={'/monster-scaler/docs'} className="ui-link text-sm italic">
+                        <Link href={'/monster-scaler/docs'} scroll={false} className="ui-link text-sm italic">
                             {t("viewDocs")}
                         </Link>
                     </PageHeader>
@@ -257,7 +257,7 @@ export default function ScalePage() {
                     {saved && (
                         <p className="text-xs text-center text-gold/60">
                             Saved to{" "}
-                            <Link href={`/${locale}/my-monsters`} className="ui-link">My Bestiary</Link>
+                            <Link href={`/${locale}/my-monsters`} scroll={false} className="ui-link">My Bestiary</Link>
                             {" "}— stored in your browser locally.
                         </p>
                     )}
@@ -266,7 +266,7 @@ export default function ScalePage() {
             )}
 
             <div className="hidden lg:block pt-4">
-                <Link href={'/monster-scaler/docs'} className={"ui-link text-sm italic inline-flex justify-center w-full"}>{t("viewDocs")}</Link>
+                <Link href={'/monster-scaler/docs'} scroll={false} className={"ui-link text-sm italic inline-flex justify-center w-full"}>{t("viewDocs")}</Link>
             </div>
         </PageSection>
     );
