@@ -1,6 +1,10 @@
 import { createSerwistRoute } from "@serwist/turbopack";
 
-const route = createSerwistRoute({ swSrc: "src/app/sw.ts" });
+// useNativeEsbuild defaults to true on Windows and false everywhere else,
+// which pulls in `esbuild-wasm` on Linux hosts — a package never installed
+// here. Forcing native `esbuild` avoids that platform-specific dependency
+// entirely; it's already resolvable (see @serwist/turbopack's own deps).
+const route = createSerwistRoute({ swSrc: "src/app/sw.ts", useNativeEsbuild: true });
 
 export const { dynamic, dynamicParams, revalidate } = route;
 
