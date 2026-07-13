@@ -80,13 +80,7 @@ function hexDirectionSector(direction: HexDirection): number {
     return Math.round(((angle + 360) % 360) / 60) % 6;
 }
 
-const DIRECTION_ARROWS = ["→", "↘", "↙", "←", "↖", "↗"];
 const DIRECTION_LABELS = ["Right", "Diagonal Bottom Right", "Diagonal Bottom Left", "Left", "Diagonal Top Left", "Diagonal Top Right"];
-
-/** Unicode arrow glyph pointing in the given hex direction. */
-export function hexDirectionArrow(direction: HexDirection): string {
-    return DIRECTION_ARROWS[hexDirectionSector(direction)];
-}
 
 /** Human-readable direction name (never a bare number) — e.g. "Diagonal Top Left". */
 export function hexDirectionLabel(direction: HexDirection): string {

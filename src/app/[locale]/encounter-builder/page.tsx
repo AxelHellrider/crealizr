@@ -475,9 +475,14 @@ export default function CombatBalancerPage() {
                                         <Card
                                             className={`border transition-all duration-150 cursor-pointer relative ${
                                                 isSelected
-                                                    ? "border-crimson ring-1 ring-crimson bg-crimson/5"
+                                                    ? ""
                                                     : (state.mode === "solo" ? "border-gold/10 bg-background/50" : "border-silver/10 bg-background/50")
                                             }`}
+                                            style={isSelected ? {
+                                                borderColor: "var(--accent-tertiary)",
+                                                boxShadow: "0 0 0 1px var(--accent-tertiary)",
+                                                backgroundColor: "color-mix(in srgb, var(--accent-tertiary) 6%, var(--surface-card))",
+                                            } : undefined}
                                             onClick={() => dispatch({ type: "SET_SELECTED_IDX", payload: i })}
                                             role="button"
                                             tabIndex={0}
@@ -485,7 +490,7 @@ export default function CombatBalancerPage() {
                                             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: "SET_SELECTED_IDX", payload: i }); }}
                                         >
                                             {isSelected && (
-                                                <span className="absolute -top-2 left-3 bg-crimson text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5">
+                                                <span className="absolute -top-2 left-3 z-10 bg-crimson text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5">
                                                     Active
                                                 </span>
                                             )}

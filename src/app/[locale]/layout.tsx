@@ -11,6 +11,7 @@ import RouteProgress from "@/app/components/RouteProgress";
 import {Suspense} from "react";
 import {ThemeProvider} from "@/app/context/ThemeContext";
 import {SidebarProvider} from "@/app/context/SidebarContext";
+import {MapFullscreenProvider} from "@/app/context/MapFullscreenContext";
 import {CustomMonstersProvider} from "@/app/context/CustomMonstersContext";
 import {NumpadProvider} from "@/app/context/NumpadContext";
 import {Numpad} from "@/app/components/organisms/Numpad";
@@ -125,6 +126,7 @@ export default async function LocaleLayout({
         <SerwistProvider swUrl="/sw.js/sw.js" register={process.env.NODE_ENV === "production"} reloadOnOnline={false}>
         <NextIntlClientProvider messages={messages}>
             <CookieConsentProvider>
+              <MapFullscreenProvider>
                 <ThemeProvider>
                     <SeoJsonLd/>
                     <SidebarProvider>
@@ -151,6 +153,7 @@ export default async function LocaleLayout({
                 </ThemeProvider>
                 <CookieBanner/>
                 <PwaInstallPrompt/>
+              </MapFullscreenProvider>
             </CookieConsentProvider>
         </NextIntlClientProvider>
         </SerwistProvider>

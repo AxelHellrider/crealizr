@@ -16,58 +16,16 @@
   "home": {
     "hero": {
       "title": "Gestisci avventure bilanciate più velocemente, senza rompere la fantasia.",
-      "description": "Un toolkit D&D pronto per il tavolo per Dungeon Master. Crea incontri, scala mostri e forgia artefatti con risultati utilizzabili subito. Passa tra 2014 e 2024 per cambiare i calcoli dietro le quinte senza modificare il tuo flusso di lavoro.",
-      "buildEncounter": "Crea un incontro",
-      "scaleMonster": "Scala un mostro",
-      "forgeItem": "Forgia un oggetto"
-    },
-    "exampleOutput": {
-      "title": "Esempio di risultato dell'incontro",
-      "description": "Un risultato concreto, pronto da usare al tavolo. Lo strumento mostra un mix consigliato e il suo allineamento al budget.",
-      "inputs": "Input",
-      "party": "Gruppo",
-      "partyValue": "4 PG · Livello 5",
-      "difficulty": "Difficoltà",
-      "difficultyValue": "Difficile",
-      "ruleset": "Regole",
-      "rulesetValue": "2014 o 2024",
-      "recommendedMix": "Mix consigliato",
-      "budgetFit": "Adesione al budget: 96% (in linea)",
-      "budgetExplanation": "Adesione al budget = XP modificati / XP obiettivo. Esempio: 1.920 contro 2.000 XP → 96%."
-    },
-    "sampleOutputs": {
-      "title": "Esempi di output",
-      "description": "Ogni strumento produce un risultato chiaro, pronto per il tavolo. Le esportazioni corrispondono all'anteprima.",
-      "encounterBuilder": "Generatore di incontri",
-      "encounterValue": "2 × CR 3, 1 × CR 1",
-      "encounterFit": "Adesione al budget: 92% · Difficile",
-      "encounterNote": "L'interruttore 2014/2024 regola soglie e XP.",
-      "monsterScaler": "Scalatore di mostri",
-      "ac": "CA",
-      "hp": "PF",
-      "dpr": "DPR",
-      "scalerNote": "L'anteprima corrisponde all'esportazione PNG/PDF.",
-      "artifactForge": "Forgia di artefatti",
-      "itemName": "Egida dell'Aurora",
-      "itemDetails": "Raro · +2 CA · Sintonia",
-      "itemFlavor": "\"Forgiata all'alba per respingere i morti inquieti.\""
-    },
-    "howItWorks": {
-      "title": "Come funziona",
-      "description": "Tre passaggi, pensati per la preparazione dal vivo o per cambi di rotta durante la sessione.",
-      "step1": "Passo 1",
-      "step1Title": "Scegli uno strumento",
-      "step1Desc": "Generatore di incontri, scalatore di mostri o forgia di oggetti.",
-      "step2": "Passo 2",
-      "step2Title": "Imposta i tuoi input",
-      "step2Desc": "Dimensione del gruppo, difficoltà, CR target e dettagli narrativi.",
-      "step3": "Passo 3",
-      "step3Title": "Esegui o esporta",
-      "step3Desc": "Copia l'output o esporta statblock PNG/PDF."
+      "welcome": "Benvenuto",
+      "welcomeBlurb": "Un toolkit gratuito pensato per il tavolo — incontri, mostri e oggetti magici, pronti quando lo sei tu. Creato al tavolo, per il tavolo — niente più pause di sessione per calcolare il CR a mente.",
+      "tool": "Strumento",
+      "about": "Chi siamo",
+      "aboutBlurb": "Creato da un Dungeon Master per i Dungeon Master — gratuito, veloce, senza account.",
+      "rulesetNote": "Compatibile con le regole 2014 & 2024",
+      "travelAction": "Pianifica un viaggio",
+      "bestiaryAction": "Gestisci il tuo bestiario"
     },
     "coreToolkit": {
-      "title": "Toolkit principale",
-      "description": "Output concreti per costruire incontri, scalare e progettare oggetti.",
       "monsterScaler": {
         "title": "Scalatore di mostri",
         "description": "Regola PF, CA, DPR e obiettivi statistici a un nuovo CR. Include statblock pronti per l'esportazione.",
@@ -85,20 +43,20 @@
       }
     },
     "reliability": {
-      "title": "Affidabilità prima di tutto",
-      "point1": {
-        "title": "Copertura delle regole",
-        "description": "Sono supportate le indicazioni 2014 e 2024, così i calcoli degli incontri restano coerenti tra le edizioni."
-      },
-      "point2": {
-        "title": "Pronto per l'esportazione",
-        "description": "Scarica PNG per l'uso in VTT o PDF per la stampa. I nomi dei file mantengono le sessioni ordinate."
-      },
       "point3": {
-        "title": "Nessun login richiesto",
-        "description": "Pensato per sessioni dal vivo: input rapidi, output leggibili e nessun obbligo di account."
-      },
-      "preview": "Anteprima manoscritto: Mostro scalato"
+        "title": "Nessun login richiesto"
+      }
+    },
+    "showcase": {
+      "title": "Vedilo in azione",
+      "description": "Output reale degli strumenti stessi — non mockup.",
+      "encounterInputs": "4 Giocatori · Livello 5 · Difficoltà: Difficile",
+      "scalerInputs": "Goblin · CR 1/4 scalato a CR 10",
+      "itemInputs": "Arma · Livello 8 · Sintonizzazione richiesta",
+      "itemFlavor": "Forgiata nel fuoco di drago, vibra lievemente quando il pericolo si avvicina.",
+      "travelInputs": "Foresta · Incontro di combattimento · Tiro d500",
+      "bestiaryInputs": "Una voce homebrew, salvata localmente e riutilizzabile in ogni strumento",
+      "noSample": "Nessun esempio disponibile per questo regolamento."
     }
   },
   "encounterBuilder": {

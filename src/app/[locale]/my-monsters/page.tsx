@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
 import type { CustomMonster } from "@/app/lib/monsterDB";
-import type { Monster } from "@/app/types/monster";
-import MonsterForm from "./MonsterForm";
 import MonsterTable from "./MonsterTable";
 import { Button } from "@/app/components/atoms/Button";
 import { InfoGrid } from "@/app/components/molecules/InfoGrid";
@@ -14,33 +13,15 @@ import { PageHeader } from "@/app/components/atoms/PageHeader";
 
 export default function MyMonstersPage() {
     const t = useTranslations("myMonsters");
-    const { customMonsters, addMonster, updateMonster, deleteMonster, importMonsters, exportAllMonsters, loading } = useCustomMonsters();
+    const locale = useLocale();
+    const router = useRouter();
+    const { customMonsters, deleteMonster, importMonsters, exportAllMonsters, loading } = useCustomMonsters();
 
-    // null = list view, "new" = add form, CustomMonster = edit form
-    const [editTarget, setEditTarget] = useState<CustomMonster | "new" | null>(null);
     const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const editingMonster = editTarget !== null && editTarget !== "new" ? editTarget : null;
-
-    const existingNames = new Set(
-        customMonsters
-            .filter((m) => m.id !== editingMonster?.id)
-            .map((m) => m.name.toLowerCase())
-    );
-
-    async function handleSave(monster: Monster) {
-        if (editingMonster) {
-            await updateMonster(editingMonster.id, monster);
-        } else {
-            await addMonster(monster);
-        }
-        setEditTarget(null);
-    }
-
     function handleEdit(monster: CustomMonster) {
-        setEditTarget(monster);
-        setFeedback(null);
+        router.push(`/${locale}/my-monsters/edit/${monster.id}`);
     }
 
     async function handleDelete(id: string) {
@@ -100,38 +81,27 @@ export default function MyMonstersPage() {
                 </div>
             )}
 
-            {editTarget === null ? (
-                <>
-                    {/* ── Actions bar ── */}
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Button data-testid="add-monster-btn" onClick={() => { setEditTarget("new"); setFeedback(null); }} className="px-5 py-2.5 text-xs uppercase tracking-widest">
-                            + {t("addMonster")}
-                        </Button>
-                        <span className="hidden sm:block w-px h-6 bg-gold/10" />
-                        <Button
-                            onClick={exportAllMonsters}
-                            disabled={customMonsters.length === 0}
-                            className="px-4 py-2 text-xs uppercase tracking-widest"
-                        >
-                            {t("export")} ({customMonsters.length})
-                        </Button>
-                        <label className="ui-button px-4 py-2 text-xs uppercase tracking-widest cursor-pointer">
-                            {t("import")}
-                            <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
-                        </label>
-                    </div>
+            {/* ── Actions bar ── */}
+            <div className="flex flex-wrap items-center gap-3">
+                <Button data-testid="add-monster-btn" onClick={() => router.push(`/${locale}/my-monsters/add`)} className="px-5 py-2.5 text-xs uppercase tracking-widest">
+                    + {t("addMonster")}
+                </Button>
+                <span className="hidden sm:block w-px h-6 bg-gold/10" />
+                <Button
+                    onClick={exportAllMonsters}
+                    disabled={customMonsters.length === 0}
+                    className="px-4 py-2 text-xs uppercase tracking-widest"
+                >
+                    {t("export")} ({customMonsters.length})
+                </Button>
+                <label className="ui-button px-4 py-2 text-xs uppercase tracking-widest cursor-pointer">
+                    {t("import")}
+                    <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+                </label>
+            </div>
 
-                    {/* ── Monster list ── */}
-                    <MonsterTable monsters={customMonsters} onEdit={handleEdit} onDelete={handleDelete} />
-                </>
-            ) : (
-                <MonsterForm
-                    initial={editingMonster ?? undefined}
-                    existingNames={existingNames}
-                    onSave={handleSave}
-                    onCancel={() => setEditTarget(null)}
-                />
-            )}
+            {/* ── Monster list ── */}
+            <MonsterTable monsters={customMonsters} onEdit={handleEdit} onDelete={handleDelete} />
         </PageSection>
     );
 }

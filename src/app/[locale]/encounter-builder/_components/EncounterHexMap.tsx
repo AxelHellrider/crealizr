@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Stage, Layer, Line, Group, Text, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
+import { useMapFullscreen } from "@/app/context/MapFullscreenContext";
 import { MapToolbar, type MapMode } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
 import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
@@ -68,7 +69,7 @@ function nodeStyle(node: EncounterNode) {
 function nodeLabel(node: EncounterNode): string {
     switch (node.kind) {
         case "party":  return node.label || "PC";
-        case "enemy":  return formatCR(node.cr);
+        case "enemy":  return node.label || (node.isBoss ? "Boss" : "Monster");
         case "hazard": return node.label || (node.source === "spell" ? "Spell" : "Hazard");
         case "cover":  return node.label || "Cover";
     }
@@ -77,11 +78,16 @@ function nodeLabel(node: EncounterNode): string {
 /** One-line summary of a node's current settings, shown on hover. */
 function nodeSettingsSummary(node: EncounterNode, ruleset: Ruleset): string {
     switch (node.kind) {
-        case "party":
-        case "enemy": {
+        case "party": {
             const defs = getConditions(ruleset);
             const names = (node.conditions ?? []).map(id => defs.find(c => c.id === id)?.name).filter(Boolean);
             return names.length ? names.join(", ") : "No conditions";
+        }
+        case "enemy": {
+            const defs = getConditions(ruleset);
+            const names = (node.conditions ?? []).map(id => defs.find(c => c.id === id)?.name).filter(Boolean);
+            const conditionsText = names.length ? names.join(", ") : "No conditions";
+            return `CR ${formatCR(node.cr)}${node.isBoss ? " · Boss" : ""} · ${conditionsText}`;
         }
         case "cover": {
             const levels: Record<string, string> = { half: "Half Cover", "three-quarter": "Three-Quarters Cover", full: "Full Cover" };
@@ -156,7 +162,8 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const [size, setSize]               = useState({ width: 320, height: 320 });
     const [mapMode, setMapMode]         = useState<MapMode>("select");
     const [cameraLocked, setCameraLocked] = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    // Shared with the rest of the app (e.g. the PWA install badge hides itself while this is true).
+    const { isFullscreen, setIsFullscreen } = useMapFullscreen();
     const [showRotateHint, setShowRotateHint] = useState(false);
 
     // Fixed vertical layout regardless of device/viewport — the battlefield
@@ -220,16 +227,10 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         return () => window.removeEventListener("resize", update);
     }, [isFullscreen]);
 
-    // Prevent body scroll while fullscreen is open, and flag it on <html> so
-    // other fixed/sticky chrome (e.g. the PWA install badge) can hide itself
-    // via CSS without needing a shared React context.
+    // Prevent body scroll while fullscreen is open.
     useEffect(() => {
         document.body.style.overflow = isFullscreen ? "hidden" : "";
-        document.documentElement.toggleAttribute("data-map-fullscreen", isFullscreen);
-        return () => {
-            document.body.style.overflow = "";
-            document.documentElement.removeAttribute("data-map-fullscreen");
-        };
+        return () => { document.body.style.overflow = ""; };
     }, [isFullscreen]);
 
     // Suggest rotating to landscape on mobile portrait, once per fullscreen
@@ -724,11 +725,12 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                                 <Line points={HEX_FILL} closed fill={style.fill} stroke={style.stroke} strokeWidth={style.strokeWidth} />
                                 <Text
                                     text={nodeLabel(node)}
-                                    fontSize={node.kind === "enemy" ? 6.5 : 6}
+                                    fontSize={6}
                                     fontFamily="sans-serif" fill={style.stroke}
                                     align="center" width={W} offsetX={W / 2} y={-4}
                                 />
-                                {node.kind === "enemy" && node.isBoss && (
+                                {/* Only needed when a custom label is set — otherwise nodeLabel() already reads "Boss" */}
+                                {node.kind === "enemy" && node.isBoss && node.label && (
                                     <Text text="BOSS" fontSize={5.5} fontFamily="serif" fill="rgba(220,38,38,0.4)" align="center" width={W} offsetX={W / 2} y={6} />
                                 )}
                                 {(node.kind === "party" || node.kind === "enemy") && conditionAbbrs(node, ruleset) && (
@@ -841,8 +843,8 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
 
                     {/* Party advantages/disadvantages — otherwise only visible in the sidebar, which fullscreen hides */}
                     {(coverBenefits.length > 0 || hazardEffects.length > 0) && (
-                        <div className="shrink-0 max-h-32 overflow-y-auto px-4 py-2 border-t border-gold/10 bg-card">
-                            <AdvantagesPanel coverBenefits={coverBenefits} hazardEffects={hazardEffects} className="border-t-0 pt-0" />
+                        <div className="shrink-0 max-h-32 overflow-y-auto border-t border-gold/10 bg-card">
+                            <AdvantagesPanel coverBenefits={coverBenefits} hazardEffects={hazardEffects} className="border-t-0 pt-0 max-w-xs mx-auto px-4 py-2" />
                         </div>
                     )}
 

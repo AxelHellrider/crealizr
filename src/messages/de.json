@@ -16,58 +16,16 @@
   "home": {
     "hero": {
       "title": "Balancierte Abenteuer schneller leiten, ohne die Fantasy zu zerstören.",
-      "description": "Ein sofort am Tisch nutzbares D&D-Toolkit für Spielleitungen. Erstelle Begegnungen, skaliere Monster und schmiede Artefakte mit Ergebnissen, die du direkt verwenden kannst. Wechsle zwischen 2014 und 2024, um die zugrunde liegende Mathematik zu ändern, ohne deinen Arbeitsablauf zu verändern.",
-      "buildEncounter": "Begegnung erstellen",
-      "scaleMonster": "Monster skalieren",
-      "forgeItem": "Gegenstand schmieden"
-    },
-    "exampleOutput": {
-      "title": "Beispielausgabe einer Begegnung",
-      "description": "Ein konkretes Ergebnis, bereit für den Einsatz am Tisch. Das Tool zeigt eine empfohlene Mischung und ihre Budget-Passung.",
-      "inputs": "Eingaben",
-      "party": "Gruppe",
-      "partyValue": "4 SC · Stufe 5",
-      "difficulty": "Schwierigkeit",
-      "difficultyValue": "Schwer",
-      "ruleset": "Regelwerk",
-      "rulesetValue": "2014 oder 2024",
-      "recommendedMix": "Empfohlene Mischung",
-      "budgetFit": "Budget-Passung: 96% (im Ziel)",
-      "budgetExplanation": "Budget-Passung = angepasstes XP / Ziel-XP. Beispiel: 1.920 zu 2.000 XP → 96%."
-    },
-    "sampleOutputs": {
-      "title": "Beispielausgaben",
-      "description": "Jedes Tool erzeugt ein klares, tischfertiges Ergebnis. Exporte entsprechen der Vorschau.",
-      "encounterBuilder": "Begegnungs-Generator",
-      "encounterValue": "2 × CR 3, 1 × CR 1",
-      "encounterFit": "Budget-Passung: 92% · Schwer",
-      "encounterNote": "Der 2014/2024-Schalter passt Schwellenwerte und XP an.",
-      "monsterScaler": "Monster-Skalierer",
-      "ac": "RK",
-      "hp": "TP",
-      "dpr": "SDR",
-      "scalerNote": "Die Vorschau entspricht dem PNG/PDF-Export.",
-      "artifactForge": "Artefakt-Schmiede",
-      "itemName": "Aegis der Morgenröte",
-      "itemDetails": "Selten · +2 RK · Einstimmung",
-      "itemFlavor": "\"Bei Sonnenaufgang geschmiedet, um die ruhelosen Toten zu bannen.\""
-    },
-    "howItWorks": {
-      "title": "So funktioniert es",
-      "description": "Drei Schritte, gemacht für Live-Vorbereitung oder spontane Änderungen während der Sitzung.",
-      "step1": "Schritt 1",
-      "step1Title": "Tool wählen",
-      "step1Desc": "Begegnungs-Generator, Monster-Skalierer oder Artefakt-Schmiede.",
-      "step2": "Schritt 2",
-      "step2Title": "Eingaben festlegen",
-      "step2Desc": "Gruppengröße, Schwierigkeit, CR-Ziele und Flavor-Details.",
-      "step3": "Schritt 3",
-      "step3Title": "Ausführen oder exportieren",
-      "step3Desc": "Ergebnis kopieren oder PNG/PDF-Statblöcke exportieren."
+      "welcome": "Willkommen",
+      "welcomeBlurb": "Ein kostenloses Toolkit für den Spieltisch — Begegnungen, Monster und magische Gegenstände, bereit, wenn du es bist. Am Tisch entwickelt, für den Tisch — keine Sitzungsunterbrechungen mehr für CR-Kopfrechnen.",
+      "tool": "Werkzeug",
+      "about": "Über uns",
+      "aboutBlurb": "Von einer Spielleitung für Spielleitungen — kostenlos, schnell und ohne Konto.",
+      "rulesetNote": "Funktioniert mit den Regeln von 2014 & 2024",
+      "travelAction": "Reise planen",
+      "bestiaryAction": "Bestiarium verwalten"
     },
     "coreToolkit": {
-      "title": "Kern-Toolkit",
-      "description": "Konkrete Ergebnisse für Begegnungsbau, Skalierung und Gegenstandsentwurf.",
       "monsterScaler": {
         "title": "Monster-Skalierer",
         "description": "Passt TP, RK, SDR und empfohlene Kampfw erte an einen neuen CR an. Enthält exportfertige Statblöcke.",
@@ -85,20 +43,20 @@
       }
     },
     "reliability": {
-      "title": "Zuverlässigkeit zuerst",
-      "point1": {
-        "title": "Regelwerksabdeckung",
-        "description": "2014- und 2024-Hinweise werden unterstützt, damit deine Begegnungsrechnung über Editionen hinweg konsistent bleibt."
-      },
-      "point2": {
-        "title": "Exportbereit",
-        "description": "PNG für VTT-Nutzung oder PDF für Ausdrucke herunterladen. Dateinamen halten Sitzungen übersichtlich."
-      },
       "point3": {
-        "title": "Kein Login nötig",
-        "description": "Für Live-Sessions gebaut: schnelle Eingaben, lesbare Ausgaben und keine Account-Hürde."
-      },
-      "preview": "Manuskriptvorschau: Skalierter Monster"
+        "title": "Kein Login nötig"
+      }
+    },
+    "showcase": {
+      "title": "So sieht's in Aktion aus",
+      "description": "Echte Ausgabe der tatsächlichen Werkzeuge — keine Mockups.",
+      "encounterInputs": "4 Spieler · Stufe 5 · Schwierigkeit: Schwer",
+      "scalerInputs": "Goblin · CR 1/4 auf CR 10 skaliert",
+      "itemInputs": "Waffe · Stufe 8 · Bindung erforderlich",
+      "itemFlavor": "In Drachenfeuer geschmiedet, summt sie leise, wenn Gefahr naht.",
+      "travelInputs": "Wald · Kampfbegegnung · d500-Wurf",
+      "bestiaryInputs": "Ein Homebrew-Eintrag, lokal gespeichert und in jedem Werkzeug wiederverwendbar",
+      "noSample": "Für dieses Regelwerk ist kein Beispiel verfügbar."
     }
   },
   "encounterBuilder": {

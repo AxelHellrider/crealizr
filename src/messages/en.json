@@ -16,58 +16,16 @@
   "home": {
     "hero": {
       "title": "Run balanced adventures faster, without breaking the fantasy.",
-      "description": "A table-ready D&D toolkit for Dungeon Masters. Build encounters, scale monsters, and forge artifacts with outputs you can use immediately. Toggle 2014 or 2024 to swap the math underneath without changing your workflow.",
-      "buildEncounter": "Build an Encounter",
-      "scaleMonster": "Scale a Monster",
-      "forgeItem": "Forge an Item"
-    },
-    "exampleOutput": {
-      "title": "Example Encounter Output",
-      "description": "A concrete result, ready to run at the table. The tool surfaces a recommended mix and its budget fit.",
-      "inputs": "Inputs",
-      "party": "Party",
-      "partyValue": "4 PCs · Level 5",
-      "difficulty": "Difficulty",
-      "difficultyValue": "Hard",
-      "ruleset": "Ruleset",
-      "rulesetValue": "2014 or 2024",
-      "recommendedMix": "Recommended Mix",
-      "budgetFit": "Budget Fit: 96% (on target)",
-      "budgetExplanation": "Budget Fit = adjusted XP / target XP. Example: 1,920 vs 2,000 XP → 96%."
-    },
-    "sampleOutputs": {
-      "title": "Sample Outputs",
-      "description": "Each tool produces a clear, table-ready result. Exports match the preview.",
-      "encounterBuilder": "Encounter Builder",
-      "encounterValue": "2 × CR 3, 1 × CR 1",
-      "encounterFit": "Budget Fit: 92% · Hard",
-      "encounterNote": "2014/2024 toggle adjusts thresholds and XP.",
-      "monsterScaler": "Monster Scaler",
-      "ac": "AC",
-      "hp": "HP",
-      "dpr": "DPR",
-      "scalerNote": "Preview matches PNG/PDF export.",
-      "artifactForge": "Artifact Forge",
-      "itemName": "Aegis of the Dawn",
-      "itemDetails": "Rare · +2 AC · Attunement",
-      "itemFlavor": "\"Forged at sunrise to turn the restless dead.\""
-    },
-    "howItWorks": {
-      "title": "How It Works",
-      "description": "Three steps, built for live prep or mid-session pivots.",
-      "step1": "Step 1",
-      "step1Title": "Choose a Tool",
-      "step1Desc": "Encounter builder, monster scaler, or item forge.",
-      "step2": "Step 2",
-      "step2Title": "Set Your Inputs",
-      "step2Desc": "Party size, difficulty, CR targets, and flavor details.",
-      "step3": "Step 3",
-      "step3Title": "Run or Export",
-      "step3Desc": "Copy the output or export PNG/PDF statblocks."
+      "welcome": "Welcome",
+      "welcomeBlurb": "A free toolkit built for the table — encounters, monsters, and magic items, ready when you are. Built at the table, for the table — no more pausing the session to eyeball CR math.",
+      "tool": "Tool",
+      "about": "About",
+      "aboutBlurb": "Built by a DM, for DMs — free, fast, and no account required.",
+      "rulesetNote": "Works with 2014 & 2024 Rules",
+      "travelAction": "Plan a Journey",
+      "bestiaryAction": "Manage Your Bestiary"
     },
     "coreToolkit": {
-      "title": "Core Toolkit",
-      "description": "Concrete outputs for encounter building, scaling, and item design.",
       "monsterScaler": {
         "title": "Monster Scaler",
         "description": "Adjust HP, AC, DPR, and suggested combat targets to a new CR. Includes export-ready statblocks.",
@@ -85,20 +43,20 @@
       }
     },
     "reliability": {
-      "title": "Reliability First",
-      "point1": {
-        "title": "Ruleset Coverage",
-        "description": "2014 + 2024 guidance is supported so your encounter math stays consistent across editions."
-      },
-      "point2": {
-        "title": "Export Ready",
-        "description": "Download PNG for VTT use or PDF for printouts. Filenames keep sessions organized."
-      },
       "point3": {
-        "title": "No Login Required",
-        "description": "Built for live sessions: fast inputs, readable outputs, and no account gate."
-      },
-      "preview": "Manuscript Preview: Scaled Monster"
+        "title": "No Login Required"
+      }
+    },
+    "showcase": {
+      "title": "See It In Action",
+      "description": "Real output from the actual tools — not mockups.",
+      "encounterInputs": "4 Players · Level 5 · Hard Difficulty",
+      "scalerInputs": "Goblin · CR 1/4 scaled to CR 10",
+      "itemInputs": "Weapon · Level 8 · Attunement Required",
+      "itemFlavor": "Forged in dragon-fire, it hums faintly whenever danger draws near.",
+      "travelInputs": "Forest · Combat Encounter · d500 Roll",
+      "bestiaryInputs": "A homebrew entry, saved locally and reusable across every tool",
+      "noSample": "No sample available for this ruleset."
     }
   },
   "encounterBuilder": {

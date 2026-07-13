@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useCookieConsent } from "@/app/context/CookieConsentContext";
+import { useMapFullscreen } from "@/app/context/MapFullscreenContext";
 import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -13,6 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 export default function PwaInstallPrompt() {
     const t = useTranslations("pwaInstall");
     const { bannerVisible: cookieBannerVisible } = useCookieConsent();
+    const { isFullscreen: isMapFullscreen } = useMapFullscreen();
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [installed, setInstalled] = useState(false);
     const [expanded, setExpanded] = useState(false);
@@ -69,7 +71,7 @@ export default function PwaInstallPrompt() {
     const deny = () => setExpanded(false);
 
     // Never fires on browsers without install support (e.g. iOS Safari).
-    if (installed || !deferredPrompt) return null;
+    if (installed || !deferredPrompt || isMapFullscreen) return null;
 
     const promptCard = (
         <>
@@ -97,7 +99,7 @@ export default function PwaInstallPrompt() {
     return (
         <div
             ref={containerRef}
-            className={`pwa-install-badge sticky w-fit ml-auto mr-4 z-[150] transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
+            className={`sticky w-fit ml-auto mr-4 z-[150] transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
         >
             {/* Mobile: centered modal popup */}
             {expanded && (

@@ -10,7 +10,7 @@ import type { ConditionId } from "@/app/data/conditions";
 import { getConditions } from "@/app/data/conditions";
 import { getHazardPresets } from "@/app/data/hazards";
 import type { Ruleset } from "@/engine/encounter";
-import { hexDirectionArrow, hexDirectionLabel } from "@/engine/encounter";
+import { hexDirectionLabel } from "@/engine/encounter";
 
 const AOE_SHAPES: { value: AoEShape; label: string }[] = [
     { value: "burst", label: "Sphere / Cube / Cylinder (radiates outward)" },
@@ -19,7 +19,7 @@ const AOE_SHAPES: { value: AoEShape; label: string }[] = [
 ];
 
 const DIRECTIONS: HexDirection[] = [0, 1, 2, 3, 4, 5];
-const DIRECTION_OPTIONS = DIRECTIONS.map(dir => ({ value: dir, label: `${hexDirectionArrow(dir)} ${hexDirectionLabel(dir)}` }));
+const DIRECTION_OPTIONS = DIRECTIONS.map(dir => ({ value: dir, label: hexDirectionLabel(dir) }));
 
 const DRAWER_WIDTH = 288;
 

@@ -16,58 +16,16 @@
   "home": {
     "hero": {
       "title": "Lancez des aventures équilibrées plus vite, sans casser la fantasy.",
-      "description": "Une boîte à outils D&D prête à l’emploi pour les maîtres du donjon. Créez des rencontres, adaptez des monstres et forgez des artefacts avec des résultats utilisables immédiatement. Basculez entre 2014 et 2024 pour changer les calculs sous-jacents sans modifier votre flux de travail.",
-      "buildEncounter": "Créer une rencontre",
-      "scaleMonster": "Adapter un monstre",
-      "forgeItem": "Forger un objet"
-    },
-    "exampleOutput": {
-      "title": "Exemple de résultat de rencontre",
-      "description": "Un résultat concret, prêt à être joué à la table. L’outil affiche un mélange recommandé et son adéquation au budget.",
-      "inputs": "Entrées",
-      "party": "Groupe",
-      "partyValue": "4 PJ · Niveau 5",
-      "difficulty": "Difficulté",
-      "difficultyValue": "Difficile",
-      "ruleset": "Règles",
-      "rulesetValue": "2014 ou 2024",
-      "recommendedMix": "Mélange recommandé",
-      "budgetFit": "Adéquation du budget : 96% (dans la cible)",
-      "budgetExplanation": "Adéquation du budget = XP ajustés / XP cible. Exemple : 1 920 contre 2 000 XP → 96%."
-    },
-    "sampleOutputs": {
-      "title": "Exemples de résultats",
-      "description": "Chaque outil produit un résultat clair, prêt pour la table. Les exports correspondent à l’aperçu.",
-      "encounterBuilder": "Générateur de rencontres",
-      "encounterValue": "2 × CR 3, 1 × CR 1",
-      "encounterFit": "Adéquation du budget : 92% · Difficile",
-      "encounterNote": "Le basculement 2014/2024 ajuste les seuils et les XP.",
-      "monsterScaler": "Ajusteur de monstres",
-      "ac": "CA",
-      "hp": "PV",
-      "dpr": "DPR",
-      "scalerNote": "L’aperçu correspond à l’export PNG/PDF.",
-      "artifactForge": "Forge d’artefacts",
-      "itemName": "Égide de l’Aube",
-      "itemDetails": "Rare · +2 CA · Harmonisation",
-      "itemFlavor": "\"Forgée à l’aube pour repousser les morts agités.\""
-    },
-    "howItWorks": {
-      "title": "Comment ça marche",
-      "description": "Trois étapes, conçues pour la préparation en direct ou les ajustements en cours de session.",
-      "step1": "Étape 1",
-      "step1Title": "Choisissez un outil",
-      "step1Desc": "Générateur de rencontres, ajusteur de monstres ou forge d’objets.",
-      "step2": "Étape 2",
-      "step2Title": "Définissez vos entrées",
-      "step2Desc": "Taille du groupe, difficulté, cibles de CR et détails de style.",
-      "step3": "Étape 3",
-      "step3Title": "Exécutez ou exportez",
-      "step3Desc": "Copiez le résultat ou exportez des blocs de stat PNG/PDF."
+      "welcome": "Bienvenue",
+      "welcomeBlurb": "Une boîte à outils gratuite conçue pour la table — rencontres, monstres et objets magiques, prêts quand vous l'êtes. Conçu à la table, pour la table — plus besoin de mettre la séance en pause pour calculer un CR.",
+      "tool": "Outil",
+      "about": "À propos",
+      "aboutBlurb": "Conçu par un maître du donjon, pour les maîtres du donjon — gratuit, rapide, sans compte.",
+      "rulesetNote": "Compatible avec les règles 2014 & 2024",
+      "travelAction": "Planifier un voyage",
+      "bestiaryAction": "Gérer votre bestiaire"
     },
     "coreToolkit": {
-      "title": "Boîte à outils principale",
-      "description": "Des résultats concrets pour créer des rencontres, adapter des monstres et concevoir des objets.",
       "monsterScaler": {
         "title": "Ajusteur de monstres",
         "description": "Ajuste les PV, la CA, le DPR et les cibles de statistiques vers un nouveau CR. Inclut des blocs de stat prêts à l’export.",
@@ -85,20 +43,20 @@
       }
     },
     "reliability": {
-      "title": "Fiabilité d’abord",
-      "point1": {
-        "title": "Couverture des règles",
-        "description": "Les conseils 2014 et 2024 sont pris en charge pour que vos calculs de rencontre restent cohérents entre les éditions."
-      },
-      "point2": {
-        "title": "Prêt à l’export",
-        "description": "Téléchargez un PNG pour une utilisation VTT ou un PDF pour l’impression. Les noms de fichiers facilitent l’organisation des sessions."
-      },
       "point3": {
-        "title": "Aucune connexion requise",
-        "description": "Conçu pour les sessions en direct : saisie rapide, résultats lisibles et aucun compte obligatoire."
-      },
-      "preview": "Aperçu du manuscrit : monstre ajusté"
+        "title": "Aucune connexion requise"
+      }
+    },
+    "showcase": {
+      "title": "En action",
+      "description": "Résultat réel des outils eux-mêmes — pas de maquettes.",
+      "encounterInputs": "4 joueurs · Niveau 5 · Difficulté élevée",
+      "scalerInputs": "Gobelin · CR 1/4 adapté à CR 10",
+      "itemInputs": "Arme · Niveau 8 · Attunement requis",
+      "itemFlavor": "Forgée dans le feu du dragon, elle vrombit doucement à l'approche du danger.",
+      "travelInputs": "Forêt · Rencontre de combat · Jet de d500",
+      "bestiaryInputs": "Une entrée homebrew, enregistrée localement et réutilisable dans tous les outils",
+      "noSample": "Aucun exemple disponible pour ces règles."
     }
   },
   "encounterBuilder": {
