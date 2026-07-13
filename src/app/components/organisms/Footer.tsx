@@ -12,7 +12,7 @@ export default function Footer() {
     const { openPreferences } = useCookieConsent();
 
     return (
-        <footer className="w-full mt-24 border-t border-gold/20 bg-card/30 backdrop-blur-sm">
+        <footer className="w-full mt-24 border-t border-gold/20 bg-card">
             <div className="max-w-[calc(100svw - 2rem)] mx-auto px-8 py-12">
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
                     {/* Brand */}

@@ -7,11 +7,12 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { MapToolbar, type MapMode } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
+import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
 import type { GroupSuggestion, BossMinionSuggestion, Ruleset } from "@/engine/encounter";
 import {
     R, W, ROW_H, SX, SY, HORIZ_GRID_W, VERT_GRID_W, CELL_BUFFER, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP,
     HEX_OUTLINE, HEX_FILL, HEX_SELECT, HEX_AOE,
-    hexCenter, hexDistance, hexesInRadius, nearestCoord,
+    hexCenter, hexDistance, hexesInRadius, hexesInCone, hexesInLine, hexDirectionLabel, nearestCoord,
 } from "@/engine/encounter";
 import type { EncounterNode, GridCoord, HazardNode, HazardSource, CoverNode, PartyNode, EnemyNode, CoverLevel, CoverBenefit, HazardEffect } from "@/app/types/encounterLayout";
 import type { ArmedTool } from "./GridToolbar";
@@ -73,6 +74,47 @@ function nodeLabel(node: EncounterNode): string {
     }
 }
 
+/** One-line summary of a node's current settings, shown on hover. */
+function nodeSettingsSummary(node: EncounterNode, ruleset: Ruleset): string {
+    switch (node.kind) {
+        case "party":
+        case "enemy": {
+            const defs = getConditions(ruleset);
+            const names = (node.conditions ?? []).map(id => defs.find(c => c.id === id)?.name).filter(Boolean);
+            return names.length ? names.join(", ") : "No conditions";
+        }
+        case "cover": {
+            const levels: Record<string, string> = { half: "Half Cover", "three-quarter": "Three-Quarters Cover", full: "Full Cover" };
+            return levels[node.coverLevel];
+        }
+        case "hazard": {
+            const parts = [node.source === "spell" ? "Spell hazard" : "Environmental hazard"];
+            if (node.aoeRadius <= 0) {
+                parts.push("No AoE");
+            } else if (node.aoeShape === "cone" && node.source === "spell") {
+                parts.push(`Cone · ${hexDirectionLabel(node.aoeDirection ?? 0)}`);
+            } else if (node.aoeShape === "line" && node.source === "spell") {
+                parts.push(`Line · ${hexDirectionLabel(node.aoeDirection ?? 0)}`);
+            } else {
+                parts.push(`Radius ${node.aoeRadius}`);
+            }
+            return parts.join(" · ");
+        }
+    }
+}
+
+/** Hexes covered by a hazard's area of effect, per its 5e AoE template — Sphere/Cube/Cylinder ("burst", radiates from origin), Cone, or Line. */
+function hazardAoEHexes(hazard: HazardNode): GridCoord[] {
+    const { col, row } = hazard.coord;
+    const shape = hazard.aoeShape ?? "burst";
+    const direction = hazard.aoeDirection ?? 0;
+    switch (shape) {
+        case "cone": return hexesInCone(col, row, hazard.aoeRadius, direction);
+        case "line": return hexesInLine(col, row, hazard.aoeRadius, direction);
+        default:     return hexesInRadius(col, row, hazard.aoeRadius);
+    }
+}
+
 // ── Marquee selection box overlay ────────────────────────────────────────────
 function MarqueeBox({ marquee }: { marquee: { x0: number; y0: number; x1: number; y1: number } }) {
     const left   = Math.min(marquee.x0, marquee.x1);
@@ -87,33 +129,22 @@ function MarqueeBox({ marquee }: { marquee: { x0: number; y0: number; x1: number
     );
 }
 
-// ── Keyboard legend (rendered outside/below the canvas — not an overlay) ───
-function KeyboardLegend({ mode, cameraLocked, onReset }: { mode: MapMode; cameraLocked: boolean; onReset: () => void }) {
-    const items = [
-        { keys: "W",   label: "Move",         active: mode === "select" },
-        { keys: "A",   label: "Env Hazard",   active: mode === "place-hazard-env" },
-        { keys: "S",   label: "Spell Hazard", active: mode === "place-hazard-spell" },
-        { keys: "C",   label: "Cover",         active: mode === "place-cover" },
-        { keys: "L",   label: "Lock Cam",     active: cameraLocked },
-        { keys: "+/−", label: "Zoom",         active: false },
-        { keys: "⇧+drag", label: "Multi-select", active: false },
-        { keys: "Del", label: "Delete sel.",  active: false },
-    ];
+const ROTATE_HINT_KEY = "hexmap-rotate-hint-dismissed";
+
+// ── Rotate-phone suggestion banner (mobile portrait, fullscreen only) ──────
+function RotateHintBanner({ onDismiss }: { onDismiss: () => void }) {
     return (
-        <div className="select-none hidden sm:flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 py-1.5 border-t border-gold/10 mt-1">
-            {items.map(({ keys, label, active }) => (
-                <div key={keys} className={`flex items-center gap-1.5 text-[11px] font-mono transition-colors ${active ? "text-gold" : "text-muted/60"}`}>
-                    <kbd className={`border rounded px-1.5 py-0.5 leading-4 text-[10px] ${active ? "border-gold/60 bg-gold/10" : "border-white/15 bg-white/5"}`}>{keys}</kbd>
-                    <span className="font-sans tracking-wide">{label}</span>
-                </div>
-            ))}
+        <div className="absolute top-2 left-2 right-2 z-10 flex items-center gap-3 border border-gold/30 bg-card px-3 py-2 sm:hidden">
+            <span className="text-lg leading-none text-gold" aria-hidden="true">⟳</span>
+            <p className="flex-1 text-[11px] text-muted leading-snug">
+                Rotate your device for a better view of the battlefield.
+            </p>
             <button
                 type="button"
-                onClick={onReset}
-                className="flex items-center gap-1.5 text-[11px] font-mono text-muted/60 hover:text-gold transition-colors"
+                onClick={onDismiss}
+                className="text-[10px] uppercase tracking-widest text-muted/70 hover:text-gold transition-colors shrink-0"
             >
-                <kbd className="border border-white/15 bg-white/5 rounded px-1.5 py-0.5 leading-4 text-[10px]">Esc</kbd>
-                <span className="font-sans tracking-wide underline decoration-dotted underline-offset-2">Reset view</span>
+                Got it
             </button>
         </div>
     );
@@ -126,12 +157,15 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const [mapMode, setMapMode]         = useState<MapMode>("select");
     const [cameraLocked, setCameraLocked] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showRotateHint, setShowRotateHint] = useState(false);
 
-    const orientation = size.width < 640 ? "v" : "h";
+    // Fixed vertical layout regardless of device/viewport — the battlefield
+    // shouldn't reflow between mobile and desktop.
+    const orientation = "v" as const;
     const layout      = useEncounterLayout(partySize, suggestion, mode, orientation);
 
     const [editingId,  setEditingId]  = useState<string | null>(null);
-    const [popoverPos, setPopoverPos] = useState<{ x: number; y: number } | null>(null);
+    const [popoverRect, setPopoverRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
     const [stagePos,   setStagePos]   = useState({ x: 0, y: 0 });
     const [zoom,       setZoom]       = useState(1);
     const [isPinching, setIsPinching] = useState(false);
@@ -148,6 +182,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
 
     // Marquee (rubber-band) multiselect — drag with Shift held over empty canvas.
     const [marquee, setMarquee] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+
+    // Hover tooltip — desktop-only affordance to preview a node's current settings without opening the editor.
+    const [hoveredNode, setHoveredNode] = useState<{ node: EncounterNode; x: number; y: number } | null>(null);
     const marqueeActive    = useRef(false);
     const justMarqueedRef  = useRef(false);
 
@@ -183,11 +220,32 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         return () => window.removeEventListener("resize", update);
     }, [isFullscreen]);
 
-    // Prevent body scroll while fullscreen is open.
+    // Prevent body scroll while fullscreen is open, and flag it on <html> so
+    // other fixed/sticky chrome (e.g. the PWA install badge) can hide itself
+    // via CSS without needing a shared React context.
     useEffect(() => {
         document.body.style.overflow = isFullscreen ? "hidden" : "";
-        return () => { document.body.style.overflow = ""; };
+        document.documentElement.toggleAttribute("data-map-fullscreen", isFullscreen);
+        return () => {
+            document.body.style.overflow = "";
+            document.documentElement.removeAttribute("data-map-fullscreen");
+        };
     }, [isFullscreen]);
+
+    // Suggest rotating to landscape on mobile portrait, once per fullscreen
+    // entry — unless the user has already dismissed it for good.
+    useEffect(() => {
+        if (!isFullscreen) { setShowRotateHint(false); return; }
+        const dismissed = window.localStorage.getItem(ROTATE_HINT_KEY) === "1";
+        const isMobile = window.matchMedia("(max-width: 639px)").matches;
+        const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+        setShowRotateHint(!dismissed && isMobile && isPortrait);
+    }, [isFullscreen]);
+
+    const dismissRotateHint = useCallback(() => {
+        setShowRotateHint(false);
+        try { window.localStorage.setItem(ROTATE_HINT_KEY, "1"); } catch { /* ignore */ }
+    }, []);
 
     // Request re-centering whenever the encounter or viewport context changes.
     useEffect(() => { shouldCenterRef.current = true; }, [suggestion, partySize, isFullscreen]);
@@ -232,7 +290,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                     }
                     if (editingIdRef.current && ids.has(editingIdRef.current)) {
                         setEditingId(null);
-                        setPopoverPos(null);
+                        setPopoverRect(null);
                     }
                     setSelectedIds(new Set());
                     break;
@@ -305,7 +363,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         for (const n of layout.nodes) {
             if (n.kind !== "hazard" || (n as HazardNode).aoeRadius <= 0) continue;
             const hazard = n as HazardNode;
-            for (const hex of hexesInRadius(hazard.coord.col, hazard.coord.row, hazard.aoeRadius)) {
+            for (const hex of hazardAoEHexes(hazard)) {
                 const key = `${hex.col},${hex.row}`;
                 if (coverKeys.has(key)) {
                     protectedKeys.add(key);
@@ -327,7 +385,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
             const key = `${creature.coord.col},${creature.coord.row}`;
             if (aoeData.protectedKeys.has(key)) continue;
             for (const hazard of hazards) {
-                if (hexDistance(creature.coord, hazard.coord) > hazard.aoeRadius) continue;
+                if (!hazardAoEHexes(hazard).some(h => h.col === creature.coord.col && h.row === creature.coord.row)) continue;
                 effects.push({
                     creatureLabel: nodeLabel(creature),
                     creatureKind: creature.kind,
@@ -377,15 +435,13 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
 
     const handleTouchEnd = () => { pinchDistRef.current = null; setIsPinching(false); };
 
-    const popoverPosFromEvent = (e: KonvaEventObject<Event>): { x: number; y: number } | null => {
+    // The editor is a drawer docked to the canvas box itself (normal or
+    // fullscreen) — not positioned near the click — so both the node and its
+    // settings stay visible together, on every device.
+    const popoverRectFromEvent = (e: KonvaEventObject<Event>): { top: number; left: number; width: number; height: number } | null => {
         const box = e.target.getStage()?.container().getBoundingClientRect();
-        const pos = e.target.getStage()?.getPointerPosition();
-        if (!box || !pos) return null;
-        const W2 = 224, H2 = 220, m = 8;
-        return {
-            x: clamp(box.left + pos.x, m, window.innerWidth  - W2 - m),
-            y: clamp(box.top  + pos.y, m, window.innerHeight - H2 - m),
-        };
+        if (!box) return null;
+        return { top: box.top, left: box.left, width: box.width, height: box.height };
     };
 
     const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
@@ -393,7 +449,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         if (e.target !== e.target.getStage()) return;
         setSelectedIds(new Set());
         setEditingId(null);
-        setPopoverPos(null);
+        setPopoverRect(null);
     };
 
     // ── Marquee (shift + drag) multiselect ───────────────────────────────────
@@ -451,8 +507,8 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         const node = armed.kind === "hazard"
             ? layout.addNode("hazard", { source: armed.source, aoeRadius: 1 }, coord)
             : layout.addNode("cover", { coverLevel: "half" }, coord);
-        const pos = popoverPosFromEvent(e);
-        if (pos) setPopoverPos(pos);
+        const rect = popoverRectFromEvent(e);
+        if (rect) setPopoverRect(rect);
         setMapMode("select");
         setEditingId(node.id);
     };
@@ -469,22 +525,22 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         }
         if (selectedIds.size > 1 && selectedIds.has(node.id)) { setSelectedIds(new Set([node.id])); return; }
         setSelectedIds(new Set([node.id]));
-        const pos = popoverPosFromEvent(e);
-        if (pos) setPopoverPos(pos);
+        const rect = popoverRectFromEvent(e);
+        if (rect) setPopoverRect(rect);
         setEditingId(node.id);
     };
 
     const handleNodeTap = (node: EncounterNode, e: KonvaEventObject<Event>) => {
         e.cancelBubble = true;
         setSelectedIds(new Set([node.id]));
-        const pos = popoverPosFromEvent(e);
-        if (pos) setPopoverPos(pos);
+        const rect = popoverRectFromEvent(e);
+        if (rect) setPopoverRect(rect);
         setEditingId(node.id);
     };
 
     const handleQuickRemove = (node: EncounterNode, e: KonvaEventObject<Event>) => {
         e.cancelBubble = true;
-        if (editingId === node.id) { setEditingId(null); setPopoverPos(null); }
+        if (editingId === node.id) { setEditingId(null); setPopoverRect(null); }
         setSelectedIds(prev => { const s = new Set(prev); s.delete(node.id); return s; });
         nodeGroupRefs.current.delete(node.id);
         if (node.kind === "party") {
@@ -494,7 +550,13 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         layout.removeNode(node.id);
     };
 
+    const handleNodeHover = (node: EncounterNode, e: KonvaEventObject<MouseEvent>) => {
+        setHoveredNode({ node, x: e.evt.clientX, y: e.evt.clientY });
+    };
+    const handleNodeUnhover = () => setHoveredNode(null);
+
     const handleDragStart = (node: EncounterNode, e: KonvaEventObject<DragEvent>) => {
+        setHoveredNode(null);
         if (!selectedIds.has(node.id) || selectedIds.size < 2) return;
         isDraggingMulti.current = true;
         dragOriginRef.current = { x: e.target.x(), y: e.target.y() };
@@ -556,7 +618,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         canClearAll: layout.nodes.some(n => n.kind === "hazard" || n.kind === "cover"),
         onClearAll: () => {
             if (editingNode && (editingNode.kind === "hazard" || editingNode.kind === "cover")) {
-                setEditingId(null); setPopoverPos(null);
+                setEditingId(null); setPopoverRect(null);
             }
             layout.clearManualNodes();
         },
@@ -599,7 +661,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                 {(layout.nodes.filter(n => n.kind === "hazard") as HazardNode[])
                     .filter(h => h.aoeRadius > 0)
                     .flatMap(hazard =>
-                        hexesInRadius(hazard.coord.col, hazard.coord.row, hazard.aoeRadius).map(hex => {
+                        hazardAoEHexes(hazard).map(hex => {
                             const [cx, cy] = hexCenter(hex.col, hex.row);
                             const key = `${hex.col},${hex.row}`;
                             const isProtected = aoeData.protectedKeys.has(key);
@@ -642,6 +704,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                                 onDragEnd={e => handleDragEnd(node, e)}
                                 onClick={e => handleNodeClick(node, e)}
                                 onTap={e => handleNodeTap(node, e)}
+                                onMouseEnter={e => handleNodeHover(node, e)}
+                                onMouseMove={e => handleNodeHover(node, e)}
+                                onMouseLeave={handleNodeUnhover}
                             >
                                 {selectedIds.has(node.id) && (
                                     <Line points={HEX_SELECT} closed fill="transparent" stroke="rgba(255,255,255,0.3)" strokeWidth={2} />
@@ -693,6 +758,16 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     // ── Render ───────────────────────────────────────────────────────────────
     return (
         <>
+            {hoveredNode && (
+                <div
+                    className="fixed z-[60] pointer-events-none border border-gold/25 bg-card px-2.5 py-1.5 text-[10px] text-foreground shadow-2xl max-w-56"
+                    style={{ left: hoveredNode.x + 14, top: hoveredNode.y + 14 }}
+                >
+                    <div className="uppercase tracking-widest text-gold/70 font-bold mb-0.5">{nodeLabel(hoveredNode.node)}</div>
+                    <div>{nodeSettingsSummary(hoveredNode.node, ruleset)}</div>
+                </div>
+            )}
+
             <div className="flex flex-col flex-1 min-h-0 gap-2">
                 <MapToolbar {...toolbarProps} isFullscreen={false} onFullscreenToggle={() => setIsFullscreen(true)} />
 
@@ -712,10 +787,6 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                     </div>
                 )}
 
-                {!isFullscreen && (
-                    <KeyboardLegend mode={mapMode} cameraLocked={cameraLocked} onReset={resetView} />
-                )}
-
                 {/* Fullscreen placeholder — keeps the flex column height reserved */}
                 {isFullscreen && (
                     <div className="flex-1 min-h-0 rounded-sm border border-gold/10 bg-black/10 flex items-center justify-center">
@@ -729,15 +800,14 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                     </div>
                 )}
 
-                {editingNode && popoverPos && (
+                {editingNode && popoverRect && (
                     <NodeEditorPopover
                         node={editingNode}
-                        x={popoverPos.x}
-                        y={popoverPos.y}
+                        containerRect={popoverRect}
                         ruleset={ruleset}
                         onChange={patch => layout.updateNode(editingNode.id, patch)}
-                        onRemove={() => { layout.removeNode(editingNode.id); setEditingId(null); setPopoverPos(null); }}
-                        onClose={() => { setEditingId(null); setPopoverPos(null); }}
+                        onRemove={() => { layout.removeNode(editingNode.id); setEditingId(null); setPopoverRect(null); }}
+                        onClose={() => { setEditingId(null); setPopoverRect(null); }}
                     />
                 )}
             </div>
@@ -754,18 +824,27 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         <button
                             type="button"
                             onClick={() => setIsFullscreen(false)}
-                            className="text-[10px] uppercase tracking-widest text-muted/60 hover:text-gold transition-colors ml-auto"
+                            className="ui-button shrink-0 ml-auto min-h-9 gap-1.5 px-3 text-[10px]"
                             aria-label="Close fullscreen"
                         >
-                            ✕
+                            <span aria-hidden="true">✕</span>
+                            <span>Close</span>
                         </button>
                     </div>
 
                     {/* Canvas */}
                     <div className="flex-1 min-h-0 relative overflow-hidden touch-none">
+                        {showRotateHint && <RotateHintBanner onDismiss={dismissRotateHint} />}
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
                     </div>
+
+                    {/* Party advantages/disadvantages — otherwise only visible in the sidebar, which fullscreen hides */}
+                    {(coverBenefits.length > 0 || hazardEffects.length > 0) && (
+                        <div className="shrink-0 max-h-32 overflow-y-auto px-4 py-2 border-t border-gold/10 bg-card">
+                            <AdvantagesPanel coverBenefits={coverBenefits} hazardEffects={hazardEffects} className="border-t-0 pt-0" />
+                        </div>
+                    )}
 
                     {/* Bottom toolbar */}
                     <MapToolbar {...toolbarProps} isFullscreen={true} onFullscreenToggle={() => setIsFullscreen(false)} />

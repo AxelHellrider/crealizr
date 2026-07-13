@@ -5,6 +5,12 @@ export type GridCoord = { col: number; row: number };
 export type NodeKind = "party" | "enemy" | "hazard" | "cover";
 export type HazardSource = "environment" | "spell";
 export type CoverLevel = "half" | "three-quarter" | "full";
+/** Matches the 5e area-of-effect templates (PHB "Areas of Effect"): a
+ * Sphere/Cube/Cylinder radiates from its point of origin ("burst" here),
+ * while a Cone or Line extends outward in one of the grid's 6 hex directions. */
+export type AoEShape = "burst" | "cone" | "line";
+/** Index into the grid's 6 hex directions (see hexGrid.ts DIRECTIONS). */
+export type HexDirection = 0 | 1 | 2 | 3 | 4 | 5;
 
 interface BaseNode {
     id: string;
@@ -29,7 +35,12 @@ export interface HazardNode extends BaseNode {
     kind: "hazard";
     source: HazardSource;
     notes?: string;
+    /** Radius (burst/cone) or length (line) in hex steps from the origin hex. */
     aoeRadius: number;
+    /** Defaults to "burst" (Sphere/Cube/Cylinder) when omitted. */
+    aoeShape?: AoEShape;
+    /** Facing for cone/line shapes; ignored for "burst". Defaults to 0. */
+    aoeDirection?: HexDirection;
 }
 
 export interface CoverNode extends BaseNode {

@@ -107,7 +107,6 @@
     "rulesetNote": "L'interruttore 2014/2024 modifica soglie e tabelle XP per CR.",
     "viewDocs": "Visualizza la documentazione",
     "quickPresets": "Preset rapidi",
-    "budgetMath": "Calcolo del budget: soglia XP × moltiplicatore dell'incontro. La scelta delle regole cambia soglie e valori XP.",
     "partySize": "Dimensione del gruppo",
     "avgLevel": "Livello medio",
     "ruleset": "Regole",
@@ -133,30 +132,12 @@
     "sameTerrain": "Stesso terreno",
     "sameAffiliation": "Stessa affiliazione",
     "sameGenus": "Stesso genere",
-    "showSuggestions": "Mostra suggerimenti",
     "suggestedEncounters": "Incontri suggeriti",
     "totalXPBudget": "Budget XP totale",
-    "budgetStatus": "Stato del budget",
     "onTarget": "In linea",
     "overBudget": "Oltre budget",
     "underBudget": "Sotto budget",
-    "exportPreview": "Anteprima esportazione",
-    "exportSnapshot": "Istantanea per screenshot rapido o stampa.",
     "recommendedMix": "Mix consigliato",
-    "monsterRecommendations": "Confronti dal Monster Manual",
-    "monsterRecommendationsNote": "Confronta il mix di CR calcolato con nomi di creature e gradi sfida del Monster Manual 2014. Blocchi statistiche e testo delle regole non sono riprodotti.",
-    "monsterManualSource": "Confronto Monster Manual 2014",
-    "basedOnAverageLevel": "Basato sul livello medio",
-    "monsters": "Mostri",
-    "compareToMix": "Confronta con",
-    "xpEach": "XP ciascuno",
-    "adjustedXp": "XP aggiustati",
-    "budgetFitShort": "Aderenza",
-    "exactCrMatch": "CR esatto",
-    "nearestCrMatch": "CR più vicino",
-    "crMixOptions": "Opzioni mix CR",
-    "crMixOptionsNote": "Combinazioni grezze CR/numero basate sul calcolo del budget dell'incontro.",
-    "budgetFit": "Adesione al budget",
     "calculationsNote": "I calcoli si basano sulle soglie XP standard e sui moltiplicatori di incontro."
   },
   "monsterScaler": {
@@ -301,14 +282,6 @@
     "rollForEncounter": "Tira per l'incontro",
     "outcome": "Esito",
     "roll": "Tiro",
-    "balanceThisEncounter": "Bilancia questo incontro",
-    "encounterBalancer": "Bilanciatore di incontri",
-    "close": "Chiudi",
-    "partySize": "Dimensione del gruppo",
-    "avgLevel": "Livello medio",
-    "targetBudget": "Budget target",
-    "soloSuggestions": "Suggerimenti per solo",
-    "groupSuggestions": "Suggerimenti per gruppo",
     "hideDmTables": "Nascondi tabelle del DM",
     "showDmTables": "Mostra tabelle del DM",
     "dmTables": "Tabelle del DM",
@@ -581,7 +554,7 @@
       {
         "heading": "8. Archiviazione Locale sul Tuo Dispositivo",
         "body": [
-          "La tua preferenza di tema e visualizzazione stagionale, le disposizioni salvate della mappa di battaglia, e qualsiasi mostro homebrew che crei nel tuo Bestiario sono memorizzati solo nell'archiviazione locale o nell'IndexedDB del tuo browser. Questi dati non lasciano mai il tuo dispositivo, non sono visibili a noi, e restano interamente sotto il tuo controllo — cancella i dati del tuo browser in qualsiasi momento per rimuoverli."
+          "La tua preferenza di tema e visualizzazione stagionale, le disposizioni salvate della mappa di battaglia, qualsiasi mostro homebrew che crei nel tuo Bestiario, e se hai rifiutato il suggerimento \"ruota il tuo dispositivo\" nella visualizzazione a schermo intero del campo di battaglia sono memorizzati solo nell'archiviazione locale o nell'IndexedDB del tuo browser. Questi dati non lasciano mai il tuo dispositivo, non sono visibili a noi, e restano interamente sotto il tuo controllo — cancella i dati del tuo browser in qualsiasi momento per rimuoverli."
         ]
       },
       {

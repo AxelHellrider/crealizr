@@ -48,19 +48,38 @@ export function Picker() {
 
     const tapRow = (i: number) => commitIndex(i);
 
+    // Rows must distinguish a tap from the start of a scroll drag — committing
+    // on pointerdown alone would select whatever row the user's finger happened
+    // to land on before they even started scrolling.
+    const dragStart = useRef<{ x: number; y: number } | null>(null);
+    const TAP_THRESHOLD = 8;
+
+    const handleRowPointerDown = (e: React.PointerEvent) => {
+        dragStart.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleRowPointerUp = (e: React.PointerEvent, i: number) => {
+        const start = dragStart.current;
+        dragStart.current = null;
+        if (!start) return;
+        const dx = Math.abs(e.clientX - start.x);
+        const dy = Math.abs(e.clientY - start.y);
+        if (dx < TAP_THRESHOLD && dy < TAP_THRESHOLD) tapRow(i);
+    };
+
     return (
         <AnimatePresence>
             {config && (
                 <>
                     <motion.div
-                        className="fixed inset-0 z-70 bg-black/50"
+                        className="fixed inset-0 z-[10000] bg-black/50"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onPointerDown={commitCentered}
                     />
                     <motion.div
-                        className="fixed bottom-0 left-0 right-0 z-80 bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden"
+                        className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden"
                         initial={{ y: "100%" }}
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}
@@ -106,7 +125,8 @@ export function Picker() {
                                             key={opt.value + i}
                                             role="option"
                                             aria-selected={isCentered}
-                                            onPointerDown={(e) => { e.preventDefault(); tapRow(i); }}
+                                            onPointerDown={handleRowPointerDown}
+                                            onPointerUp={(e) => handleRowPointerUp(e, i)}
                                             className="flex items-center justify-center select-none cursor-pointer font-serif text-lg uppercase tracking-wide text-foreground"
                                             style={{ height: ROW_H, scrollSnapAlign: "center", opacity, transform: `scale(${scale})` }}
                                         >

@@ -5,7 +5,7 @@
 // useEncounterLayout hook is just a thin wrapper around this.
 
 import type { GroupSuggestion, BossMinionSuggestion } from "./service";
-import type { EncounterNode, EnemyNode, PartyNode, GridCoord, ManualNode, NodeKind, HazardNode, CoverNode, CoverLevel } from "@/app/types/encounterLayout";
+import type { EncounterNode, EnemyNode, PartyNode, GridCoord, ManualNode, NodeKind, HazardNode, CoverNode, CoverLevel, AoEShape, HexDirection } from "@/app/types/encounterLayout";
 import type { ConditionId } from "@/app/data/conditions";
 import { newId } from "@/app/lib/id";
 
@@ -21,7 +21,7 @@ export type LayoutState = {
     suggestionRef: GroupSuggestion | BossMinionSuggestion | null;
 };
 
-export type EditablePatch = { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; conditions?: ConditionId[] };
+export type EditablePatch = { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; aoeShape?: AoEShape; aoeDirection?: HexDirection; conditions?: ConditionId[] };
 
 export type LayoutAction =
     | { type: "SET_FROM_SUGGESTION"; partySize: number; suggestion: GroupSuggestion | BossMinionSuggestion | null; mode: LayoutMode; orientation: Orientation }

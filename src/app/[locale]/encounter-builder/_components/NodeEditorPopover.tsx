@@ -1,21 +1,34 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { formatCR } from "@/app/lib/format";
-import type { EncounterNode, CoverLevel } from "@/app/types/encounterLayout";
+import type { EncounterNode, CoverLevel, AoEShape, HexDirection } from "@/app/types/encounterLayout";
 import type { ConditionId } from "@/app/data/conditions";
 import { getConditions } from "@/app/data/conditions";
 import { getHazardPresets } from "@/app/data/hazards";
 import type { Ruleset } from "@/engine/encounter";
+import { hexDirectionArrow, hexDirectionLabel } from "@/engine/encounter";
+
+const AOE_SHAPES: { value: AoEShape; label: string }[] = [
+    { value: "burst", label: "Sphere / Cube / Cylinder (radiates outward)" },
+    { value: "cone",  label: "Cone (fans out in one direction)" },
+    { value: "line",  label: "Line (extends in one direction)" },
+];
+
+const DIRECTIONS: HexDirection[] = [0, 1, 2, 3, 4, 5];
+const DIRECTION_OPTIONS = DIRECTIONS.map(dir => ({ value: dir, label: `${hexDirectionArrow(dir)} ${hexDirectionLabel(dir)}` }));
+
+const DRAWER_WIDTH = 288;
 
 interface NodeEditorPopoverProps {
     node: EncounterNode;
-    x: number;
-    y: number;
+    /** The battlefield canvas box (normal or fullscreen) this drawer docks to. */
+    containerRect: { top: number; left: number; width: number; height: number };
     ruleset: Ruleset;
-    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; conditions?: ConditionId[] }) => void;
+    onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; aoeShape?: AoEShape; aoeDirection?: HexDirection; conditions?: ConditionId[] }) => void;
     onRemove: () => void;
     onClose: () => void;
 }
@@ -29,7 +42,7 @@ function nodeTitle(node: EncounterNode): string {
     }
 }
 
-export function NodeEditorPopover({ node, x, y, ruleset, onChange, onRemove, onClose }: NodeEditorPopoverProps) {
+export function NodeEditorPopover({ node, containerRect, ruleset, onChange, onRemove, onClose }: NodeEditorPopoverProps) {
     if (typeof document === "undefined") return null;
 
     const toggleCondition = (id: ConditionId, current: ConditionId[]) => {
@@ -37,13 +50,22 @@ export function NodeEditorPopover({ node, x, y, ruleset, onChange, onRemove, onC
         onChange({ conditions: next });
     };
 
+    const width = Math.min(DRAWER_WIDTH, containerRect.width);
+
     return createPortal(
         <>
             <div className="fixed inset-0 z-40" onClick={onClose} />
-            <div
-                className="fixed z-50 w-56 rounded-sm border border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2 max-h-[80vh] overflow-y-auto
-                    max-sm:!left-1/2 max-sm:!top-1/2 max-sm:!-translate-x-1/2 max-sm:!-translate-y-1/2"
-                style={{ left: x, top: y }}
+            <motion.div
+                className="fixed z-50 border-l border-gold/25 bg-card shadow-2xl p-3 flex flex-col gap-2 overflow-y-auto"
+                style={{
+                    top: containerRect.top,
+                    left: containerRect.left + containerRect.width - width,
+                    width,
+                    height: containerRect.height,
+                }}
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                transition={{ type: "spring", damping: 32, stiffness: 320 }}
             >
                 <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase tracking-widest text-gold/70 font-bold">
@@ -88,10 +110,32 @@ export function NodeEditorPopover({ node, x, y, ruleset, onChange, onRemove, onC
                             aria-label="AoE radius"
                         >
                             <option value={0}>No AoE (single hex)</option>
-                            <option value={1}>Radius 1 (7 hexes)</option>
-                            <option value={2}>Radius 2 (19 hexes)</option>
-                            <option value={3}>Radius 3 (37 hexes)</option>
+                            <option value={1}>{node.aoeShape === "line" ? "Length 1 (2 hexes)" : "Radius 1 (7 hexes)"}</option>
+                            <option value={2}>{node.aoeShape === "line" ? "Length 2 (3 hexes)" : "Radius 2 (19 hexes)"}</option>
+                            <option value={3}>{node.aoeShape === "line" ? "Length 3 (4 hexes)" : "Radius 3 (37 hexes)"}</option>
                         </Select>
+
+                        {/* Directional shapes (Cone/Line) only make sense for spells — environmental
+                            hazards (pits, terrain, weather) are inherently area effects, not aimed. */}
+                        {node.aoeRadius > 0 && node.source === "spell" && (
+                            <Select
+                                value={node.aoeShape ?? "burst"}
+                                onChange={(e) => onChange({ aoeShape: e.target.value as AoEShape })}
+                                aria-label="AoE shape"
+                            >
+                                {AOE_SHAPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                            </Select>
+                        )}
+
+                        {node.aoeRadius > 0 && node.source === "spell" && (node.aoeShape === "cone" || node.aoeShape === "line") && (
+                            <Select
+                                value={node.aoeDirection ?? 0}
+                                onChange={(e) => onChange({ aoeDirection: Number(e.target.value) as HexDirection })}
+                                aria-label="AoE direction"
+                            >
+                                {DIRECTION_OPTIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                            </Select>
+                        )}
                     </>
                 )}
 
@@ -141,7 +185,7 @@ export function NodeEditorPopover({ node, x, y, ruleset, onChange, onRemove, onC
                 >
                     Remove from grid
                 </button>
-            </div>
+            </motion.div>
         </>,
         document.body,
     );

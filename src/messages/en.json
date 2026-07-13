@@ -107,7 +107,6 @@
     "rulesetNote": "2014/2024 toggles threshold and per-CR XP tables.",
     "viewDocs": "View Documentation",
     "quickPresets": "Quick presets",
-    "budgetMath": "Budget math: XP threshold × encounter multiplier. Ruleset choice changes thresholds and XP values.",
     "partySize": "Party Size",
     "avgLevel": "Average Level",
     "ruleset": "Ruleset",
@@ -133,30 +132,12 @@
     "sameAffiliation": "Same Affiliation",
     "sameGenus": "Same Genus",
     "mixTypes": "Mix Types",
-    "showSuggestions": "Show Suggestions",
     "suggestedEncounters": "Suggested Encounters",
     "totalXPBudget": "Total XP Budget",
-    "budgetStatus": "Budget Status",
     "onTarget": "Well-balanced",
     "overBudget": "Deadly — over budget",
     "underBudget": "Below difficulty",
-    "exportPreview": "Export Preview",
-    "exportSnapshot": "Snapshot for quick screenshot or print.",
     "recommendedMix": "Recommended Mix",
-    "monsterRecommendations": "Monster Manual Benchmarks",
-    "monsterRecommendationsNote": "Compare the calculated CR mix against 2014 Monster Manual creature names and challenge ratings. Stat blocks and rules text are not reproduced.",
-    "monsterManualSource": "2014 Monster Manual comparison",
-    "basedOnAverageLevel": "Based on average level",
-    "monsters": "Monsters",
-    "compareToMix": "Compare to",
-    "xpEach": "XP each",
-    "adjustedXp": "Adjusted XP",
-    "budgetFitShort": "Fit",
-    "exactCrMatch": "Exact CR",
-    "nearestCrMatch": "Nearest CR",
-    "crMixOptions": "CR Mix Options",
-    "crMixOptionsNote": "Raw CR/count combinations using the encounter budget math.",
-    "budgetFit": "Budget Fit",
     "calculationsNote": "Calculations based on standard XP thresholds and encounter multipliers."
   },
   "monsterScaler": {
@@ -301,14 +282,6 @@
     "rollForEncounter": "Roll for Encounter",
     "outcome": "Outcome",
     "roll": "Roll",
-    "balanceThisEncounter": "Balance this Encounter",
-    "encounterBalancer": "Encounter Balancer",
-    "close": "Close",
-    "partySize": "Party size",
-    "avgLevel": "Avg Level",
-    "targetBudget": "Target Budget",
-    "soloSuggestions": "Solo Suggestions",
-    "groupSuggestions": "Group Suggestions",
     "hideDmTables": "Hide DM Tables",
     "showDmTables": "Show DM Tables",
     "dmTables": "DM Tables",
@@ -581,7 +554,7 @@
       {
         "heading": "8. Local Storage on Your Device",
         "body": [
-          "Your theme and seasonal display preference, your saved encounter battle-map layouts, and any homebrew monsters you create in My Bestiary are stored only in your own browser's local storage or IndexedDB. This data never leaves your device, is not visible to us, and is entirely under your control — clear your browser data at any time to remove it."
+          "Your theme and seasonal display preference, your saved encounter battle-map layouts, any homebrew monsters you create in My Bestiary, and whether you've dismissed the \"rotate your device\" suggestion in the battlefield's fullscreen view are stored only in your own browser's local storage or IndexedDB. This data never leaves your device, is not visible to us, and is entirely under your control — clear your browser data at any time to remove it."
         ]
       },
       {

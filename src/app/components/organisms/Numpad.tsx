@@ -26,14 +26,14 @@ export function Numpad() {
             {config && (
                 <>
                     <motion.div
-                        className="fixed inset-0 z-40 bg-black/50"
+                        className="fixed inset-0 z-[10000] bg-black/50"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onPointerDown={() => { commit(); }}
                     />
                     <motion.div
-                        className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden"
+                        className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden"
                         initial={{ y: "100%" }}
                         animate={{ y: 0 }}
                         exit={{ y: "100%" }}

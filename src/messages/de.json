@@ -107,7 +107,6 @@
     "rulesetNote": "Der 2014/2024-Schalter verändert Schwellenwerte und XP-Tabellen pro CR.",
     "viewDocs": "Dokumentation ansehen",
     "quickPresets": "Schnellvorgaben",
-    "budgetMath": "Budget-Rechnung: XP-Schwelle × Begegnungsmultiplikator. Die Wahl des Regelwerks verändert Schwellen und XP-Werte.",
     "partySize": "Gruppengröße",
     "avgLevel": "Durchschnittsstufe",
     "ruleset": "Regelwerk",
@@ -133,30 +132,12 @@
     "sameTerrain": "Gleiches Terrain",
     "sameAffiliation": "Gleiche Zugehörigkeit",
     "sameGenus": "Gleiche Gattung",
-    "showSuggestions": "Vorschläge anzeigen",
     "suggestedEncounters": "Vorgeschlagene Begegnungen",
     "totalXPBudget": "Gesamt-XP-Budget",
-    "budgetStatus": "Budget-Status",
     "onTarget": "Im Ziel",
     "overBudget": "Über Budget",
     "underBudget": "Unter Budget",
-    "exportPreview": "Export-Vorschau",
-    "exportSnapshot": "Schnappschuss für schnellen Screenshot oder Druck.",
     "recommendedMix": "Empfohlene Mischung",
-    "monsterRecommendations": "Monster-Manual-Vergleichswerte",
-    "monsterRecommendationsNote": "Vergleiche die berechnete CR-Mischung mit Kreaturennamen und Herausforderungsgraden aus dem Monster Manual 2014. Statblocks und Regeltext werden nicht wiedergegeben.",
-    "monsterManualSource": "Monster-Manual-2014-Vergleich",
-    "basedOnAverageLevel": "Basierend auf Durchschnittsstufe",
-    "monsters": "Monster",
-    "compareToMix": "Vergleichen mit",
-    "xpEach": "XP je",
-    "adjustedXp": "Angepasste XP",
-    "budgetFitShort": "Passung",
-    "exactCrMatch": "Exakter CR",
-    "nearestCrMatch": "Nächster CR",
-    "crMixOptions": "CR-Mischoptionen",
-    "crMixOptionsNote": "Reine CR/Anzahl-Kombinationen aus der Begegnungsbudget-Rechnung.",
-    "budgetFit": "Budget-Passung",
     "calculationsNote": "Berechnungen basieren auf standardmäßigen XP-Schwellen und Begegnungsmultiplikatoren."
   },
   "monsterScaler": {
@@ -301,14 +282,6 @@
     "rollForEncounter": "Für Begegnung würfeln",
     "outcome": "Ergebnis",
     "roll": "Wurf",
-    "balanceThisEncounter": "Diese Begegnung ausbalancieren",
-    "encounterBalancer": "Begegnungs-Ausgleicher",
-    "close": "Schließen",
-    "partySize": "Gruppengröße",
-    "avgLevel": "Durchschn.-Stufe",
-    "targetBudget": "Zielbudget",
-    "soloSuggestions": "Vorschläge für Solo",
-    "groupSuggestions": "Vorschläge für Gruppe",
     "hideDmTables": "SL-Tabellen ausblenden",
     "showDmTables": "SL-Tabellen anzeigen",
     "dmTables": "SL-Tabellen",
@@ -581,7 +554,7 @@
       {
         "heading": "8. Lokale Speicherung auf Ihrem Gerät",
         "body": [
-          "Ihre Design- und saisonale Anzeigeeinstellung, gespeicherte Layouts der Kampfkarte sowie alle von Ihnen im Bestiarium erstellten Homebrew-Monster werden ausschließlich im lokalen Speicher oder IndexedDB Ihres eigenen Browsers gespeichert. Diese Daten verlassen niemals Ihr Gerät, sind für uns nicht einsehbar und liegen vollständig in Ihrer eigenen Kontrolle — löschen Sie jederzeit Ihre Browserdaten, um sie zu entfernen."
+          "Ihre Design- und saisonale Anzeigeeinstellung, gespeicherte Layouts der Kampfkarte, alle von Ihnen im Bestiarium erstellten Homebrew-Monster sowie ob Sie den Hinweis \"Gerät drehen\" in der Vollbildansicht des Kampffelds abgelehnt haben, werden ausschließlich im lokalen Speicher oder IndexedDB Ihres eigenen Browsers gespeichert. Diese Daten verlassen niemals Ihr Gerät, sind für uns nicht einsehbar und liegen vollständig in Ihrer eigenen Kontrolle — löschen Sie jederzeit Ihre Browserdaten, um sie zu entfernen."
         ]
       },
       {

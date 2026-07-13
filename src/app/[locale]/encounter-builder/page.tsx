@@ -35,7 +35,8 @@ import {
     type GroupSuggestion,
 } from "@/app/hooks/useEncounterBuilder";
 import type { Monster } from "@/app/types/monster";
-import type { CoverBenefit, CoverLevel, HazardEffect } from "@/app/types/encounterLayout";
+import type { CoverBenefit, HazardEffect } from "@/app/types/encounterLayout";
+import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
 
 function EncounterModal({
     suggestion, mode, ruleset, catalog, filterMonsterPool, hasActiveFilter, onClose,
@@ -141,14 +142,6 @@ function EncounterModal({
     return typeof document !== "undefined" ? createPortal(modal, document.body) : null;
 }
 
-function coverBenefitText(level: CoverLevel): string {
-    switch (level) {
-        case "half":          return "+2 AC & Dex saves";
-        case "three-quarter": return "+5 AC & Dex saves";
-        case "full":          return "Cannot be targeted";
-    }
-}
-
 function BudgetBar({ fit, accent = "gold" }: { fit: number; accent?: "gold" | "silver" }) {
     return (
         <div className={`mt-2.5 h-px w-full ${accent === "silver" ? "bg-silver/10" : "bg-gold/10"} rounded-full overflow-hidden`}>
@@ -171,16 +164,6 @@ export default function CombatBalancerPage() {
         knownGenera, filterMonsterPool, hasActiveFilter, activeFilterLabel,
         showRelationControls, useXP,
     } = useEncounterBuilder();
-
-    // Lock body scroll on desktop — mobile uses normal stacked layout
-    useEffect(() => {
-        const mq = window.matchMedia("(min-width: 1024px)");
-        const apply = (matches: boolean) => { document.body.style.overflow = matches ? "hidden" : ""; };
-        apply(mq.matches);
-        const handler = (e: MediaQueryListEvent) => apply(e.matches);
-        mq.addEventListener("change", handler);
-        return () => { mq.removeEventListener("change", handler); document.body.style.overflow = ""; };
-    }, []);
 
     const budgetStatus = (fit: number) => {
         if (fit >= 0.95 && fit <= 1.05) return { label: t("onTarget"), color: "text-green-400" };
@@ -214,7 +197,7 @@ export default function CombatBalancerPage() {
                 </PageHeader>
             </div>
 
-            <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[minmax(252px,1fr)_minmax(320px,1.6fr)_minmax(252px,1fr)] gap-6 p-4 lg:px-8 lg:pb-8">
+            <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[minmax(220px,0.8fr)_minmax(360px,2.2fr)_minmax(220px,0.8fr)] gap-6 p-4 lg:px-8 lg:pb-8">
 
                 {/* LEFT: Party Options */}
                 <div className="min-h-0 flex flex-col gap-4 lg:overflow-y-auto">
@@ -285,41 +268,7 @@ export default function CombatBalancerPage() {
                             )}
                         </div>
 
-                        {(coverBenefits.length > 0 || hazardEffects.length > 0) && (
-                            <div className="mt-5 pt-4 border-t border-sky-400/20">
-                                <span className="text-xs uppercase tracking-widest text-sky-400/80 font-bold">Advantages / Disadvantages</span>
-                                <ul className="mt-2 flex flex-col gap-1.5">
-                                    {coverBenefits.map((b, i) => (
-                                        <li key={`cover-${i}`} className="flex items-baseline justify-between gap-2 text-xs">
-                                            <span className="text-foreground/80 font-medium truncate">{b.partyLabel}</span>
-                                            <span className="text-sky-400 shrink-0 text-right">
-                                                {coverBenefitText(b.coverLevel)}
-                                                <span className="ml-1 font-bold opacity-70">C</span>
-                                            </span>
-                                        </li>
-                                    ))}
-                                    {hazardEffects.map((h, i) => (
-                                        <li key={`hazard-${i}`} className="flex flex-col gap-0.5 text-xs" title={h.notes}>
-                                            <div className="flex items-baseline justify-between gap-2">
-                                                <span className="text-foreground/80 font-medium truncate">
-                                                    {h.creatureLabel}
-                                                    <span className="ml-1.5 text-[9px] uppercase tracking-widest text-muted/60">
-                                                        {h.creatureKind === "party" ? "PC" : "NPC"}
-                                                    </span>
-                                                </span>
-                                                <span className={`shrink-0 text-right ${h.source === "spell" ? "text-purple-400" : "text-amber-500"}`}>
-                                                    {h.hazardLabel}
-                                                    <span className="ml-1 font-bold opacity-70">{h.source === "spell" ? "S" : "E"}</span>
-                                                </span>
-                                            </div>
-                                            {h.notes && (
-                                                <span className="text-muted/60 italic truncate">{h.notes}</span>
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                        <AdvantagesPanel coverBenefits={coverBenefits} hazardEffects={hazardEffects} className="mt-5" />
                     </Card>
 
                     <p className="text-xs text-muted italic text-center shrink-0 pb-2">{t("calculationsNote")}</p>
@@ -524,9 +473,9 @@ export default function CombatBalancerPage() {
                                 return (
                                     <li key={i} data-testid="suggestion-card">
                                         <Card
-                                            className={`border transition-all duration-150 cursor-pointer ${
+                                            className={`border transition-all duration-150 cursor-pointer relative ${
                                                 isSelected
-                                                    ? (state.mode === "solo" ? "border-gold/50 bg-gold/6" : "border-silver/50 bg-silver/4")
+                                                    ? "border-crimson ring-1 ring-crimson bg-crimson/5"
                                                     : (state.mode === "solo" ? "border-gold/10 bg-background/50" : "border-silver/10 bg-background/50")
                                             }`}
                                             onClick={() => dispatch({ type: "SET_SELECTED_IDX", payload: i })}
@@ -535,6 +484,11 @@ export default function CombatBalancerPage() {
                                             aria-pressed={isSelected}
                                             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: "SET_SELECTED_IDX", payload: i }); }}
                                         >
+                                            {isSelected && (
+                                                <span className="absolute -top-2 left-3 bg-crimson text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5">
+                                                    Active
+                                                </span>
+                                            )}
                                             <div className="p-3">
                                                 <div className="flex justify-between items-start gap-2">
                                                     <div className="flex flex-wrap items-baseline gap-x-1 flex-1">

@@ -97,7 +97,7 @@ export default function PwaInstallPrompt() {
     return (
         <div
             ref={containerRef}
-            className={`fixed right-4 z-[150] transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
+            className={`pwa-install-badge sticky w-fit ml-auto mr-4 z-[150] transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
         >
             {/* Mobile: centered modal popup */}
             {expanded && (

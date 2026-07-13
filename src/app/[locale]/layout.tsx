@@ -127,11 +127,11 @@ export default async function LocaleLayout({
             <CookieConsentProvider>
                 <ThemeProvider>
                     <SeoJsonLd/>
-                    {/* Top route change progress bar */}
-                    <Suspense>
-                        <RouteProgress/>
-                    </Suspense>
                     <SidebarProvider>
+                        {/* Route loading screen — closes the sidebar on completion, so must be inside SidebarProvider */}
+                        <Suspense>
+                            <RouteProgress/>
+                        </Suspense>
                         <CustomMonstersProvider>
                             <NumpadProvider>
                                 <PickerProvider>

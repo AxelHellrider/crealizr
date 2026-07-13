@@ -107,7 +107,6 @@
     "rulesetNote": "Le basculement 2014/2024 modifie les seuils et les tableaux de XP par CR.",
     "viewDocs": "Voir la documentation",
     "quickPresets": "Préréglages rapides",
-    "budgetMath": "Calcul du budget : seuil de XP × multiplicateur de rencontre. Le choix des règles modifie les seuils et les valeurs de XP.",
     "partySize": "Taille du groupe",
     "avgLevel": "Niveau moyen",
     "ruleset": "Règles",
@@ -133,30 +132,12 @@
     "sameTerrain": "Même terrain",
     "sameAffiliation": "Même affiliation",
     "sameGenus": "Même genre",
-    "showSuggestions": "Afficher les suggestions",
     "suggestedEncounters": "Rencontres suggérées",
     "totalXPBudget": "Budget total de XP",
-    "budgetStatus": "État du budget",
     "onTarget": "Dans la cible",
     "overBudget": "Au-dessus du budget",
     "underBudget": "En dessous du budget",
-    "exportPreview": "Aperçu de l’export",
-    "exportSnapshot": "Instantané pour capture rapide ou impression.",
     "recommendedMix": "Mélange recommandé",
-    "monsterRecommendations": "Références du Monster Manual",
-    "monsterRecommendationsNote": "Comparez le mélange de CR calculé avec des noms de créatures et des facteurs de puissance du Monster Manual 2014. Les blocs de statistiques et le texte de règles ne sont pas reproduits.",
-    "monsterManualSource": "Comparaison Monster Manual 2014",
-    "basedOnAverageLevel": "Basé sur le niveau moyen",
-    "monsters": "Monstres",
-    "compareToMix": "Comparer à",
-    "xpEach": "XP chacun",
-    "adjustedXp": "XP ajustés",
-    "budgetFitShort": "Ajustement",
-    "exactCrMatch": "CR exact",
-    "nearestCrMatch": "CR le plus proche",
-    "crMixOptions": "Options de mélange CR",
-    "crMixOptionsNote": "Combinaisons brutes CR/nombre basées sur le calcul du budget de rencontre.",
-    "budgetFit": "Adéquation du budget",
     "calculationsNote": "Les calculs sont basés sur les seuils XP standards et les multiplicateurs de rencontre."
   },
   "monsterScaler": {
@@ -301,14 +282,6 @@
     "rollForEncounter": "Lancer pour une rencontre",
     "outcome": "Résultat",
     "roll": "Lancer",
-    "balanceThisEncounter": "Équilibrer cette rencontre",
-    "encounterBalancer": "Équilibreur de rencontre",
-    "close": "Fermer",
-    "partySize": "Taille du groupe",
-    "avgLevel": "Niveau moy.",
-    "targetBudget": "Budget cible",
-    "soloSuggestions": "Suggestions solo",
-    "groupSuggestions": "Suggestions de groupe",
     "hideDmTables": "Masquer les tableaux MJ",
     "showDmTables": "Afficher les tableaux MJ",
     "dmTables": "Tableaux MJ",
@@ -581,7 +554,7 @@
       {
         "heading": "8. Stockage local sur votre appareil",
         "body": [
-          "Votre préférence de thème et d'affichage saisonnier, vos dispositions de champ de bataille enregistrées, et tout monstre personnalisé que vous créez dans votre Bestiaire sont stockés uniquement dans le stockage local ou l'IndexedDB de votre propre navigateur. Ces données ne quittent jamais votre appareil, ne nous sont pas visibles, et restent entièrement sous votre contrôle — effacez les données de votre navigateur à tout moment pour les supprimer."
+          "Votre préférence de thème et d'affichage saisonnier, vos dispositions de champ de bataille enregistrées, tout monstre personnalisé que vous créez dans votre Bestiaire, et le fait que vous ayez rejeté la suggestion « faites pivoter votre appareil » en mode plein écran du champ de bataille sont stockés uniquement dans le stockage local ou l'IndexedDB de votre propre navigateur. Ces données ne quittent jamais votre appareil, ne nous sont pas visibles, et restent entièrement sous votre contrôle — effacez les données de votre navigateur à tout moment pour les supprimer."
         ]
       },
       {

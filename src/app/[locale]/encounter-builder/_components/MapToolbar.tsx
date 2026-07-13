@@ -77,46 +77,51 @@ export function MapToolbar({
           :           "border-gold/15 text-muted hover:text-gold hover:border-gold/40"
         }`;
 
+    // Mobile (outside fullscreen): only the fullscreen toggle is shown — the
+    // full button list only appears once fullscreen is entered. Desktop keeps
+    // the full toolbar here, on top, at all times.
     return (
         <div className="flex flex-wrap items-center gap-1.5">
-            {MODES.map(({ mode: m, label, shortcut }) => (
-                <button key={m} type="button" onClick={() => onModeChange(m)}
-                    className={btn(mode === m)} aria-pressed={mode === m}>
-                    {label}
-                    {shortcut && (
-                        <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">
-                            {shortcut}
-                        </kbd>
-                    )}
+            <div className="hidden sm:flex flex-wrap items-center gap-1.5">
+                {MODES.map(({ mode: m, label, shortcut }) => (
+                    <button key={m} type="button" onClick={() => onModeChange(m)}
+                        className={btn(mode === m)} aria-pressed={mode === m}>
+                        {label}
+                        {shortcut && (
+                            <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">
+                                {shortcut}
+                            </kbd>
+                        )}
+                    </button>
+                ))}
+
+                <span className="w-px self-stretch bg-gold/10" aria-hidden />
+
+                <button type="button" onClick={onCameraLockToggle}
+                    className={btn(cameraLocked)} aria-pressed={cameraLocked}>
+                    {cameraLocked ? "Cam Locked" : "Lock Cam"}
+                    <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">L</kbd>
                 </button>
-            ))}
 
-            <span className="w-px self-stretch bg-gold/10" aria-hidden />
+                <button type="button" onClick={onZoomIn}  className={btn(false)} title="Zoom in  (+)">+</button>
+                <button type="button" onClick={onZoomOut} className={btn(false)} title="Zoom out (−)">−</button>
 
-            <button type="button" onClick={onCameraLockToggle}
-                className={btn(cameraLocked)} aria-pressed={cameraLocked}>
-                {cameraLocked ? "Cam Locked" : "Lock Cam"}
-                <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">L</kbd>
-            </button>
+                <span className="w-px self-stretch bg-gold/10" aria-hidden />
 
-            <button type="button" onClick={onZoomIn}  className={btn(false)} title="Zoom in  (+)">+</button>
-            <button type="button" onClick={onZoomOut} className={btn(false)} title="Zoom out (−)">−</button>
+                <button type="button" onClick={onClearAll} disabled={!canClearAll}
+                    className={`${btn(false, true)} disabled:opacity-30 disabled:pointer-events-none`}>
+                    Clear hazards &amp; cover
+                </button>
 
-            <span className="w-px self-stretch bg-gold/10" aria-hidden />
-
-            <button type="button" onClick={onClearAll} disabled={!canClearAll}
-                className={`${btn(false, true)} disabled:opacity-30 disabled:pointer-events-none`}>
-                Clear hazards &amp; cover
-            </button>
+                {mode !== "select" && (
+                    <span className="text-[9px] text-muted/60 italic">Click empty hex to place</span>
+                )}
+            </div>
 
             <button type="button" onClick={onFullscreenToggle} className={btn(false)}
                 title="Fullscreen map" aria-label="Open fullscreen map">
                 ⛶
             </button>
-
-            {mode !== "select" && (
-                <span className="text-[9px] text-muted/60 italic">Click empty hex to place</span>
-            )}
         </div>
     );
 }

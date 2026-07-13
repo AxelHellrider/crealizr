@@ -88,7 +88,7 @@ export default function ItemCreatorPage() {
                     <label className="flex items-center gap-3 cursor-pointer group" title="Prevent item type changes from overwriting the bonuses you've already set">
                         <input
                             type="checkbox"
-                            className="w-5 h-5 rounded-sm border-gold/30 bg-card text-gold focus:ring-gold/20 accent-gold"
+                            className="ui-checkbox"
                             checked={fields.lockMechanics}
                             onChange={(e) => setField("lockMechanics", e.target.checked)}
                         />
@@ -208,7 +208,7 @@ export default function ItemCreatorPage() {
                 <label className="flex items-center gap-3 cursor-pointer group">
                     <input
                         type="checkbox"
-                        className="w-5 h-5 rounded-sm border-gold/30 bg-card text-gold focus:ring-gold/20 accent-gold"
+                        className="ui-checkbox"
                         checked={fields.attunement}
                         onChange={(e) => setField("attunement", e.target.checked)}
                     />

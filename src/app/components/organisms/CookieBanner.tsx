@@ -16,7 +16,7 @@ export default function CookieBanner() {
             role="dialog"
             aria-live="polite"
             aria-label={t("title")}
-            className="fixed inset-x-0 bottom-0 z-[200] border-t border-gold/20 bg-surface/95 backdrop-blur-sm"
+            className="sticky bottom-0 z-[200] border-t border-gold/20 bg-surface/95 backdrop-blur-sm"
         >
             <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
