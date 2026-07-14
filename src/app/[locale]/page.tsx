@@ -1,4 +1,4 @@
-import {Metadata, Viewport} from "next";
+import {Metadata} from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buildHreflang } from "@/app/lib/seo";
@@ -84,14 +84,6 @@ export const metadata: Metadata = {
         description: "Free D&D 5e toolkit: encounter builder, monster scaler, travel encounters, and artifact forge. Supports 2014 and 2024 rules.",
         images: ["/og-default.svg"],
     },
-};
-
-export const viewport: Viewport = {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
 };
 
 export default async function Home({params}: {params: Promise<{locale: string}>}) {

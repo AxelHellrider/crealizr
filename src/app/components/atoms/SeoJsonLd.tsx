@@ -1,3 +1,5 @@
+import Script from "next/script";
+
 type JsonLdItem = Record<string, unknown>;
 
 function compact(obj: JsonLdItem) {
@@ -53,9 +55,9 @@ export function SeoJsonLd() {
   const data = [website, software];
 
   return (
-    <script
+    <Script
+      id="json-ld"
       type="application/ld+json"
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e") }}
     />
   );

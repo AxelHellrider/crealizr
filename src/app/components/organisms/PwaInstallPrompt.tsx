@@ -99,7 +99,7 @@ export default function PwaInstallPrompt() {
     return (
         <div
             ref={containerRef}
-            className={`sticky w-fit ml-auto mr-4 z-[150] transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
+            className={`lg:fixed lg:right-4 max-lg:sticky w-fit ml-auto mr-4 z-150 transition-[bottom] duration-300 ${cookieBannerVisible ? "bottom-28 sm:bottom-24" : "bottom-4"}`}
         >
             {/* Mobile: centered modal popup */}
             {expanded && (
@@ -107,7 +107,7 @@ export default function PwaInstallPrompt() {
                     role="dialog"
                     aria-modal="true"
                     aria-label={t("title")}
-                    className="sm:hidden fixed inset-0 z-[151] flex items-end justify-center bg-black/50 backdrop-blur-sm p-4"
+                    className="sm:hidden fixed inset-0 z-151 flex items-end justify-center bg-black/50 backdrop-blur-sm p-4"
                     onClick={() => setExpanded(false)}
                 >
                     <div
@@ -135,7 +135,7 @@ export default function PwaInstallPrompt() {
                 onClick={() => setExpanded((v) => !v)}
                 aria-label={t("title")}
                 aria-expanded={expanded}
-                className="flex items-center justify-center h-12 w-12 rounded-full border border-gold/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.5)] text-gold hover:border-gold hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                className="flex items-center justify-center size-12 rounded-full border border-gold/40 bg-card shadow-[0_2px_12px_rgba(0,0,0,0.5)] text-gold hover:border-gold hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
             >
                 <CrealizrMark className="h-6 w-auto" />
             </button>

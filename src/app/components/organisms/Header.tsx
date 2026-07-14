@@ -10,8 +10,11 @@ export default function Header() {
     const { isOpen, toggle } = useSidebar();
 
     return (
-        <header className="sticky top-0 z-50 w-full h-14 bg-background border-b border-gold/20 xl:hidden">
-            <div className="flex h-full items-center justify-between px-4">
+        <header
+            className="sticky top-0 z-50 w-full bg-background border-b border-gold/20 xl:hidden"
+            style={{ paddingTop: "env(safe-area-inset-top)" }}
+        >
+            <div className="flex h-14 items-center justify-between px-4">
                 <Link href={`/${locale}`} scroll={false} className="accent-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-sm">
                     <CrealizrMark className="h-7 w-auto" />
                 </Link>

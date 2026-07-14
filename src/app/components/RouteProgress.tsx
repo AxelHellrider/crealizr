@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 import { useSidebar } from "@/app/context/SidebarContext";
+
+/** First path segment after the locale — the "tool" a route belongs to, or "" for home. */
+function toolRootOf(pathname: string): string {
+  return pathname.split("/").filter(Boolean)[1] ?? "";
+}
 
 /** Visual state of the mark loading indicator at any point in its animation sequence. */
 type ProgressState = {
@@ -37,8 +42,10 @@ function progressReducer(state: ProgressState, action: ProgressAction): Progress
 
 export default function RouteProgress() {
   const pathname = usePathname();
-  const search = useSearchParams();
-  const key = useMemo(() => `${pathname}?${search?.toString() ?? ""}`,[pathname, search]);
+  // Only re-trigger the full-screen loading sequence when navigating between
+  // top-level tools (or to/from home) — not for sub-routes within the same
+  // tool, like /my-monsters/add or /my-monsters/edit/[id].
+  const toolRoot = useMemo(() => toolRootOf(pathname), [pathname]);
   const [{ activeBars, opacity, visible }, dispatch] = useReducer(progressReducer, initialState);
   const timers = useRef<number[]>([]);
   const { isOpen: sidebarOpen, setIsOpen: setSidebarOpen } = useSidebar();
@@ -64,7 +71,7 @@ export default function RouteProgress() {
   }, [pathname, prefersReducedMotion]);
 
   useEffect(() => {
-    // start progress on route key change
+    // start progress on tool-root change (see toolRootOf above)
     // clear any pending timers
     timers.current.forEach((t) => window.clearTimeout(t));
     timers.current = [];
@@ -104,7 +111,7 @@ export default function RouteProgress() {
       timers.current.forEach((t) => window.clearTimeout(t));
       timers.current = [];
     };
-  }, [key, setSidebarOpen, prefersReducedMotion]);
+  }, [toolRoot, setSidebarOpen, prefersReducedMotion]);
 
   if (!visible) return null;
   return (

@@ -73,6 +73,10 @@ body {
   background: var(--surface-base);
   color: var(--text-base);
   min-height: 100vh;
+  /* 100dvh tracks the *current* visible viewport as mobile browser chrome
+     (URL bar, nav bar) shows/hides, instead of the largest-ever size — the
+     100vh fallback above covers browsers without dvh support. */
+  min-height: 100dvh;
 }
 
 /* Subtle grain overlay */
@@ -348,14 +352,33 @@ h1, h2, h3, h4, .font-serif {
 }
 
 /* ─── Layout ───────────────────────────────────────────────────────────── */
-.page-wrap { width: 100%; margin: 0 auto; padding: 0.5rem; }
+/* Adds env(safe-area-inset-*) on top of the base padding so content never
+   sits flush against notches, home indicators, or gesture bars — including
+   when a mobile browser's URL bar hides and reveals more viewport. Requires
+   viewport-fit=cover (see layout.tsx) or the env() values resolve to 0. */
+.page-wrap {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.5rem;
+  padding-left: calc(0.5rem + env(safe-area-inset-left));
+  padding-right: calc(0.5rem + env(safe-area-inset-right));
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+}
 
 @media (min-width: 640px) {
-  .page-wrap { padding: 1rem; }
+  .page-wrap {
+    padding: 1rem;
+    padding-left: calc(1rem + env(safe-area-inset-left));
+    padding-right: calc(1rem + env(safe-area-inset-right));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
 }
 @media (min-width: 1024px) {
   .page-wrap {
     padding: 1.5rem 2rem;
+    padding-left: calc(2rem + env(safe-area-inset-left));
+    padding-right: calc(2rem + env(safe-area-inset-right));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
     max-width: calc(100svw - 2rem);
   }
 }

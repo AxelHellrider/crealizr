@@ -89,11 +89,12 @@ export default function Sidebar() {
       <aside
         id="sidebar"
         className={`
-          fixed left-0 top-0 h-screen w-72 bg-card border-r border-gold/20 z-[210]
+          fixed left-0 top-0 h-dvh w-72 bg-card border-r border-gold/20 z-[210]
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           flex flex-col
         `}
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         {/* Logo */}
         <div className="flex justify-start lg:justify-end text-right p-3 border-b border-gold/20">
@@ -125,7 +126,10 @@ export default function Sidebar() {
           </nav>
 
           {/* Bottom section */}
-          <div className="p-4 border-t border-gold/20 space-y-4">
+          <div
+              className="p-4 border-t border-gold/20 space-y-4"
+              style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+          >
               {/* Language Switcher */}
               <div>
                   <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">

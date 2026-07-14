@@ -712,7 +712,10 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
             {isFullscreen && typeof document !== "undefined" && createPortal(
                 <div className="fixed inset-0 z-50 flex flex-col bg-background">
                     {/* Header */}
-                    <div className="shrink-0 flex items-center justify-between gap-4 px-4 h-10 border-b border-gold/10">
+                    <div
+                        className="shrink-0 flex items-center justify-between gap-4 px-4 h-10 border-b border-gold/10"
+                        style={{ paddingTop: "env(safe-area-inset-top)", height: "calc(2.5rem + env(safe-area-inset-top))" }}
+                    >
                         <span className="font-serif text-xs uppercase tracking-widest text-muted">Battlefield</span>
                         {mapMode !== "select" && (
                             <span className="text-[9px] text-muted/60 italic">Tap empty hex to place</span>

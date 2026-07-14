@@ -37,7 +37,10 @@ export function MapToolbar({
         const active = (on: boolean) => on ? "bg-gold/10 text-gold" : "text-muted hover:text-foreground active:text-gold";
 
         return (
-            <div className="shrink-0 flex items-stretch divide-x divide-gold/10 border-t border-gold/10 bg-background overflow-x-auto">
+            <div
+                className="shrink-0 flex items-stretch divide-x divide-gold/10 border-t border-gold/10 bg-background overflow-x-auto"
+                style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+            >
                 {MODES.map(({ mode: m, label }) => (
                     <button key={m} type="button" onClick={() => onModeChange(m)}
                         className={`${base} ${active(mode === m)}`} aria-pressed={mode === m}>

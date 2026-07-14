@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type {Metadata, Viewport} from "next";
 import { buildHreflang } from "@/app/lib/seo";
 import {Geist, Geist_Mono, Cinzel} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
@@ -45,6 +45,17 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = "https://crealizr.net";
+
+// viewport-fit=cover is required for env(safe-area-inset-*) to resolve to
+// non-zero values on notch/home-indicator devices — see the safe-area
+// padding in globals.css (.page-wrap, Header, Sidebar) that depends on it.
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover",
+};
 
 export async function generateMetadata({
     params,
