@@ -1,64 +1,36 @@
-"use client";
-
-import { useState } from "react";
 import { formatCR } from "@/app/lib/format";
 import { CR_MATRIX } from "@/app/data/constants";
-import { CR_MATRIX_2024 } from "@/app/data/constants2024";
 
-function CRTable({ data }: { data: typeof CR_MATRIX }) {
+// Column headers are kept in English — basic D&D/5e terminology stays universal across locales.
+export function CRTableToggle() {
     return (
-        <div className="overflow-x-auto rounded bg-black/30 p-4 text-sm">
+        <div className="overflow-x-auto border border-gold/20 bg-background text-sm mt-4">
             <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-black/50">
-                    <tr>
-                        <th className="px-2 py-1">Challenge Rating</th>
-                        <th className="px-2 py-1">Proficiency Bonus</th>
-                        <th className="px-2 py-1">Armor Class</th>
-                        <th className="px-2 py-1">Hit Points</th>
-                        <th className="px-2 py-1">Attack Bonus</th>
-                        <th className="px-2 py-1">Damage per Round</th>
-                        <th className="px-2 py-1">Save DC</th>
+                <thead>
+                    <tr className="border-b border-gold/20">
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Challenge Rating</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Proficiency Bonus</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Armor Class</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Hit Points</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Attack Bonus</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Damage per Round</th>
+                        <th className="px-2 py-2 text-gold/80 text-xs uppercase tracking-widest font-bold">Save DC</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? "bg-white/20" : "bg-white/10"}>
+                    {CR_MATRIX.map((row, i) => (
+                        <tr key={i} className={`border-b border-gold/5 ${i % 2 === 0 ? "bg-gold/5" : ""}`}>
                             <td className="px-2 py-1 text-center">{formatCR(row.cr)}</td>
                             <td className="px-2 py-1 text-center">{row.pb}</td>
                             <td className="px-2 py-1 text-center">{row.ac}</td>
                             <td className="px-2 py-1 text-center">{row.hp}</td>
                             <td className="px-2 py-1 text-center">{row.atkb}</td>
-                            <td className="px-2 py-1 text-center">{row.dpr}</td>
+                            <td className="px-2 py-1 text-center">{row.dpr.min}–{row.dpr.max}</td>
                             <td className="px-2 py-1 text-center">{row.save_dc}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
-    );
-}
-
-export function CRTableToggle() {
-    const [edition, setEdition] = useState<"2014" | "2024">("2014");
-    return (
-        <>
-            <div className="flex gap-4 mt-4">
-                <button
-                    className={`px-4 py-1 rounded ${edition === "2014" ? "bg-amber-500 text-black" : "bg-black/40"}`}
-                    onClick={() => setEdition("2014")}
-                >
-                    2014 Edition
-                </button>
-                <button
-                    className={`px-4 py-1 rounded ${edition === "2024" ? "bg-amber-500 text-black" : "bg-black/40"}`}
-                    onClick={() => setEdition("2024")}
-                >
-                    2024 Edition
-                </button>
-            </div>
-            <div className="mt-6">
-                {edition === "2014" ? <CRTable data={CR_MATRIX} /> : <CRTable data={CR_MATRIX_2024} />}
-            </div>
-        </>
     );
 }

@@ -234,7 +234,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                         value={name}
                         onChange={(e) => dispatch({ type: "SET_NAME", value: e.target.value })}
                         className="text-2xl font-serif py-3"
-                        placeholder="e.g. Dire Owlbear"
+                        placeholder={t("form.namePlaceholder")}
                     />
                 </FormField>
 
@@ -246,10 +246,10 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                         </Select>
                     </FormField>
                     <FormField label={t("form.type")}>
-                        <Input value={type} onChange={(e) => dispatch({ type: "SET_TYPE", value: e.target.value })} placeholder="e.g. monstrosity" />
+                        <Input value={type} onChange={(e) => dispatch({ type: "SET_TYPE", value: e.target.value })} placeholder={t("form.typePlaceholder")} />
                     </FormField>
                     <FormField label={t("form.alignment")}>
-                        <Input value={alignment} onChange={(e) => dispatch({ type: "SET_ALIGNMENT", value: e.target.value })} placeholder="e.g. chaotic evil" />
+                        <Input value={alignment} onChange={(e) => dispatch({ type: "SET_ALIGNMENT", value: e.target.value })} placeholder={t("form.alignmentPlaceholder")} />
                     </FormField>
                 </div>
 
@@ -318,7 +318,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                         <Input type="number" min={0} value={dprMax} onChange={(e) => dispatch({ type: "SET_DPR_MAX", value: Number(e.target.value) })} />
                     </FormField>
                     <FormField label={t("form.dprRange")}>
-                        <Input value={dprRange} onChange={(e) => dispatch({ type: "SET_DPR_RANGE", value: e.target.value })} placeholder="e.g. 2d8+4" />
+                        <Input value={dprRange} onChange={(e) => dispatch({ type: "SET_DPR_RANGE", value: e.target.value })} placeholder={t("form.dprRangePlaceholder")} />
                     </FormField>
                 </div>
             </Card>
@@ -363,7 +363,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
             {/* ── Encounter Data — terrain, affiliation, genus ── */}
             <Card className="p-6">
                 <SectionHeader>
-                    Encounter Data
+                    {t("form.encounterData")}
                 </SectionHeader>
 
                 {/* Terrain */}
@@ -374,7 +374,7 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                             value={terrain}
                             onChange={(val) => dispatch({ type: "SET_TERRAIN", value: val as Terrain[] })}
                             options={TERRAINS}
-                            placeholder="Search terrains..."
+                            placeholder={t("form.terrainPlaceholder")}
                         />
                     </FormField>
                 </div>
@@ -386,19 +386,19 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
                             value={affiliation}
                             onChange={(val) => dispatch({ type: "SET_AFFILIATION", value: val as Affiliation })}
                             options={AFFILIATIONS}
-                            placeholder="Search affiliations..."
+                            placeholder={t("form.affiliationPlaceholder")}
                         />
                     </FormField>
                 </div>
 
                 {/* Genus */}
                 <div>
-                    <FormField label={t("form.genus")} sublabel="type or pick from existing">
+                    <FormField label={t("form.genus")} sublabel={t("form.genusSublabel")}>
                         <Autocomplete
                             value={genus}
                             onChange={(val) => dispatch({ type: "SET_GENUS", value: val })}
                             options={knownGenera}
-                            placeholder="e.g. owlbear, dragon, goblinoid"
+                            placeholder={t("form.genusPlaceholder")}
                         />
                     </FormField>
                 </div>

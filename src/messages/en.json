@@ -17,10 +17,10 @@
     "hero": {
       "title": "Run balanced adventures faster, without breaking the fantasy.",
       "welcome": "Welcome",
-      "welcomeBlurb": "A free toolkit built for the table — encounters, monsters, and magic items, ready when you are. Built at the table, for the table — no more pausing the session to eyeball CR math.",
+      "welcomeBlurb": "Encounters, monsters, and magic items, ready whenever you need them — free, and no more stopping the game to eyeball CR math.",
       "tool": "Tool",
       "about": "About",
-      "aboutBlurb": "Built by a DM, for DMs — free, fast, and no account required.",
+      "aboutBlurb": "Made by a DM who got tired of doing this math by hand. Free, fast, no account needed.",
       "rulesetNote": "Works with 2014 & 2024 Rules",
       "travelAction": "Plan a Journey",
       "bestiaryAction": "Manage Your Bestiary"
@@ -57,6 +57,11 @@
       "travelInputs": "Forest · Combat Encounter · d500 Roll",
       "bestiaryInputs": "A homebrew entry, saved locally and reusable across every tool",
       "noSample": "No sample available for this ruleset."
+    },
+    "contactCta": {
+      "title": "Got Feedback?",
+      "description": "Found a bug or have an idea for a feature? I'd genuinely like to hear about it.",
+      "action": "Get in Touch"
     }
   },
   "encounterBuilder": {
@@ -96,7 +101,9 @@
     "overBudget": "Deadly — over budget",
     "underBudget": "Below difficulty",
     "recommendedMix": "Recommended Mix",
-    "calculationsNote": "Calculations based on standard XP thresholds and encounter multipliers."
+    "calculationsNote": "Calculations based on standard XP thresholds and encounter multipliers.",
+    "openBattlefield": "Open Battlefield",
+    "openBattlefieldHint": "Open the battlefield fullscreen for a better view on mobile."
   },
   "monsterScaler": {
     "title": "Monster Scaler",
@@ -104,8 +111,8 @@
     "viewDocs": "View Documentation",
     "whatScales": "What scales",
     "whatScalesDesc": "AC, HP, DPR targets, and ability modifiers.",
-    "rulesetNotes": "Ruleset notes",
-    "rulesetNotesDesc": "2014 uses DMG tables. 2024 uses updated bands with softened ranges.",
+    "acSourceNotes": "AC sources",
+    "acSourceNotesDesc": "Dex-based, equipped armor, or natural armor — plus an optional shield.",
     "guardrails": "Guardrails",
     "guardrailsDesc": "Verify action economy, legendary actions, and unique traits after scaling.",
     "generalInfo": "General Information",
@@ -113,14 +120,19 @@
     "namePlaceholder": "e.g. Ancient Red Dragon",
     "creatureType": "Creature Type",
     "typePlaceholder": "e.g. Dragon",
-    "ruleset": "Ruleset",
     "currentCR": "Current CR",
     "targetCR": "Target CR",
     "selectTargetCR": "Select target CR",
     "baseAttributes": "Base Attributes",
     "defenseAdjustments": "Defense & Ability Adjustments",
-    "equipmentACBonus": "Equipment AC Bonus",
-    "naturalArmorBonus": "Natural Armor Bonus",
+    "acSource": "AC Source",
+    "acSourceDex": "Dex-based (10 + Dex mod)",
+    "acSourceArmor": "Equipped Armor (10 + bonus)",
+    "acSourceNatural": "Natural Armor (flat value)",
+    "armorBonus": "Armor Bonus",
+    "naturalArmorValue": "Natural Armor Value",
+    "shield": "Shield",
+    "shieldHint": "Wielding a shield (+2 AC)",
     "abilityScoreBonuses": "Ability Score Bonuses",
     "scaleMonster": "SCALE A MONSTER",
     "scaling": "SCALING...",
@@ -279,7 +291,7 @@
   },
   "myMonsters": {
     "title": "My Bestiary",
-    "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
+    "description": "Add and manage your homebrew monsters. They're saved right in your browser and work automatically with every CRealizr tool.",
     "addMonster": "Add Monster",
     "editMonster": "Edit",
     "saveMonster": "Save Monster",
@@ -298,17 +310,25 @@
     "infoUsageDesc": "Custom monsters appear automatically in the Encounter Builder recommendations and can be loaded into the Monster Scaler.",
     "infoPortability": "Portability",
     "infoPortabilityDesc": "Export your library as JSON to back up, share, or transfer to another device. Import any previously exported file to restore.",
+    "invalidJsonFile": "Invalid JSON file.",
     "form": {
       "name": "Name",
+      "namePlaceholder": "e.g. Dire Owlbear",
       "cr": "Challenge Rating",
       "edition": "Edition",
       "terrain": "Terrain",
+      "terrainPlaceholder": "Search terrains...",
       "affiliation": "Affiliation",
+      "affiliationPlaceholder": "Search affiliations...",
       "genus": "Genus",
+      "genusSublabel": "type or pick from existing",
+      "genusPlaceholder": "e.g. owlbear, dragon, goblinoid",
       "statBlock": "Stat Block (Optional)",
       "size": "Size",
       "type": "Type",
+      "typePlaceholder": "e.g. monstrosity",
       "alignment": "Alignment",
+      "alignmentPlaceholder": "e.g. chaotic evil",
       "ac": "AC",
       "hp": "HP",
       "speed": "Speed",
@@ -321,11 +341,13 @@
       "dprMin": "DPR Min",
       "dprMax": "DPR Max",
       "dprRange": "DPR Range",
+      "dprRangePlaceholder": "e.g. 2d8+4",
       "xp": "XP",
       "actions": "Actions",
       "actionName": "Action Name",
       "actionDamage": "Damage",
       "addAction": "Add Action",
+      "encounterData": "Encounter Data",
       "nameRequired": "Name is required.",
       "nameDuplicate": "A monster with this name already exists."
     }
@@ -356,7 +378,7 @@
       {
         "heading": "4. Your Content",
         "body": [
-          "Custom monsters, homebrew content, and other data you create (\"User Content\") are stored locally in your browser and are never transmitted to our servers. You are solely responsible for backing up your User Content using the export feature — clearing your browser data or switching devices will permanently remove it.",
+          "Custom monsters, homebrew content, and anything else you create (\"User Content\") stay in your browser and are never sent to our servers. Back them up yourself using the export feature — clearing your browser data or switching devices will permanently delete them.",
           "You retain all rights to your User Content. By using the Service you confirm that your User Content does not infringe on the rights of any third party."
         ]
       },
@@ -512,7 +534,7 @@
       {
         "heading": "8. Local Storage on Your Device",
         "body": [
-          "Your theme and seasonal display preference, your saved encounter battle-map layouts, any homebrew monsters you create in My Bestiary, and whether you've dismissed the \"rotate your device\" suggestion in the battlefield's fullscreen view are stored only in your own browser's local storage or IndexedDB. This data never leaves your device, is not visible to us, and is entirely under your control — clear your browser data at any time to remove it."
+          "Your theme, saved battle-map layouts, any homebrew monsters you create in My Bestiary, and a few small UI preferences (like whether you've dismissed the \"rotate your device\" tip) are stored only in your own browser's local storage or IndexedDB. None of it ever reaches our servers or is visible to us — clear your browser data at any time to remove it."
         ]
       },
       {
@@ -551,5 +573,169 @@
     "description": "Add it to your home screen for quick, offline-ready access at the table.",
     "install": "Install",
     "dismiss": "Not now"
+  },
+  "encounterBuilderDocs": {
+    "title": "Encounter Builder – How It Works",
+    "description": "Complete reference for every feature in the Encounter Builder — party setup, two calculation modes, the interactive battlefield, and cover mechanics.",
+    "sections": [
+      {
+        "heading": "Inputs",
+        "html": "<ul>\n        <li><strong>Party size</strong> — number of characters (1–8). Quick-preset chips for 3/4/5/6.</li>\n        <li><strong>Average level</strong> — 1–20. Drives both XP thresholds and CR target calculations.</li>\n        <li><strong>Difficulty</strong> — <code>easy</code>, <code>medium</code>, <code>hard</code>, or <code>deadly</code>.</li>\n        <li><strong>Ruleset</strong> — 2014 DMG or 2024 Player's Handbook tables.</li>\n        <li><strong>Formation</strong> — <em>Solo Boss</em> (one dominant enemy, optionally with minions) or <em>Horde/Group</em> (mixed-CR mob).</li>\n      </ul>"
+      },
+      {
+        "heading": "Calculation Mode",
+        "html": "<p>The <strong>Calculation Mode</strong> toggle switches between two distinct approaches. Both produce the same suggestion card format; what changes is the math behind them.</p>\n      <h3>XP Budget mode (default)</h3>\n      <p>Full D&amp;D 5e encounter-budget flow:</p>\n      <ol>\n        <li>Look up the per-character XP threshold for the chosen level and difficulty.</li>\n        <li>Multiply by party size: <code>budget = threshold[level][difficulty] × partySize</code>.</li>\n        <li>For each candidate group of monsters, compute: <code>adjustedXP = Σ(count × xpEach) × encounterMultiplier(totalCount)</code>.</li>\n        <li>Keep suggestions where <code>fit = min(budget, adjustedXP) / max(budget, adjustedXP) ≥ 0.7</code>.</li>\n        <li>Sort by highest fit, then lower adjustedXP. Return top 12.</li>\n      </ol>\n      <p>The <strong>Budget Type</strong> sub-toggle switches between <em>Encounter budget</em> (single session) and <em>Daily budget</em> (≈3.4× encounter budget, for full adventuring days).</p>\n      <h4>Encounter multipliers</h4>\n      <ul>\n        <li>1 monster → <code>×1</code></li>\n        <li>2 → <code>×1.5</code></li>\n        <li>3–6 → <code>×2</code></li>\n        <li>7–10 → <code>×2.5</code></li>\n        <li>11–14 → <code>×3</code></li>\n        <li>15+ → <code>×4</code></li>\n      </ul>\n      <h3>CR Match mode</h3>\n      <p>No XP math. Suggestions are generated purely by comparing challenge ratings to the party level:</p>\n      <ol>\n        <li>Compute a <strong>target CR</strong> per difficulty offset: <code>easy: level−2 · medium: level · hard: level+1 · deadly: level+3</code> (min 1/8).</li>\n        <li>Scale by party size: <code>crBudget = targetCR × (partySize / 4)</code>.</li>\n        <li>For each candidate group, compute a <strong>CR encounter weight</strong>: <code>crWeight = Σ(cr × count) × √encounterMultiplier(totalCount)</code>.</li>\n        <li>Keep suggestions where <code>fit = min(crBudget, crWeight) / max(crBudget, crWeight) ≥ 0.5</code>.</li>\n      </ol>\n      <p>The <strong>Max Beatable CR</strong> displayed in the party card is <code>crTarget × (partySize / 4)</code>, formatted as a challenge rating — the single-monster ceiling the party can handle at the selected difficulty.</p>\n      <p>No accuracy labels (On Target / Over Budget) are shown in CR Match mode because the CR tables already define an unambiguous answer; percentage fit is redundant.</p>"
+      },
+      {
+        "heading": "Solo Boss vs Horde/Group",
+        "html": "<h3>Solo Boss</h3>\n      <p>Enumerates boss CRs near the target, optionally pairing them with lower-CR minions. With <strong>Include Minions</strong> on, the tool searches for related monsters (by terrain, affiliation, or genus via the Relation Filter) to populate the minion slot.</p>\n      <h3>Horde / Group</h3>\n      <p>Builds mixed-CR compositions. The <strong>Mix Types</strong> setting (2–5) caps how many distinct CR types appear in one suggestion. For N total monsters and T types:</p>\n      <ul>\n        <li>Enumerate all CR combinations of size T.</li>\n        <li>Enumerate all ways to split N into T positive integer counts.</li>\n        <li>Keep combinations whose budget fit meets the threshold.</li>\n      </ul>"
+      },
+      {
+        "heading": "Relation Filter",
+        "html": "<p>Available when minions are enabled (Solo) or always in Group mode. Restricts candidates to monsters that share a chosen property with a benchmark creature at the target CR:</p>\n      <ul>\n        <li><strong>Any Species</strong> — no filter.</li>\n        <li><strong>Same Terrain</strong> — monsters whose terrain list overlaps.</li>\n        <li><strong>Same Affiliation</strong> — monsters with the same faction tag.</li>\n        <li><strong>Same Genus</strong> — monsters of the same creature genus (e.g. undead, dragon).</li>\n      </ul>"
+      },
+      {
+        "heading": "Battlefield Map",
+        "html": "<p>An interactive flat-top hex grid. Party members (green) and enemies (gold/red for bosses) are placed automatically when a suggestion is selected. All nodes are draggable.</p>\n      <h3>Toolbar modes</h3>\n      <ul>\n        <li><code>W</code> — <strong>Move</strong>: drag nodes freely. Multi-select with Ctrl/Cmd/Shift+click to drag several nodes at once.</li>\n        <li><code>A</code> — <strong>Env Hazard</strong>: click an empty hex to place an environment hazard (orange).</li>\n        <li><code>S</code> — <strong>Spell Hazard</strong>: click an empty hex to place a spell hazard (purple).</li>\n        <li><code>C</code> — <strong>Cover</strong>: click an empty hex to place a cover obstacle (bright blue).</li>\n        <li><code>L</code> — <strong>Lock Camera</strong>: freezes panning while you drag nodes.</li>\n        <li><code>+</code> / <code>−</code> — zoom in / out.</li>\n        <li><code>Esc</code> — return to Move mode and unlock camera.</li>\n      </ul>\n      <h3>Removing nodes</h3>\n      <p>Each node shows a small <code>×</code> button. Removing a party node decrements the outer party size counter. Removing an enemy node persists across re-syncs from the same suggestion and resets only when a new suggestion is selected.</p>\n      <h3>Grid</h3>\n      <p>The grid is infinite in all directions. Pan by dragging the background. Pinch-to-zoom works on touch devices. The view auto-centers on the current encounter nodes whenever the suggestion or party size changes.</p>\n      <h3>Mobile fullscreen</h3>\n      <p>On mobile, the battlefield only opens as a fullscreen overlay with a touch-friendly bottom toolbar — tap <strong>Open Battlefield</strong> to enter, and <strong>← Exit</strong> to return.</p>"
+      },
+      {
+        "heading": "Hazards & Area of Effect",
+        "html": "<p>Both hazard types (environment and spell) support an <strong>AoE</strong> — a Sphere/Cube/Cylinder burst by default, or a Cone/Line for spell hazards, in any of the 6 hex directions (0–3 hexes, default 1). After placing a hazard, open its editor to adjust the shape, direction, and radius.</p>\n      <ul>\n        <li>The AoE fills covered hexes with a matching tint (orange = env, purple = spell).</li>\n        <li>Any <strong>Cover node</strong> within the AoE turns the hex blue — the cover blocks the hazard there.</li>\n        <li>Party or enemy nodes inside an unprotected AoE hex glow with the hazard's colour.</li>\n        <li>Hazards stack on top of any other node. Cover, party, and enemy nodes remain exclusive (one per hex).</li>\n      </ul>"
+      },
+      {
+        "heading": "Cover",
+        "html": "<p>Cover follows standard D&amp;D 5e rules. Three levels are available via the node editor:</p>\n      <ul>\n        <li><strong>Half Cover</strong> — +2 bonus to AC and Dexterity saving throws.</li>\n        <li><strong>Three-Quarters Cover</strong> — +5 bonus to AC and Dexterity saving throws.</li>\n        <li><strong>Full Cover</strong> — cannot be targeted directly by attacks or spells.</li>\n      </ul>\n      <p>The <strong>Advantages / Disadvantages</strong> section in the Party card automatically lists every party member who is adjacent (1 hex away) to a cover node, showing the best cover level available.</p>"
+      },
+      {
+        "heading": "Node Editor",
+        "html": "<p>Click any node to open its editor. Available fields vary by node type:</p>\n      <ul>\n        <li><strong>All nodes</strong> — custom label.</li>\n        <li><strong>Hazards</strong> — notes text, AoE shape/direction (spell only), and radius (0 = single hex, 1–3 = expanding rings).</li>\n        <li><strong>Cover</strong> — cover level (Half / Three-Quarters / Full).</li>\n      </ul>"
+      }
+    ],
+    "note": "Rules basis: D&D 5e 2014 DMG encounter building guidelines and PHB cover rules. Use as a starting point and adjust to your table."
+  },
+  "monsterScalerDocs": {
+    "title": "Monster Scaler – How It Works",
+    "description": "Documents the exact steps and formulas used by the Monster Scaler. The CR matrix is identical across the 2014 and 2024 rulesets, so scaling works the same regardless of which sourcebook a monster comes from.",
+    "sections": [
+      {
+        "heading": "Inputs",
+        "html": "<ul>\n        <li>Source monster stat block: name, size/type, current <code>CR</code>, and stats (AC, HP, STR/DEX/CON/INT/WIS/CHA).</li>\n        <li>Optional action list used to estimate DPR from damage expressions (e.g. <code>1d6+2</code>).</li>\n        <li>Target CR (supports fractional CRs 1/8, 1/4, 1/2 and CR 1–30).</li>\n        <li>AC source: Dex-based, equipped armor, or natural armor — plus an optional shield toggle.</li>\n        <li>Optional per-ability-score bonuses.</li>\n      </ul>"
+      },
+      {
+        "heading": "CR row lookup",
+        "html": "<p>We look up two rows from the CR matrix: one for the source CR and one for the target CR. Each row contains reference values for proficiency bonus, expected AC, HP, attack bonus, DPR, and save DC — the highest row with <code>row.cr ≤ cr</code> is used.</p>"
+      },
+      {
+        "heading": "Damage Per Round (DPR) estimation",
+        "html": "<p>If the monster has actions with damage strings, we estimate average damage for each action and sum:</p>\n      <ul>\n        <li>For each token like <code>XdY</code> (e.g. <code>2d6</code>), expected value = <code>X × (Y + 1) / 2</code>.</li>\n        <li>An optional flat modifier <code>±N</code> is added once to that action's total.</li>\n        <li>Non-dice numbers are parsed as a flat value where possible.</li>\n      </ul>\n      <p>The per-action averages are summed and rounded to the nearest integer. If no actions are provided, the scaler skips the DPR ratio and shows the target CR's expected DPR as an absolute reference instead.</p>"
+      },
+      {
+        "heading": "HP scaling",
+        "html": "<p>HP is scaled proportionally, preserving how far above or below the CR baseline the original monster sits:</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, with a minimum of 1.</p>\n      <p><em>Example: a CR 1 monster with 156 HP (2× the CR 1 baseline of 78) scaled to CR 5 (baseline 138) yields <code>round(156 × 138/78) = 276</code> — still roughly 2× the CR 5 baseline.</em></p>"
+      },
+      {
+        "heading": "AC scaling",
+        "html": "<p>AC is derived independently of the CR matrix, from one of three sources you choose, plus an optional shield:</p>\n      <ul>\n        <li><strong>Dex-based</strong>: <code>10 + Dex modifier</code> — for unarmored creatures relying on agility.</li>\n        <li><strong>Equipped armor</strong>: <code>10 + armor bonus</code> — the bonus you enter for whatever armor the creature wears.</li>\n        <li><strong>Natural armor</strong>: a flat value you enter directly (e.g. a dragon's or tortle's natural armor) — not added to 10.</li>\n      </ul>\n      <p>A held <strong>shield</strong> always adds a flat <code>+2</code> on top of any of the three sources.</p>\n      <p>Dex-based and natural armor are inherent to the creature and are capped at <strong>AC 30</strong> for monsters — mirroring how player AC caps at 20 from Dex/natural sources alone. Equipped armor and a shield are treated as items and are allowed to push AC past the cap: <code>finalAC = (armor ? 10 + armorBonus : clamp(inherentAC, 1, 30)) + (shield ? 2 : 0)</code>. The Tarrasque's AC of 25 is a good reference point for how high natural armor can go without ever needing an item.</p>\n      <p>Situational cover (see the Encounter Builder's cover mechanic) can further raise effective AC during combat, but isn't part of the monster's base stat block.</p>"
+      },
+      {
+        "heading": "Ability score scaling (STR/DEX/CON/INT/WIS/CHA)",
+        "html": "<p>We scale ability scores by modifier steps, not by raw points:</p>\n      <ol>\n        <li>Compute CR difference: <code>crDiff = targetCR − sourceCR</code>.</li>\n        <li>Increase the ability modifier by <code>floor(crDiff / 2)</code> steps. Example: from CR 1 to CR 5, <code>crDiff=4</code> ⇒ <code>+2</code> modifier steps.</li>\n        <li>Map the new modifier back to the nearest canonical score using the standard \"score ⇒ modifier\" table.</li>\n        <li>Apply any per-ability bonus, then clamp to the 1–30 range.</li>\n      </ol>"
+      },
+      {
+        "heading": "Attack bonus advice",
+        "html": "<ul>\n        <li>Best attack ability modifier: <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> for scaled stats.</li>\n        <li>Matrix baseline change: <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Adjust for the monster's own stat change: <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Suggested: <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
+      },
+      {
+        "heading": "Save DC advice",
+        "html": "<p>Suggested save DC starts from the target row's DC and shifts with the monster's INT modifier change (as a spellcasting-style proxy):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+      },
+      {
+        "heading": "DPR reference",
+        "html": "<p>When actions are provided, the scaler reports a scale factor to help you retune damage:</p>\n      <ul>\n        <li><code>srcDPR</code>: estimated from input actions.</li>\n        <li><code>tgtDPR</code>: midpoint of the official DMG damage/round range for the target CR, used only for the ratio.</li>\n        <li><code>dprScale = tgtDPR / max(1, srcDPR)</code> — multiply each action's damage by this to hit the target band.</li>\n      </ul>\n      <p>The monster's displayed <code>dpr</code> field is always the official DMG range itself (e.g. <code>33–38</code> at CR 5) — not a synthetic band computed around a single number.</p>"
+      },
+      {
+        "heading": "Bounds, clamps & determinism",
+        "html": "<ul>\n        <li>AC is clamped to 5–30 after all adjustments.</li>\n        <li>Ability scores are clamped to 1–30.</li>\n        <li>HP has a minimum of 1.</li>\n      </ul>\n      <p>The scaler is fully deterministic. All matrix values are the midpoint of the official DMG ranges. No randomness is applied at runtime — same inputs always produce the same output.</p>"
+      },
+      {
+        "heading": "CR Matrix Reference",
+        "html": "<p>These are the exact baseline values used by the scaler, taken directly from the live data layer. The table is the official DMG \"Monster Statistics by Challenge Rating\" table and is identical for the 2014 and 2024 rulesets — CRealizr uses a single unified matrix regardless of which sourcebook a monster is drawn from.</p>"
+      }
+    ],
+    "note": "HP and Damage/Round values are the official DMG CR table ranges — HP is shown as its midpoint, DPR is shown as the full range. Attack bonuses and Save DCs match the official table exactly."
+  },
+  "artifactForgeDocs": {
+    "title": "Artifact Forge – How It Works",
+    "description": "Details on rarity by level, suggested bonuses, and the item blueprint produced by the Artifact Forge.",
+    "sections": [
+      {
+        "heading": "Inputs",
+        "html": "<ul>\n        <li>Item name (optional)</li>\n        <li>Item type: <code>Weapon</code> | <code>Armor</code> | <code>Wand</code> | <code>Wondrous</code></li>\n        <li>Player level (1–20) used for tuning</li>\n        <li>Player Attunement Requirement setup</li>\n        <li>Optional target monster tags to annotate effectiveness</li>\n        <li>Optional crafting ingredients with quantity (and optional unit)</li>\n        <li>Optional crafting cost, time, and special requirement (place, profession, or specialist)</li>\n        <li>Optional lore description (up to 100 words)</li>\n      </ul>"
+      },
+      {
+        "heading": "Quick actions",
+        "html": "<ul>\n        <li>Use Example to prefill a complete artifact blueprint.</li>\n        <li>Lock Mechanics to keep type/level/attunement while refining flavor.</li>\n        <li>Clear Flavor or Clear Crafting to iterate quickly.</li>\n      </ul>"
+      },
+      {
+        "heading": "Mechanics vs Flavor",
+        "html": "<p>The forge separates mechanical output (rarity, bonuses, tuned level) from flavor (ingredients, requirements, and lore). This keeps balance adjustments fast while you iterate on story.</p>"
+      },
+      {
+        "heading": "Export preview",
+        "html": "<p>The preview panel mirrors the JSON output so you can copy or screenshot it quickly.</p>"
+      },
+      {
+        "heading": "Rarity by level",
+        "html": "<p>Rarity is assigned from player level via a simple curve:</p>\n      <ul>\n        <li>≤3 → <code>Common</code></li>\n        <li>4–6 → <code>Uncommon</code></li>\n        <li>7–10 → <code>Rare</code></li>\n        <li>11–16 → <code>Very Rare</code></li>\n        <li>17–20 → <code>Legendary</code></li>\n      </ul>"
+      },
+      {
+        "heading": "Suggested bonuses",
+        "html": "<p>Bonuses are intentionally conservative and keyed to rarity bands:</p>\n      <ul>\n        <li>Magic bonus: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Avg damage bonus: mirrors magic bonus by rarity</li>\n        <li>Save DC (for wands): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Application by type:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: no automatic combat bonus (freeform design)</li>\n      </ul>"
+      },
+      {
+        "heading": "Item blueprint",
+        "html": "<p>The tool returns a structured blueprint object you can export or copy:</p>\n      <ul>\n        <li><code>name</code>: provided or autogenerated from type and rarity</li>\n        <li><code>type</code>: one of the supported types</li>\n        <li><code>attunement</code>: boolean value (true/false)</li>\n        <li><code>rarity</code>: derived from level</li>\n        <li><code>levelTuned</code>: clamped level (1–20)</li>\n        <li><code>targetTags</code>: your optional list</li>\n        <li><code>ingredients</code>: list of name/quantity/unit</li>\n        <li><code>craftingCost</code>: numeric gold piece cost if provided</li>\n        <li><code>craftingTime</code> + <code>craftingTimeUnit</code>: hours/days/weeks as provided</li>\n        <li><code>craftingRequirement</code>: optional place or specialist requirement</li>\n        <li><code>lore</code>: optional 100-word description</li>\n        <li><code>bonusToHit</code>, <code>bonusAC</code>, <code>bonusSaveDC</code>, <code>avgDamageBonus</code>: as applicable</li>\n        <li><code>notes</code>: summary text if targets were provided</li>\n      </ul>"
+      }
+    ],
+    "note": "These are baseline heuristics for quick prep on mobile. Adjust or extend to fit your table's tone."
+  },
+  "myMonstersDocs": {
+    "title": "My Bestiary – Field Reference",
+    "description": "Explains every field in the My Bestiary form and how homebrew monsters integrate with the other CRealizr tools.",
+    "sections": [
+      {
+        "heading": "Identity",
+        "html": "<ul>\n        <li><strong>Name</strong> — the monster's display name. Must be unique within your library (case-insensitive).</li>\n        <li><strong>Size</strong> — one of <code>Tiny</code>, <code>Small</code>, <code>Medium</code>, <code>Large</code>, <code>Huge</code>, or <code>Gargantuan</code>. Matches the 5e size categories.</li>\n        <li><strong>Type</strong> — a free-text creature type (e.g. \"monstrosity\", \"undead\"). Informational only; not used for filtering.</li>\n        <li><strong>Alignment</strong> — a free-text alignment string (e.g. \"chaotic evil\"). Informational only.</li>\n      </ul>"
+      },
+      {
+        "heading": "Edition, CR & XP",
+        "html": "<ul>\n        <li><strong>Edition</strong> — <code>2014</code> or <code>2024</code>. Determines which XP and threshold tables apply when the Encounter Builder uses this monster.</li>\n        <li><strong>Challenge Rating (CR)</strong> — ranges from 0 to 30 (including 1/8, 1/4, 1/2). The Encounter Builder uses CR to compute XP budgets and suggest encounter compositions.</li>\n        <li><strong>XP</strong> — experience points awarded for defeating this monster. If set to 0, the Encounter Builder falls back to the standard XP-by-CR table.</li>\n      </ul>"
+      },
+      {
+        "heading": "Stat Block",
+        "html": "<p>The stat block section is optional. Filling in any defense or ability score field enables the full stat block on save.</p>\n      <ul>\n        <li><strong>AC</strong> — Armor Class (0–30).</li>\n        <li><strong>HP</strong> — Hit Points.</li>\n        <li><strong>Speed</strong> — free-text (e.g. \"30 ft, fly 60 ft\").</li>\n        <li><strong>Ability Scores</strong> — STR, DEX, CON, INT, WIS, CHA (0–30 each). The modifier is calculated automatically as <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
+      },
+      {
+        "heading": "Damage Per Round (DPR)",
+        "html": "<p>DPR fields help the Monster Scaler estimate how dangerous a creature is at different CRs.</p>\n      <ul>\n        <li><strong>DPR Min / Max</strong> — the low and high ends of expected damage output per round.</li>\n        <li><strong>DPR Range</strong> — a human-readable dice expression (e.g. <code>2d8+4</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Actions",
+        "html": "<p>Add as many named actions as needed. Each action has:</p>\n      <ul>\n        <li><strong>Action Name</strong> — e.g. \"Multiattack\", \"Bite\".</li>\n        <li><strong>Damage</strong> — optional dice expression (e.g. <code>2d6+3</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Encounter Data",
+        "html": "<p>These fields control how your monster appears in the Encounter Builder's filtered monster pool.</p>\n      <ul>\n        <li><strong>Terrain</strong> — one or more of <code>dungeon</code>, <code>wilderness</code>, <code>urban</code>, <code>underwater</code>, <code>planar</code>, or <code>any</code>. Monsters tagged <code>any</code> always appear. You can select multiple terrains.</li>\n        <li><strong>Affiliation</strong> — the creature's broad category: <code>humanoid</code>, <code>beast</code>, <code>undead</code>, <code>construct</code>, <code>dragon</code>, <code>fiend</code>, <code>celestial</code>, <code>fey</code>, <code>monstrosity</code>, <code>giant</code>, <code>elemental</code>, <code>aberration</code>, <code>plant</code>, or <code>any</code>. Used to filter suggestions by creature category.</li>\n        <li><strong>Genus</strong> — an optional grouping tag (e.g. \"goblinoid\", \"dragon\", \"owlbear\"). The autocomplete dropdown shows all genera already used across SRD and homebrew monsters — type a new one or pick an existing one. Used by the Encounter Builder to group thematically related creatures together.</li>\n      </ul>"
+      },
+      {
+        "heading": "Storage & Portability",
+        "html": "<ul>\n        <li>Monsters are stored in your browser's <strong>IndexedDB</strong>. Clearing browser data removes them.</li>\n        <li>Use <strong>Export</strong> to download your entire library as a JSON file. This is your backup.</li>\n        <li>Use <strong>Import</strong> to restore from a previously exported JSON file. Duplicate names are skipped.</li>\n        <li>Exported files can be shared with other DMs or transferred between devices.</li>\n      </ul>"
+      },
+      {
+        "heading": "Cross-Tool Integration",
+        "html": "<ul>\n        <li><strong>Encounter Builder</strong> — homebrew monsters appear in the filtered monster pool alongside SRD creatures, matched by CR, terrain, affiliation, and genus.</li>\n        <li><strong>Monster Scaler</strong> — homebrew monsters with a stat block can be loaded and scaled to different CRs.</li>\n      </ul>"
+      }
+    ],
+    "note": "All fields follow D&D 5e conventions. Use this page as a reference when building your homebrew library."
   }
 }

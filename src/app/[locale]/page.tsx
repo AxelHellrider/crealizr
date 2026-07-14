@@ -1,7 +1,9 @@
 import {Metadata, Viewport} from "next";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buildHreflang } from "@/app/lib/seo";
 
+import { Button } from "@/app/components/atoms/Button";
 import { StatScalePreview } from "@/app/components/molecules/StatScalePreview";
 import { ItemCardPreview } from "@/app/components/molecules/ItemCardPreview";
 import { IconMonsterScaler, IconEncounterBuilder, IconArtifactForge, IconTravelEncounters, IconMyBestiary, IconQuill } from "@/app/components/atoms/ToolIcons";
@@ -183,7 +185,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
   );
   const encounterSample = encounterResult.groupSuggestions[0];
 
-  const scaledGoblin = scaleMonster(SAMPLE_GOBLIN, 10, "2014");
+  const scaledGoblin = scaleMonster(SAMPLE_GOBLIN, 10);
   const goblinDprBefore = Math.round((SAMPLE_GOBLIN.dpr.min + SAMPLE_GOBLIN.dpr.max) / 2);
   const goblinDprAfter = Math.round((scaledGoblin.dpr.min + scaledGoblin.dpr.max) / 2);
 
@@ -322,6 +324,17 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
             </div>
           </div>
         </Card>
+      </section>
+
+      {/* Contact CTA */}
+      <section className="flex flex-col items-center text-center gap-5 border border-gold/15 bg-card/40 py-12 px-6">
+        <h2 className="text-2xl lg:text-3xl font-serif accent-gold uppercase tracking-widest">{t("home.contactCta.title")}</h2>
+        <p className="text-muted max-w-md text-sm">{t("home.contactCta.description")}</p>
+        <Link href={`/${locale}/contact`} scroll={false}>
+          <Button variant="primary" className="px-8 py-3 text-xs uppercase tracking-widest">
+            {t("home.contactCta.action")}
+          </Button>
+        </Link>
       </section>
 
     </div>

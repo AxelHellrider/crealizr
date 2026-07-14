@@ -17,10 +17,10 @@
     "hero": {
       "title": "Lancez des aventures équilibrées plus vite, sans casser la fantasy.",
       "welcome": "Bienvenue",
-      "welcomeBlurb": "Une boîte à outils gratuite conçue pour la table — rencontres, monstres et objets magiques, prêts quand vous l'êtes. Conçu à la table, pour la table — plus besoin de mettre la séance en pause pour calculer un CR.",
+      "welcomeBlurb": "Rencontres, monstres et objets magiques, prêts dès que vous en avez besoin — gratuitement, et sans plus jamais interrompre la partie pour estimer un CR à l'œil.",
       "tool": "Outil",
       "about": "À propos",
-      "aboutBlurb": "Conçu par un maître du donjon, pour les maîtres du donjon — gratuit, rapide, sans compte.",
+      "aboutBlurb": "Créé par un MJ fatigué de faire ces calculs à la main. Gratuit, rapide, sans compte requis.",
       "rulesetNote": "Compatible avec les règles 2014 & 2024",
       "travelAction": "Planifier un voyage",
       "bestiaryAction": "Gérer votre bestiaire"
@@ -57,6 +57,11 @@
       "travelInputs": "Forêt · Rencontre de combat · Jet de d500",
       "bestiaryInputs": "Une entrée homebrew, enregistrée localement et réutilisable dans tous les outils",
       "noSample": "Aucun exemple disponible pour ces règles."
+    },
+    "contactCta": {
+      "title": "Un avis à partager ?",
+      "description": "Vous avez trouvé un bug ou une idée de fonctionnalité ? J'aimerais sincèrement en entendre parler.",
+      "action": "Nous contacter"
     }
   },
   "encounterBuilder": {
@@ -96,7 +101,9 @@
     "overBudget": "Au-dessus du budget",
     "underBudget": "En dessous du budget",
     "recommendedMix": "Mélange recommandé",
-    "calculationsNote": "Les calculs sont basés sur les seuils XP standards et les multiplicateurs de rencontre."
+    "calculationsNote": "Les calculs sont basés sur les seuils XP standards et les multiplicateurs de rencontre.",
+    "openBattlefield": "Ouvrir le champ de bataille",
+    "openBattlefieldHint": "Ouvrez le champ de bataille en plein écran pour une meilleure vue sur mobile."
   },
   "monsterScaler": {
     "title": "Ajusteur de monstres",
@@ -104,8 +111,8 @@
     "viewDocs": "Voir la documentation",
     "whatScales": "Ce qui s’adapte",
     "whatScalesDesc": "CA, PV, cibles de DPR et modificateurs de caractéristiques.",
-    "rulesetNotes": "Notes sur les règles",
-    "rulesetNotesDesc": "2014 utilise les tableaux du DMG. 2024 utilise des plages mises à jour avec des intervalles adoucis.",
+    "acSourceNotes": "Sources de CA",
+    "acSourceNotesDesc": "Basée sur la Dextérité, armure équipée ou armure naturelle — plus un bouclier optionnel.",
     "guardrails": "Garde-fous",
     "guardrailsDesc": "Vérifiez l’économie d’actions, les actions légendaires et les traits uniques après l’adaptation.",
     "generalInfo": "Informations générales",
@@ -113,14 +120,19 @@
     "namePlaceholder": "ex. Dragon rouge ancien",
     "creatureType": "Type de créature",
     "typePlaceholder": "ex. Dragon",
-    "ruleset": "Règles",
     "currentCR": "CR actuel",
     "targetCR": "CR cible",
     "selectTargetCR": "Sélectionnez le CR cible",
     "baseAttributes": "Attributs de base",
     "defenseAdjustments": "Ajustements de défense et de caractéristiques",
-    "equipmentACBonus": "Bonus de CA d’équipement",
-    "naturalArmorBonus": "Bonus d’armure naturelle",
+    "acSource": "Source de CA",
+    "acSourceDex": "Basée sur la Dextérité (10 + mod. DEX)",
+    "acSourceArmor": "Armure équipée (10 + bonus)",
+    "acSourceNatural": "Armure naturelle (valeur fixe)",
+    "armorBonus": "Bonus d'armure",
+    "naturalArmorValue": "Valeur d'armure naturelle",
+    "shield": "Bouclier",
+    "shieldHint": "Porte un bouclier (+2 CA)",
     "abilityScoreBonuses": "Bonus de caractéristiques",
     "scaleMonster": "ADAPTER LE MONSTRE",
     "scaling": "ADAPTATION...",
@@ -278,37 +290,45 @@
     }
   },
   "myMonsters": {
-    "title": "My Bestiary",
-    "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
-    "addMonster": "Add Monster",
-    "editMonster": "Edit",
-    "saveMonster": "Save Monster",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this monster?",
-    "export": "Export",
-    "import": "Import",
-    "importSuccess": "{count} monster(s) imported successfully.",
-    "importErrors": "Some entries could not be imported:",
-    "emptyState": "No custom monsters yet. Add your first homebrew monster to get started.",
-    "search": "Search monsters...",
-    "infoStorage": "Browser Storage",
-    "infoStorageDesc": "Your monsters are stored in this browser's IndexedDB. Clearing browser data will remove them — use Export to back up.",
-    "infoUsage": "Cross-Tool Integration",
-    "infoUsageDesc": "Custom monsters appear automatically in the Encounter Builder recommendations and can be loaded into the Monster Scaler.",
-    "infoPortability": "Portability",
-    "infoPortabilityDesc": "Export your library as JSON to back up, share, or transfer to another device. Import any previously exported file to restore.",
+    "title": "Mon Bestiaire",
+    "description": "Ajoutez et gérez vos monstres faits maison. Ils sont enregistrés directement dans votre navigateur et fonctionnent automatiquement avec tous les outils de CRealizr.",
+    "addMonster": "Ajouter un monstre",
+    "editMonster": "Modifier",
+    "saveMonster": "Enregistrer le monstre",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirmDelete": "Voulez-vous vraiment supprimer ce monstre ?",
+    "export": "Exporter",
+    "import": "Importer",
+    "importSuccess": "{count} monstre(s) importé(s) avec succès.",
+    "importErrors": "Certaines entrées n'ont pas pu être importées :",
+    "emptyState": "Aucun monstre personnalisé pour le moment. Ajoutez votre premier monstre homebrew pour commencer.",
+    "search": "Rechercher des monstres...",
+    "infoStorage": "Stockage du navigateur",
+    "infoStorageDesc": "Vos monstres sont stockés dans l'IndexedDB de ce navigateur. Effacer les données du navigateur les supprimera — utilisez Exporter pour les sauvegarder.",
+    "infoUsage": "Intégration entre outils",
+    "infoUsageDesc": "Les monstres personnalisés apparaissent automatiquement dans les recommandations du Générateur de rencontres et peuvent être chargés dans l'Ajusteur de monstres.",
+    "infoPortability": "Portabilité",
+    "infoPortabilityDesc": "Exportez votre bibliothèque au format JSON pour la sauvegarder, la partager ou la transférer sur un autre appareil. Importez un fichier précédemment exporté pour le restaurer.",
+    "invalidJsonFile": "Fichier JSON invalide.",
     "form": {
-      "name": "Name",
+      "name": "Nom",
+      "namePlaceholder": "ex. Dire Owlbear",
       "cr": "Challenge Rating",
-      "edition": "Edition",
+      "edition": "Édition",
       "terrain": "Terrain",
+      "terrainPlaceholder": "Rechercher des terrains...",
       "affiliation": "Affiliation",
-      "genus": "Genus",
-      "statBlock": "Stat Block (Optional)",
-      "size": "Size",
+      "affiliationPlaceholder": "Rechercher des affiliations...",
+      "genus": "Genre",
+      "genusSublabel": "saisissez ou choisissez parmi l'existant",
+      "genusPlaceholder": "ex. owlbear, dragon, goblinoid",
+      "statBlock": "Statblock (optionnel)",
+      "size": "Taille",
       "type": "Type",
-      "alignment": "Alignment",
+      "typePlaceholder": "ex. monstrosity",
+      "alignment": "Alignement",
+      "alignmentPlaceholder": "ex. chaotic evil",
       "ac": "AC",
       "hp": "HP",
       "speed": "Speed",
@@ -320,14 +340,16 @@
       "cha": "CHA",
       "dprMin": "DPR Min",
       "dprMax": "DPR Max",
-      "dprRange": "DPR Range",
+      "dprRange": "Plage de DPR",
+      "dprRangePlaceholder": "ex. 2d8+4",
       "xp": "XP",
       "actions": "Actions",
-      "actionName": "Action Name",
-      "actionDamage": "Damage",
-      "addAction": "Add Action",
-      "nameRequired": "Name is required.",
-      "nameDuplicate": "A monster with this name already exists."
+      "actionName": "Nom de l'action",
+      "actionDamage": "Dégâts",
+      "addAction": "Ajouter une action",
+      "encounterData": "Données de rencontre",
+      "nameRequired": "Le nom est requis.",
+      "nameDuplicate": "Un monstre portant ce nom existe déjà."
     }
   },
   "terms": {
@@ -356,7 +378,7 @@
       {
         "heading": "4. Votre contenu",
         "body": [
-          "Les monstres personnalisés, le contenu maison et les autres données que vous créez (le « Contenu utilisateur ») sont stockés localement dans votre navigateur et ne sont jamais transmis à nos serveurs. Vous êtes seul responsable de la sauvegarde de votre Contenu utilisateur via la fonction d'exportation — l'effacement des données du navigateur ou le changement d'appareil le supprimera définitivement.",
+          "Les monstres personnalisés, le contenu fait maison et tout ce que vous créez (« Contenu Utilisateur ») restent dans votre navigateur et ne sont jamais envoyés à nos serveurs. Sauvegardez-les vous-même via la fonction d'exportation — effacer les données de votre navigateur ou changer d'appareil les supprimera définitivement.",
           "Vous conservez tous les droits sur votre Contenu utilisateur. En utilisant le Service, vous confirmez que votre Contenu utilisateur ne porte pas atteinte aux droits de tiers."
         ]
       },
@@ -512,7 +534,7 @@
       {
         "heading": "8. Stockage local sur votre appareil",
         "body": [
-          "Votre préférence de thème et d'affichage saisonnier, vos dispositions de champ de bataille enregistrées, tout monstre personnalisé que vous créez dans votre Bestiaire, et le fait que vous ayez rejeté la suggestion « faites pivoter votre appareil » en mode plein écran du champ de bataille sont stockés uniquement dans le stockage local ou l'IndexedDB de votre propre navigateur. Ces données ne quittent jamais votre appareil, ne nous sont pas visibles, et restent entièrement sous votre contrôle — effacez les données de votre navigateur à tout moment pour les supprimer."
+          "Votre thème, vos mises en page de carte de bataille enregistrées, les monstres faits maison que vous créez dans Mon Bestiaire, ainsi que quelques petites préférences d'interface (comme le fait d'avoir masqué le conseil « faites pivoter votre appareil ») sont stockés uniquement dans le stockage local ou l'IndexedDB de votre navigateur. Rien de tout cela n'atteint jamais nos serveurs ni ne nous est visible — effacez les données de votre navigateur à tout moment pour les supprimer."
         ]
       },
       {
@@ -551,5 +573,169 @@
     "description": "Ajoutez-le à votre écran d'accueil pour un accès rapide, même hors ligne, à table.",
     "install": "Installer",
     "dismiss": "Plus tard"
+  },
+  "encounterBuilderDocs": {
+    "title": "Générateur de rencontres – Comment ça marche",
+    "description": "Référence complète pour chaque fonctionnalité du Générateur de rencontres — configuration du groupe, deux modes de calcul, le champ de bataille interactif et la mécanique de couverture.",
+    "sections": [
+      {
+        "heading": "Entrées",
+        "html": "<ul>\n        <li><strong>Taille du groupe</strong> — nombre de personnages (1–8). Réglages rapides pour 3/4/5/6.</li>\n        <li><strong>Niveau moyen</strong> — 1–20. Détermine à la fois les seuils XP et les calculs de CR cible.</li>\n        <li><strong>Difficulté</strong> — <code>easy</code>, <code>medium</code>, <code>hard</code> ou <code>deadly</code>.</li>\n        <li><strong>Règles</strong> — tables du DMG 2014 ou du Player's Handbook 2024.</li>\n        <li><strong>Formation</strong> — <em>Boss solo</em> (un ennemi dominant, éventuellement avec des sbires) ou <em>Horde/Groupe</em> (masse à CR mixte).</li>\n      </ul>"
+      },
+      {
+        "heading": "Mode de calcul",
+        "html": "<p>Le sélecteur <strong>Mode de calcul</strong> bascule entre deux approches distinctes. Les deux produisent le même format de carte de suggestion ; ce qui change, c'est le calcul sous-jacent.</p>\n      <h3>Mode Budget XP (par défaut)</h3>\n      <p>Flux complet de budget de rencontre D&amp;D 5e :</p>\n      <ol>\n        <li>Recherche du seuil XP par personnage pour le niveau et la difficulté choisis.</li>\n        <li>Multiplication par la taille du groupe : <code>budget = threshold[level][difficulty] × partySize</code>.</li>\n        <li>Pour chaque groupe de monstres candidat, calcul de : <code>adjustedXP = Σ(count × xpEach) × encounterMultiplier(totalCount)</code>.</li>\n        <li>Conservation des suggestions où <code>fit = min(budget, adjustedXP) / max(budget, adjustedXP) ≥ 0.7</code>.</li>\n        <li>Tri par adéquation la plus élevée, puis par adjustedXP le plus bas. Retour des 12 meilleurs résultats.</li>\n      </ol>\n      <p>Le sous-sélecteur <strong>Type de budget</strong> bascule entre <em>Budget de rencontre</em> (une seule session) et <em>Budget quotidien</em> (≈3,4× le budget de rencontre, pour des journées d'aventure complètes).</p>\n      <h4>Multiplicateurs de rencontre</h4>\n      <ul>\n        <li>1 monstre → <code>×1</code></li>\n        <li>2 → <code>×1.5</code></li>\n        <li>3–6 → <code>×2</code></li>\n        <li>7–10 → <code>×2.5</code></li>\n        <li>11–14 → <code>×3</code></li>\n        <li>15+ → <code>×4</code></li>\n      </ul>\n      <h3>Mode Correspondance CR</h3>\n      <p>Aucun calcul XP. Les suggestions sont générées uniquement en comparant les degrés de puissance au niveau du groupe :</p>\n      <ol>\n        <li>Calcul d'un <strong>CR cible</strong> par décalage de difficulté : <code>easy: level−2 · medium: level · hard: level+1 · deadly: level+3</code> (min. 1/8).</li>\n        <li>Mise à l'échelle selon la taille du groupe : <code>crBudget = targetCR × (partySize / 4)</code>.</li>\n        <li>Pour chaque groupe candidat, calcul d'un <strong>poids de rencontre CR</strong> : <code>crWeight = Σ(cr × count) × √encounterMultiplier(totalCount)</code>.</li>\n        <li>Conservation des suggestions où <code>fit = min(crBudget, crWeight) / max(crBudget, crWeight) ≥ 0.5</code>.</li>\n      </ol>\n      <p>Le <strong>CR maximal gérable</strong> affiché sur la carte du groupe est <code>crTarget × (partySize / 4)</code>, formaté comme un degré de puissance — le plafond pour un monstre unique que le groupe peut affronter à la difficulté sélectionnée.</p>\n      <p>Aucune étiquette de précision (Dans la cible / Au-dessus du budget) n'est affichée en mode Correspondance CR, car les tables de CR fournissent déjà une réponse sans ambiguïté ; le pourcentage d'adéquation serait redondant.</p>"
+      },
+      {
+        "heading": "Boss solo contre Horde/Groupe",
+        "html": "<h3>Boss solo</h3>\n      <p>Énumère les CR de boss proches de la cible, éventuellement associés à des sbires de CR inférieur. Avec <strong>Inclure les sbires</strong> activé, l'outil recherche des monstres apparentés (par terrain, affiliation ou genre via le Filtre de relation) pour remplir l'emplacement de sbire.</p>\n      <h3>Horde / Groupe</h3>\n      <p>Construit des compositions à CR mixte. Le paramètre <strong>Types de mélange</strong> (2–5) limite le nombre de types de CR distincts apparaissant dans une suggestion. Pour N monstres au total et T types :</p>\n      <ul>\n        <li>Énumération de toutes les combinaisons de CR de taille T.</li>\n        <li>Énumération de toutes les façons de diviser N en T entiers positifs.</li>\n        <li>Conservation des combinaisons dont l'adéquation budgétaire atteint le seuil.</li>\n      </ul>"
+      },
+      {
+        "heading": "Filtre de relation",
+        "html": "<p>Disponible lorsque les sbires sont activés (Solo), ou toujours en mode Groupe. Restreint les candidats aux monstres qui partagent une propriété choisie avec une créature de référence au CR cible :</p>\n      <ul>\n        <li><strong>N'importe quelle espèce</strong> — aucun filtre.</li>\n        <li><strong>Même terrain</strong> — monstres dont la liste de terrains se chevauche.</li>\n        <li><strong>Même affiliation</strong> — monstres portant la même étiquette de faction.</li>\n        <li><strong>Même genre</strong> — monstres du même genre de créature (ex. mort-vivant, dragon).</li>\n      </ul>"
+      },
+      {
+        "heading": "Carte du champ de bataille",
+        "html": "<p>Une grille hexagonale à sommet plat interactive. Les membres du groupe (vert) et les ennemis (or/rouge pour les boss) sont placés automatiquement lorsqu'une suggestion est sélectionnée. Tous les nœuds sont déplaçables.</p>\n      <h3>Modes de la barre d'outils</h3>\n      <ul>\n        <li><code>W</code> — <strong>Déplacer</strong> : faites glisser librement les nœuds. Sélection multiple avec Ctrl/Cmd/Maj+clic pour déplacer plusieurs nœuds à la fois.</li>\n        <li><code>A</code> — <strong>Risque environnemental</strong> : cliquez sur un hexagone vide pour placer un risque environnemental (orange).</li>\n        <li><code>S</code> — <strong>Risque de sort</strong> : cliquez sur un hexagone vide pour placer un risque de sort (violet).</li>\n        <li><code>C</code> — <strong>Couverture</strong> : cliquez sur un hexagone vide pour placer un obstacle de couverture (bleu vif).</li>\n        <li><code>L</code> — <strong>Verrouiller la caméra</strong> : bloque le panoramique pendant que vous déplacez des nœuds.</li>\n        <li><code>+</code> / <code>−</code> — zoom avant / arrière.</li>\n        <li><code>Esc</code> — retour au mode Déplacer et déverrouillage de la caméra.</li>\n      </ul>\n      <h3>Suppression de nœuds</h3>\n      <p>Chaque nœud affiche un petit bouton <code>×</code>. La suppression d'un nœud de groupe décrémente le compteur externe de taille de groupe. La suppression d'un nœud ennemi persiste à travers les resynchronisations de la même suggestion, et ne se réinitialise que lorsqu'une nouvelle suggestion est sélectionnée.</p>\n      <h3>Grille</h3>\n      <p>La grille est infinie dans toutes les directions. Faites un panoramique en faisant glisser l'arrière-plan. Le pincement pour zoomer fonctionne sur les appareils tactiles. La vue se recentre automatiquement sur les nœuds de rencontre actuels chaque fois que la suggestion ou la taille du groupe change.</p>\n      <h3>Plein écran mobile</h3>\n      <p>Sur mobile, le champ de bataille ne s'ouvre qu'en superposition plein écran avec une barre d'outils inférieure adaptée au tactile — appuyez sur <strong>Ouvrir le champ de bataille</strong> pour y entrer, et sur <strong>← Quitter</strong> pour revenir.</p>"
+      },
+      {
+        "heading": "Risques et zone d'effet",
+        "html": "<p>Les deux types de risques (environnemental et sort) prennent en charge une <strong>zone d'effet (ZdE)</strong> — une explosion en Sphère/Cube/Cylindre par défaut, ou un Cône/Ligne pour les risques de sort, dans l'une des 6 directions hexagonales (0–3 hexagones, 1 par défaut). Après avoir placé un risque, ouvrez son éditeur pour ajuster la forme, la direction et le rayon.</p>\n      <ul>\n        <li>La ZdE remplit les hexagones couverts d'une teinte correspondante (orange = environnemental, violet = sort).</li>\n        <li>Tout <strong>nœud de couverture</strong> à l'intérieur de la ZdE colore l'hexagone en bleu — la couverture bloque le risque à cet endroit.</li>\n        <li>Les nœuds de groupe ou ennemis dans un hexagone de ZdE non protégé brillent de la couleur du risque.</li>\n        <li>Les risques s'empilent au-dessus de tout autre nœud. Couverture, groupe et ennemis restent exclusifs (un par hexagone).</li>\n      </ul>"
+      },
+      {
+        "heading": "Couverture",
+        "html": "<p>La couverture suit les règles standard de D&amp;D 5e. Trois niveaux sont disponibles via l'éditeur de nœud :</p>\n      <ul>\n        <li><strong>Demi-couverture</strong> — bonus de +2 à la CA et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture aux trois quarts</strong> — bonus de +5 à la CA et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture totale</strong> — ne peut pas être ciblé directement par des attaques ou des sorts.</li>\n      </ul>\n      <p>La section <strong>Avantages / Désavantages</strong> de la carte du groupe liste automatiquement chaque membre du groupe adjacent (à 1 hexagone) à un nœud de couverture, en indiquant le meilleur niveau de couverture disponible.</p>"
+      },
+      {
+        "heading": "Éditeur de nœud",
+        "html": "<p>Cliquez sur n'importe quel nœud pour ouvrir son éditeur. Les champs disponibles varient selon le type de nœud :</p>\n      <ul>\n        <li><strong>Tous les nœuds</strong> — étiquette personnalisée.</li>\n        <li><strong>Risques</strong> — texte de notes, forme/direction de la ZdE (sorts uniquement) et rayon (0 = hexagone unique, 1–3 = anneaux croissants).</li>\n        <li><strong>Couverture</strong> — niveau de couverture (Demi / Trois quarts / Totale).</li>\n      </ul>"
+      }
+    ],
+    "note": "Base des règles : lignes directrices de création de rencontres du DMG D&D 5e 2014 et règles de couverture du PHB. À utiliser comme point de départ et à adapter à votre table."
+  },
+  "monsterScalerDocs": {
+    "title": "Ajusteur de monstres – Comment ça marche",
+    "description": "Documente les étapes et formules exactes utilisées par le Redimensionneur de monstres. La matrice de CR est identique entre les règles 2014 et 2024, donc la mise à l'échelle fonctionne de la même façon quel que soit le livre source du monstre.",
+    "sections": [
+      {
+        "heading": "Entrées",
+        "html": "<ul>\n        <li>Bloc de statistiques du monstre source : nom, taille/type, <code>CR</code> actuel, et statistiques (CA, PV, FOR/DEX/CON/INT/SAG/CHA).</li>\n        <li>Liste d'actions optionnelle utilisée pour estimer les DPR à partir d'expressions de dégâts (ex. <code>1d6+2</code>).</li>\n        <li>CR cible (prend en charge les CR fractionnaires 1/8, 1/4, 1/2 et CR 1–30).</li>\n        <li>Source de CA : basée sur la Dextérité, armure équipée, ou armure naturelle — plus un bouclier optionnel.</li>\n        <li>Bonus optionnels par caractéristique.</li>\n      </ul>"
+      },
+      {
+        "heading": "Recherche de ligne CR",
+        "html": "<p>Nous recherchons deux lignes dans la matrice de CR : une pour le CR source et une pour le CR cible. Chaque ligne contient des valeurs de référence pour le bonus de maîtrise, la CA attendue, les PV, le bonus d'attaque, le DPR et le DD de sauvegarde — la ligne la plus élevée avec <code>row.cr ≤ cr</code> est utilisée.</p>"
+      },
+      {
+        "heading": "Estimation des dégâts par round (DPR)",
+        "html": "<p>Si le monstre a des actions avec des chaînes de dégâts, nous estimons les dégâts moyens pour chaque action et faisons la somme :</p>\n      <ul>\n        <li>Pour chaque terme comme <code>XdY</code> (ex. <code>2d6</code>), la valeur attendue = <code>X × (Y + 1) / 2</code>.</li>\n        <li>Un modificateur fixe optionnel <code>±N</code> est ajouté une fois au total de cette action.</li>\n        <li>Les nombres non-dés sont interprétés comme une valeur fixe lorsque c'est possible.</li>\n      </ul>\n      <p>Les moyennes par action sont additionnées et arrondies à l'entier le plus proche. Si aucune action n'est fournie, l'ajusteur ignore le ratio de DPR et affiche à la place le DPR attendu du CR cible comme référence absolue.</p>"
+      },
+      {
+        "heading": "Mise à l'échelle des PV",
+        "html": "<p>Les PV sont mis à l'échelle proportionnellement, en préservant l'écart du monstre original par rapport à la référence de CR :</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, avec un minimum de 1.</p>\n      <p><em>Exemple : un monstre CR 1 avec 156 PV (2× la référence de CR 1 de 78), mis à l'échelle en CR 5 (référence 138), donne <code>round(156 × 138/78) = 276</code> — toujours environ 2× la référence de CR 5.</em></p>"
+      },
+      {
+        "heading": "Mise à l'échelle de la CA",
+        "html": "<p>La CA est calculée indépendamment de la matrice de CR, à partir de l'une des trois sources choisies, plus un bouclier optionnel :</p>\n      <ul>\n        <li><strong>Basée sur la Dextérité</strong> : <code>10 + mod. de Dextérité</code> — pour les créatures non blindées qui comptent sur l'agilité.</li>\n        <li><strong>Armure équipée</strong> : <code>10 + bonus d'armure</code> — le bonus que vous saisissez pour l'armure portée par la créature.</li>\n        <li><strong>Armure naturelle</strong> : une valeur fixe que vous saisissez directement (ex. l'armure naturelle d'un dragon ou d'un tortue) — non ajoutée à 10.</li>\n      </ul>\n      <p>Un <strong>bouclier</strong> porté ajoute toujours un forfait de <code>+2</code> au-dessus de l'une des trois sources.</p>\n      <p>La CA basée sur la Dextérité et l'armure naturelle sont inhérentes à la créature et plafonnées à <strong>CA 30</strong> pour les monstres — reflétant le fait que la CA d'un joueur plafonne à 20 à partir des seules sources Dextérité/naturelle. L'armure équipée et un bouclier sont considérés comme des objets et peuvent faire dépasser ce plafond : <code>finalAC = (armure ? 10 + bonusArmure : clamp(caInhérente, 1, 30)) + (bouclier ? 2 : 0)</code>. La CA 25 du Tarrasque est un bon point de référence pour savoir jusqu'où l'armure naturelle peut monter sans jamais nécessiter d'objet.</p>\n      <p>La couverture situationnelle (voir le mécanisme de couverture du Générateur de rencontres) peut encore augmenter la CA effective en combat, mais ne fait pas partie du bloc de statistiques de base du monstre.</p>"
+      },
+      {
+        "heading": "Mise à l'échelle des caractéristiques (FOR/DEX/CON/INT/SAG/CHA)",
+        "html": "<p>Nous mettons à l'échelle les caractéristiques par paliers de modificateur, pas par points bruts :</p>\n      <ol>\n        <li>Calcul de la différence de CR : <code>crDiff = targetCR − sourceCR</code>.</li>\n        <li>Augmentation du modificateur de caractéristique de <code>floor(crDiff / 2)</code> paliers. Exemple : de CR 1 à CR 5, <code>crDiff=4</code> ⇒ <code>+2</code> paliers de modificateur.</li>\n        <li>Association du nouveau modificateur au score canonique le plus proche via la table standard « score ⇒ modificateur ».</li>\n        <li>Application d'un éventuel bonus par caractéristique, puis limitation à la plage 1–30.</li>\n      </ol>"
+      },
+      {
+        "heading": "Conseil de bonus d'attaque",
+        "html": "<ul>\n        <li>Meilleur modificateur de caractéristique d'attaque : <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> pour les statistiques mises à l'échelle.</li>\n        <li>Changement de la référence de matrice : <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Ajustement pour le propre changement de statistiques du monstre : <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Suggestion : <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
+      },
+      {
+        "heading": "Conseil de DD de sauvegarde",
+        "html": "<p>Le DD de sauvegarde suggéré part du DD de la ligne cible et se décale selon le changement du modificateur d'INT du monstre (comme approximation de style lanceur de sorts) :</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+      },
+      {
+        "heading": "Référence DPR",
+        "html": "<p>Lorsque des actions sont fournies, le redimensionneur indique un facteur d'échelle pour vous aider à réajuster les dégâts :</p>\n      <ul>\n        <li><code>srcDPR</code> : estimé à partir des actions saisies.</li>\n        <li><code>tgtDPR</code> : point médian de la plage officielle de dégâts par round du DMG pour le CR cible, utilisé uniquement pour le ratio.</li>\n        <li><code>dprScale = tgtDPR / max(1, srcDPR)</code> — multipliez les dégâts de chaque action par cette valeur pour atteindre la plage cible.</li>\n      </ul>\n      <p>Le champ <code>dpr</code> affiché du monstre est toujours la plage officielle du DMG elle-même (ex. <code>33–38</code> au CR 5) — pas une bande synthétique calculée autour d'un nombre unique.</p>"
+      },
+      {
+        "heading": "Limites, plafonds et déterminisme",
+        "html": "<ul>\n        <li>La CA est limitée à 5–30 après tous les ajustements.</li>\n        <li>Les caractéristiques sont limitées à 1–30.</li>\n        <li>Les PV ont un minimum de 1.</li>\n      </ul>\n      <p>L'ajusteur est entièrement déterministe. Toutes les valeurs de matrice sont le point médian des fourchettes officielles du DMG. Aucun hasard n'est appliqué à l'exécution — les mêmes entrées produisent toujours la même sortie.</p>"
+      },
+      {
+        "heading": "Référence de la matrice CR",
+        "html": "<p>Ce sont les valeurs de référence exactes utilisées par le redimensionneur, tirées directement de la couche de données en direct. Le tableau est le tableau officiel du DMG « Monster Statistics by Challenge Rating » et est identique pour les règles 2014 et 2024 — CRealizr utilise une matrice unique et unifiée quel que soit le livre source d'un monstre.</p>"
+      }
+    ],
+    "note": "Les valeurs de PV et de Dégâts par round sont les plages officielles du tableau de CR du DMG — les PV sont affichés comme leur point médian, les DPR sont affichés comme la plage complète. Les bonus d'attaque et les Sl de sauvegarde correspondent exactement au tableau officiel."
+  },
+  "artifactForgeDocs": {
+    "title": "Forge d'artefacts – Comment ça marche",
+    "description": "Détails sur la rareté par niveau, les bonus suggérés et le plan d'objet produit par la Forge d'artefacts.",
+    "sections": [
+      {
+        "heading": "Entrées",
+        "html": "<ul>\n        <li>Nom de l'objet (optionnel)</li>\n        <li>Type d'objet : <code>Weapon</code> | <code>Armor</code> | <code>Wand</code> | <code>Wondrous</code></li>\n        <li>Niveau du joueur (1–20) utilisé pour l'ajustement</li>\n        <li>Configuration de l'exigence d'attunement du joueur</li>\n        <li>Étiquettes de monstres cibles optionnelles pour annoter l'efficacité</li>\n        <li>Ingrédients d'artisanat optionnels avec quantité (et unité optionnelle)</li>\n        <li>Coût, durée et exigence spéciale de fabrication optionnels (lieu, profession ou spécialiste)</li>\n        <li>Description narrative optionnelle (jusqu'à 100 mots)</li>\n      </ul>"
+      },
+      {
+        "heading": "Actions rapides",
+        "html": "<ul>\n        <li>Utilisez Exemple pour préremplir un plan d'artefact complet.</li>\n        <li>Verrouiller les mécaniques pour conserver type/niveau/attunement tout en affinant le style.</li>\n        <li>Effacer le style ou Effacer l'artisanat pour itérer rapidement.</li>\n      </ul>"
+      },
+      {
+        "heading": "Mécaniques vs Style",
+        "html": "<p>La forge sépare le résultat mécanique (rareté, bonus, niveau ajusté) du style (ingrédients, exigences et lore). Cela permet des ajustements d'équilibre rapides pendant que vous itérez sur l'histoire.</p>"
+      },
+      {
+        "heading": "Aperçu d'exportation",
+        "html": "<p>Le panneau d'aperçu reflète la sortie JSON afin que vous puissiez la copier ou la capturer rapidement.</p>"
+      },
+      {
+        "heading": "Rareté par niveau",
+        "html": "<p>La rareté est attribuée à partir du niveau du joueur via une courbe simple :</p>\n      <ul>\n        <li>≤3 → <code>Common</code></li>\n        <li>4–6 → <code>Uncommon</code></li>\n        <li>7–10 → <code>Rare</code></li>\n        <li>11–16 → <code>Very Rare</code></li>\n        <li>17–20 → <code>Legendary</code></li>\n      </ul>"
+      },
+      {
+        "heading": "Bonus suggérés",
+        "html": "<p>Les bonus sont volontairement conservateurs et liés aux bandes de rareté :</p>\n      <ul>\n        <li>Bonus magique : <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Bonus de dégâts moyen : reflète le bonus magique selon la rareté</li>\n        <li>DD de sauvegarde (pour les baguettes) : <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Application par type :</p>\n      <ul>\n        <li><code>Weapon</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code> : <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code> : aucun bonus de combat automatique (design libre)</li>\n      </ul>"
+      },
+      {
+        "heading": "Plan d'objet",
+        "html": "<p>L'outil renvoie un objet de plan structuré que vous pouvez exporter ou copier :</p>\n      <ul>\n        <li><code>name</code> : fourni ou généré automatiquement à partir du type et de la rareté</li>\n        <li><code>type</code> : l'un des types pris en charge</li>\n        <li><code>attunement</code> : valeur booléenne (true/false)</li>\n        <li><code>rarity</code> : dérivée du niveau</li>\n        <li><code>levelTuned</code> : niveau limité (1–20)</li>\n        <li><code>targetTags</code> : votre liste optionnelle</li>\n        <li><code>ingredients</code> : liste de nom/quantité/unité</li>\n        <li><code>craftingCost</code> : coût numérique en pièces d'or, si fourni</li>\n        <li><code>craftingTime</code> + <code>craftingTimeUnit</code> : heures/jours/semaines selon fourniture</li>\n        <li><code>craftingRequirement</code> : exigence optionnelle de lieu ou de spécialiste</li>\n        <li><code>lore</code> : description optionnelle de 100 mots</li>\n        <li><code>bonusToHit</code>, <code>bonusAC</code>, <code>bonusSaveDC</code>, <code>avgDamageBonus</code> : selon applicabilité</li>\n        <li><code>notes</code> : texte de résumé si des cibles ont été fournies</li>\n      </ul>"
+      }
+    ],
+    "note": "Ce sont des heuristiques de base pour une préparation rapide en déplacement. Ajustez ou étendez-les pour correspondre au ton de votre table."
+  },
+  "myMonstersDocs": {
+    "title": "Mon Bestiaire – Référence des champs",
+    "description": "Explique chaque champ disponible lors de la création ou modification d'un monstre personnalisé, et comment les monstres s'intègrent aux autres outils CRealizr.",
+    "sections": [
+      {
+        "heading": "Identité",
+        "html": "<ul>\n        <li><strong>Nom</strong> — le nom d'affichage du monstre. Doit être unique dans votre bibliothèque (insensible à la casse).</li>\n        <li><strong>Taille</strong> — l'une de <code>Tiny</code>, <code>Small</code>, <code>Medium</code>, <code>Large</code>, <code>Huge</code> ou <code>Gargantuan</code>. Correspond aux catégories de taille du 5e.</li>\n        <li><strong>Type</strong> — un type de créature en texte libre (ex. « monstrosity », « undead »). Informatif uniquement ; non utilisé pour le filtrage.</li>\n        <li><strong>Alignement</strong> — une chaîne d'alignement en texte libre (ex. « chaotic evil »). Informatif uniquement.</li>\n      </ul>"
+      },
+      {
+        "heading": "Édition, CR & XP",
+        "html": "<ul>\n        <li><strong>Édition</strong> — <code>2014</code> ou <code>2024</code>. Détermine quelles tables de XP et de seuils s'appliquent lorsque le Générateur de rencontres utilise ce monstre.</li>\n        <li><strong>Degré de puissance (CR)</strong> — va de 0 à 30 (y compris 1/8, 1/4, 1/2). Le Générateur de rencontres utilise le CR pour calculer les budgets XP et suggérer des compositions de rencontre.</li>\n        <li><strong>XP</strong> — points d'expérience accordés pour la défaite de ce monstre. À 0, le Générateur de rencontres se rabat sur la table XP-par-CR standard.</li>\n      </ul>"
+      },
+      {
+        "heading": "Bloc de statistiques",
+        "html": "<p>La section bloc de statistiques est optionnelle. Remplir n'importe quel champ de défense ou de caractéristique active le bloc de statistiques complet à l'enregistrement.</p>\n      <ul>\n        <li><strong>CA</strong> — Classe d'Armure (0–30).</li>\n        <li><strong>PV</strong> — Points de Vie.</li>\n        <li><strong>Vitesse</strong> — texte libre (ex. « 30 ft, fly 60 ft »).</li>\n        <li><strong>Caractéristiques</strong> — FOR, DEX, CON, INT, SAG, CHA (0–30 chacune). Le modificateur est calculé automatiquement comme <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
+      },
+      {
+        "heading": "Dégâts par round (DPR)",
+        "html": "<p>Les champs DPR aident l'Ajusteur de monstres à estimer le niveau de danger d'une créature à différents CR.</p>\n      <ul>\n        <li><strong>DPR Min / Max</strong> — les extrêmes bas et haut des dégâts attendus par round.</li>\n        <li><strong>Plage de DPR</strong> — une expression de dés lisible (ex. <code>2d8+4</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Actions",
+        "html": "<p>Ajoutez autant d'actions nommées que nécessaire. Chaque action comporte :</p>\n      <ul>\n        <li><strong>Nom de l'action</strong> — ex. « Multiattack », « Bite ».</li>\n        <li><strong>Dégâts</strong> — expression de dés optionnelle (ex. <code>2d6+3</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Données de rencontre",
+        "html": "<p>Ces champs contrôlent l'apparition de votre monstre dans le pool de monstres filtré du Générateur de rencontres.</p>\n      <ul>\n        <li><strong>Terrain</strong> — un ou plusieurs parmi <code>dungeon</code>, <code>wilderness</code>, <code>urban</code>, <code>underwater</code>, <code>planar</code> ou <code>any</code>. Les monstres marqués <code>any</code> apparaissent toujours. Vous pouvez sélectionner plusieurs terrains.</li>\n        <li><strong>Affiliation</strong> — la catégorie large de la créature : <code>humanoid</code>, <code>beast</code>, <code>undead</code>, <code>construct</code>, <code>dragon</code>, <code>fiend</code>, <code>celestial</code>, <code>fey</code>, <code>monstrosity</code>, <code>giant</code>, <code>elemental</code>, <code>aberration</code>, <code>plant</code> ou <code>any</code>. Utilisée pour filtrer les suggestions par catégorie de créature.</li>\n        <li><strong>Genre</strong> — une étiquette de regroupement optionnelle (ex. « goblinoid », « dragon », « owlbear »). Le menu déroulant d'autocomplétion affiche tous les genres déjà utilisés parmi les monstres SRD et personnalisés — saisissez-en un nouveau ou choisissez-en un existant. Utilisé par le Générateur de rencontres pour regrouper les créatures thématiquement liées.</li>\n      </ul>"
+      },
+      {
+        "heading": "Stockage et portabilité",
+        "html": "<ul>\n        <li>Les monstres sont stockés dans l'<strong>IndexedDB</strong> de votre navigateur. Effacer les données du navigateur les supprime.</li>\n        <li>Utilisez <strong>Exporter</strong> pour télécharger toute votre bibliothèque sous forme de fichier JSON. C'est votre sauvegarde.</li>\n        <li>Utilisez <strong>Importer</strong> pour restaurer à partir d'un fichier JSON précédemment exporté. Les noms en double sont ignorés.</li>\n        <li>Les fichiers exportés peuvent être partagés avec d'autres maîtres du donjon ou transférés entre appareils.</li>\n      </ul>"
+      },
+      {
+        "heading": "Intégration entre outils",
+        "html": "<ul>\n        <li><strong>Générateur de rencontres</strong> — les monstres personnalisés apparaissent dans le pool filtré aux côtés des créatures SRD, appariés par CR, terrain, affiliation et genre.</li>\n        <li><strong>Ajusteur de monstres</strong> — les monstres personnalisés avec un bloc de statistiques peuvent être chargés et mis à l'échelle vers différents CR.</li>\n      </ul>"
+      }
+    ],
+    "note": "Tous les champs suivent les conventions D&D 5e. Utilisez cette page comme référence lors de la construction de votre bibliothèque personnalisée."
   }
 }

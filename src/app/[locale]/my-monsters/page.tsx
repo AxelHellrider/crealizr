@@ -51,7 +51,7 @@ export default function MyMonstersPage() {
                 });
             }
         } catch {
-            setFeedback({ type: "error", message: "Invalid JSON file." });
+            setFeedback({ type: "error", message: t("invalidJsonFile") });
         }
 
         if (fileInputRef.current) fileInputRef.current.value = "";

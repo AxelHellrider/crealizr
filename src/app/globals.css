@@ -281,6 +281,61 @@ h1, h2, h3, h4, .font-serif {
   clip-path: polygon(0 0, 100% 0, 96% 100%, 4% 100%);
 }
 
+/* ─── Documentation body (reference pages) ─────────────────────────────────
+   Flat, dense, documentary — no prose-plugin defaults. Matches the app's
+   gold/serif system while staying plain enough to read as a technical ref. */
+.doc-body { color: var(--text-base); line-height: 1.7; }
+.doc-body p { margin: 0.75rem 0; }
+.doc-body ul, .doc-body ol { margin: 0.75rem 0; padding-left: 1.25rem; }
+.doc-body ul { list-style: disc; }
+.doc-body ol { list-style: decimal; }
+.doc-body li { margin: 0.35rem 0; }
+.doc-body li::marker { color: var(--accent-primary); }
+.doc-body strong { color: var(--accent-primary); font-weight: 700; }
+.doc-body em { color: var(--text-secondary); font-style: italic; }
+.doc-body code {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-raised);
+  color: var(--accent-primary);
+  padding: 0.1rem 0.4rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85em;
+}
+.doc-body h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-serif), serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+}
+.doc-body h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  color: var(--text-base);
+}
+.doc-body h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.doc-body .doc-note {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 /* ─── Links ────────────────────────────────────────────────────────────── */
 .ui-link {
   color: var(--accent-primary);

@@ -88,7 +88,7 @@ export function MapToolbar({
                         className={btn(mode === m)} aria-pressed={mode === m}>
                         {label}
                         {shortcut && (
-                            <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">
+                            <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-xs px-[3px] leading-[11px]">
                                 {shortcut}
                             </kbd>
                         )}
@@ -100,7 +100,7 @@ export function MapToolbar({
                 <button type="button" onClick={onCameraLockToggle}
                     className={btn(cameraLocked)} aria-pressed={cameraLocked}>
                     {cameraLocked ? "Cam Locked" : "Lock Cam"}
-                    <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-[2px] px-[3px] leading-[11px]">L</kbd>
+                    <kbd className="font-mono text-[8px] opacity-50 border border-current rounded-xs px-[3px] leading-[11px]">L</kbd>
                 </button>
 
                 <button type="button" onClick={onZoomIn}  className={btn(false)} title="Zoom in  (+)">+</button>
@@ -117,11 +117,6 @@ export function MapToolbar({
                     <span className="text-[9px] text-muted/60 italic">Click empty hex to place</span>
                 )}
             </div>
-
-            <button type="button" onClick={onFullscreenToggle} className={btn(false)}
-                title="Fullscreen map" aria-label="Open fullscreen map">
-                ⛶
-            </button>
         </div>
     );
 }

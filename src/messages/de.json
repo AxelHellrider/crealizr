@@ -17,10 +17,10 @@
     "hero": {
       "title": "Balancierte Abenteuer schneller leiten, ohne die Fantasy zu zerstören.",
       "welcome": "Willkommen",
-      "welcomeBlurb": "Ein kostenloses Toolkit für den Spieltisch — Begegnungen, Monster und magische Gegenstände, bereit, wenn du es bist. Am Tisch entwickelt, für den Tisch — keine Sitzungsunterbrechungen mehr für CR-Kopfrechnen.",
+      "welcomeBlurb": "Begegnungen, Monster und magische Gegenstände, bereit wann immer du sie brauchst — kostenlos, und ohne die Runde zu unterbrechen, um CR-Werte zu überschlagen.",
       "tool": "Werkzeug",
       "about": "Über uns",
-      "aboutBlurb": "Von einer Spielleitung für Spielleitungen — kostenlos, schnell und ohne Konto.",
+      "aboutBlurb": "Gebaut von einem Spielleiter, der es leid war, diese Rechnungen von Hand zu machen. Kostenlos, schnell, kein Konto nötig.",
       "rulesetNote": "Funktioniert mit den Regeln von 2014 & 2024",
       "travelAction": "Reise planen",
       "bestiaryAction": "Bestiarium verwalten"
@@ -57,6 +57,11 @@
       "travelInputs": "Wald · Kampfbegegnung · d500-Wurf",
       "bestiaryInputs": "Ein Homebrew-Eintrag, lokal gespeichert und in jedem Werkzeug wiederverwendbar",
       "noSample": "Für dieses Regelwerk ist kein Beispiel verfügbar."
+    },
+    "contactCta": {
+      "title": "Feedback?",
+      "description": "Einen Fehler gefunden oder eine Idee für eine Funktion? Ich würde wirklich gerne davon hören.",
+      "action": "Kontakt aufnehmen"
     }
   },
   "encounterBuilder": {
@@ -96,7 +101,9 @@
     "overBudget": "Über Budget",
     "underBudget": "Unter Budget",
     "recommendedMix": "Empfohlene Mischung",
-    "calculationsNote": "Berechnungen basieren auf standardmäßigen XP-Schwellen und Begegnungsmultiplikatoren."
+    "calculationsNote": "Berechnungen basieren auf standardmäßigen XP-Schwellen und Begegnungsmultiplikatoren.",
+    "openBattlefield": "Schlachtfeld öffnen",
+    "openBattlefieldHint": "Öffne das Schlachtfeld im Vollbild für eine bessere Ansicht auf dem Handy."
   },
   "monsterScaler": {
     "title": "Monster-Skalierer",
@@ -104,8 +111,8 @@
     "viewDocs": "Dokumentation ansehen",
     "whatScales": "Was skaliert wird",
     "whatScalesDesc": "RK-, TP-, SDR-Ziele und Fähigkeitsmodifikatoren.",
-    "rulesetNotes": "Hinweise zum Regelwerk",
-    "rulesetNotesDesc": "2014 verwendet DMG-Tabellen. 2024 verwendet aktualisierte Bereiche mit weicheren Spannen.",
+    "acSourceNotes": "RK-Quellen",
+    "acSourceNotesDesc": "Geschicklichkeitsbasiert, getragene Rüstung oder natürliche Rüstung — plus optionaler Schild.",
     "guardrails": "Leitplanken",
     "guardrailsDesc": "Prüfe nach dem Skalieren Aktionsökonomie, legendäre Aktionen und einzigartige Eigenschaften.",
     "generalInfo": "Allgemeine Informationen",
@@ -113,14 +120,19 @@
     "namePlaceholder": "z. B. Uralter roter Drache",
     "creatureType": "Kreaturentyp",
     "typePlaceholder": "z. B. Drache",
-    "ruleset": "Regelwerk",
     "currentCR": "Aktueller CR",
     "targetCR": "Ziel-CR",
     "selectTargetCR": "Ziel-CR auswählen",
     "baseAttributes": "Basiswerte",
     "defenseAdjustments": "Verteidigungs- & Attributanpassungen",
-    "equipmentACBonus": "RK-Bonus durch Ausrüstung",
-    "naturalArmorBonus": "Bonus durch natürliche Rüstung",
+    "acSource": "RK-Quelle",
+    "acSourceDex": "Geschicklichkeitsbasiert (10 + GES-Mod)",
+    "acSourceArmor": "Getragene Rüstung (10 + Bonus)",
+    "acSourceNatural": "Natürliche Rüstung (fester Wert)",
+    "armorBonus": "Rüstungsbonus",
+    "naturalArmorValue": "Wert der natürlichen Rüstung",
+    "shield": "Schild",
+    "shieldHint": "Trägt einen Schild (+2 RK)",
     "abilityScoreBonuses": "Attributsboni",
     "scaleMonster": "MONSTER SKALIEREN",
     "scaling": "SKALIERUNG...",
@@ -278,37 +290,45 @@
     }
   },
   "myMonsters": {
-    "title": "My Bestiary",
-    "description": "Add and manage your homebrew monsters. These persist locally in your browser and integrate automatically with all CRealizr tools.",
-    "addMonster": "Add Monster",
-    "editMonster": "Edit",
-    "saveMonster": "Save Monster",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this monster?",
-    "export": "Export",
-    "import": "Import",
-    "importSuccess": "{count} monster(s) imported successfully.",
-    "importErrors": "Some entries could not be imported:",
-    "emptyState": "No custom monsters yet. Add your first homebrew monster to get started.",
-    "search": "Search monsters...",
-    "infoStorage": "Browser Storage",
-    "infoStorageDesc": "Your monsters are stored in this browser's IndexedDB. Clearing browser data will remove them — use Export to back up.",
-    "infoUsage": "Cross-Tool Integration",
-    "infoUsageDesc": "Custom monsters appear automatically in the Encounter Builder recommendations and can be loaded into the Monster Scaler.",
-    "infoPortability": "Portability",
-    "infoPortabilityDesc": "Export your library as JSON to back up, share, or transfer to another device. Import any previously exported file to restore.",
+    "title": "Mein Bestiarium",
+    "description": "Füge deine Homebrew-Monster hinzu und verwalte sie. Sie werden direkt in deinem Browser gespeichert und funktionieren automatisch mit jedem CRealizr-Werkzeug.",
+    "addMonster": "Monster hinzufügen",
+    "editMonster": "Bearbeiten",
+    "saveMonster": "Monster speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirmDelete": "Möchtest du dieses Monster wirklich löschen?",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "importSuccess": "{count} Monster erfolgreich importiert.",
+    "importErrors": "Einige Einträge konnten nicht importiert werden:",
+    "emptyState": "Noch keine eigenen Monster. Füge dein erstes Homebrew-Monster hinzu, um zu beginnen.",
+    "search": "Monster durchsuchen...",
+    "infoStorage": "Browser-Speicher",
+    "infoStorageDesc": "Deine Monster werden in der IndexedDB dieses Browsers gespeichert. Das Löschen von Browserdaten entfernt sie — nutze Exportieren, um sie zu sichern.",
+    "infoUsage": "Werkzeugübergreifende Integration",
+    "infoUsageDesc": "Eigene Monster erscheinen automatisch in den Empfehlungen des Begegnungs-Generators und können im Monster-Skalierer geladen werden.",
+    "infoPortability": "Portabilität",
+    "infoPortabilityDesc": "Exportiere deine Bibliothek als JSON, um sie zu sichern, zu teilen oder auf ein anderes Gerät zu übertragen. Importiere eine zuvor exportierte Datei, um sie wiederherzustellen.",
+    "invalidJsonFile": "Ungültige JSON-Datei.",
     "form": {
       "name": "Name",
+      "namePlaceholder": "z. B. Dire Owlbear",
       "cr": "Challenge Rating",
       "edition": "Edition",
       "terrain": "Terrain",
-      "affiliation": "Affiliation",
-      "genus": "Genus",
-      "statBlock": "Stat Block (Optional)",
-      "size": "Size",
-      "type": "Type",
-      "alignment": "Alignment",
+      "terrainPlaceholder": "Terrains durchsuchen...",
+      "affiliation": "Zugehörigkeit",
+      "affiliationPlaceholder": "Zugehörigkeiten durchsuchen...",
+      "genus": "Gattung",
+      "genusSublabel": "eingeben oder aus vorhandenen wählen",
+      "genusPlaceholder": "z. B. owlbear, dragon, goblinoid",
+      "statBlock": "Statblock (optional)",
+      "size": "Größe",
+      "type": "Typ",
+      "typePlaceholder": "z. B. monstrosity",
+      "alignment": "Gesinnung",
+      "alignmentPlaceholder": "z. B. chaotic evil",
       "ac": "AC",
       "hp": "HP",
       "speed": "Speed",
@@ -320,14 +340,16 @@
       "cha": "CHA",
       "dprMin": "DPR Min",
       "dprMax": "DPR Max",
-      "dprRange": "DPR Range",
+      "dprRange": "DPR-Bereich",
+      "dprRangePlaceholder": "z. B. 2d8+4",
       "xp": "XP",
-      "actions": "Actions",
-      "actionName": "Action Name",
-      "actionDamage": "Damage",
-      "addAction": "Add Action",
-      "nameRequired": "Name is required.",
-      "nameDuplicate": "A monster with this name already exists."
+      "actions": "Aktionen",
+      "actionName": "Aktionsname",
+      "actionDamage": "Schaden",
+      "addAction": "Aktion hinzufügen",
+      "encounterData": "Begegnungsdaten",
+      "nameRequired": "Name ist erforderlich.",
+      "nameDuplicate": "Ein Monster mit diesem Namen existiert bereits."
     }
   },
   "terms": {
@@ -356,7 +378,7 @@
       {
         "heading": "4. Ihre Inhalte",
         "body": [
-          "Eigene Monster, Homebrew-Inhalte und andere von Ihnen erstellte Daten (\"Nutzerinhalte\") werden lokal in Ihrem Browser gespeichert und niemals an unsere Server übertragen. Sie sind allein dafür verantwortlich, Ihre Nutzerinhalte über die Exportfunktion zu sichern — das Löschen von Browserdaten oder ein Gerätewechsel entfernt sie dauerhaft.",
+          "Eigene Monster, Homebrew-Inhalte und alles andere, was du erstellst (\"Nutzerinhalte\"), bleiben in deinem Browser und werden niemals an unsere Server gesendet. Sichere sie selbst über die Exportfunktion — das Löschen deiner Browserdaten oder ein Gerätewechsel entfernt sie dauerhaft.",
           "Sie behalten alle Rechte an Ihren Nutzerinhalten. Durch die Nutzung des Dienstes bestätigen Sie, dass Ihre Nutzerinhalte keine Rechte Dritter verletzen."
         ]
       },
@@ -512,7 +534,7 @@
       {
         "heading": "8. Lokale Speicherung auf Ihrem Gerät",
         "body": [
-          "Ihre Design- und saisonale Anzeigeeinstellung, gespeicherte Layouts der Kampfkarte, alle von Ihnen im Bestiarium erstellten Homebrew-Monster sowie ob Sie den Hinweis \"Gerät drehen\" in der Vollbildansicht des Kampffelds abgelehnt haben, werden ausschließlich im lokalen Speicher oder IndexedDB Ihres eigenen Browsers gespeichert. Diese Daten verlassen niemals Ihr Gerät, sind für uns nicht einsehbar und liegen vollständig in Ihrer eigenen Kontrolle — löschen Sie jederzeit Ihre Browserdaten, um sie zu entfernen."
+          "Dein Theme, gespeicherte Kampfkarten-Layouts, alle Homebrew-Monster, die du in Mein Bestiarium erstellst, sowie ein paar kleine UI-Einstellungen (etwa ob du den \"Gerät drehen\"-Hinweis ausgeblendet hast) werden nur im lokalen Speicher deines Browsers oder in IndexedDB gespeichert. Nichts davon erreicht jemals unsere Server oder ist für uns sichtbar — lösche deine Browserdaten jederzeit, um sie zu entfernen."
         ]
       },
       {
@@ -551,5 +573,169 @@
     "description": "Zum Startbildschirm hinzufügen für schnellen, offline-fähigen Zugriff am Spieltisch.",
     "install": "Installieren",
     "dismiss": "Nicht jetzt"
+  },
+  "encounterBuilderDocs": {
+    "title": "Begegnungs-Generator – So funktioniert's",
+    "description": "Vollständige Referenz für jede Funktion des Begegnungs-Generators — Gruppen-Setup, zwei Berechnungsmodi, das interaktive Schlachtfeld und Deckungsmechanik.",
+    "sections": [
+      {
+        "heading": "Eingaben",
+        "html": "<ul>\n        <li><strong>Gruppengröße</strong> — Anzahl der Charaktere (1–8). Schnellauswahl-Chips für 3/4/5/6.</li>\n        <li><strong>Durchschnittsstufe</strong> — 1–20. Bestimmt sowohl XP-Schwellen als auch CR-Zielberechnungen.</li>\n        <li><strong>Schwierigkeit</strong> — <code>easy</code>, <code>medium</code>, <code>hard</code> oder <code>deadly</code>.</li>\n        <li><strong>Regelwerk</strong> — 2014 DMG oder 2024 Player's Handbook Tabellen.</li>\n        <li><strong>Formation</strong> — <em>Solo Boss</em> (ein dominanter Gegner, optional mit Handlangern) oder <em>Horde/Gruppe</em> (gemischtes CR-Mob).</li>\n      </ul>"
+      },
+      {
+        "heading": "Berechnungsmodus",
+        "html": "<p>Der Umschalter <strong>Berechnungsmodus</strong> wechselt zwischen zwei unterschiedlichen Ansätzen. Beide erzeugen dasselbe Vorschlagskarten-Format; was sich ändert, ist die Mathematik dahinter.</p>\n      <h3>XP-Budget-Modus (Standard)</h3>\n      <p>Vollständiger D&amp;D-5e-Begegnungsbudget-Ablauf:</p>\n      <ol>\n        <li>Ermittle die XP-Schwelle pro Charakter für die gewählte Stufe und Schwierigkeit.</li>\n        <li>Multipliziere mit der Gruppengröße: <code>budget = threshold[level][difficulty] × partySize</code>.</li>\n        <li>Berechne für jede Kandidatengruppe von Monstern: <code>adjustedXP = Σ(count × xpEach) × encounterMultiplier(totalCount)</code>.</li>\n        <li>Behalte Vorschläge, bei denen <code>fit = min(budget, adjustedXP) / max(budget, adjustedXP) ≥ 0.7</code>.</li>\n        <li>Sortiere nach höchster Übereinstimmung, dann niedrigerem adjustedXP. Zeige die besten 12.</li>\n      </ol>\n      <p>Der Untermenü-Umschalter <strong>Budget-Typ</strong> wechselt zwischen <em>Begegnungsbudget</em> (eine Sitzung) und <em>Tagesbudget</em> (≈3,4× Begegnungsbudget, für ganze Abenteuertage).</p>\n      <h4>Begegnungsmultiplikatoren</h4>\n      <ul>\n        <li>1 Monster → <code>×1</code></li>\n        <li>2 → <code>×1.5</code></li>\n        <li>3–6 → <code>×2</code></li>\n        <li>7–10 → <code>×2.5</code></li>\n        <li>11–14 → <code>×3</code></li>\n        <li>15+ → <code>×4</code></li>\n      </ul>\n      <h3>CR-Abgleich-Modus</h3>\n      <p>Keine XP-Mathematik. Vorschläge entstehen rein durch den Vergleich von Herausforderungsgraden mit der Gruppenstufe:</p>\n      <ol>\n        <li>Berechne einen <strong>Ziel-CR</strong> je Schwierigkeits-Offset: <code>easy: level−2 · medium: level · hard: level+1 · deadly: level+3</code> (min. 1/8).</li>\n        <li>Skaliere nach Gruppengröße: <code>crBudget = targetCR × (partySize / 4)</code>.</li>\n        <li>Berechne für jede Kandidatengruppe ein <strong>CR-Begegnungsgewicht</strong>: <code>crWeight = Σ(cr × count) × √encounterMultiplier(totalCount)</code>.</li>\n        <li>Behalte Vorschläge, bei denen <code>fit = min(crBudget, crWeight) / max(crBudget, crWeight) ≥ 0.5</code>.</li>\n      </ol>\n      <p>Der in der Gruppenkarte angezeigte <strong>maximal bewältigbare CR</strong> ist <code>crTarget × (partySize / 4)</code>, als Herausforderungsgrad formatiert — die Einzelmonster-Obergrenze, die die Gruppe bei der gewählten Schwierigkeit bewältigen kann.</p>\n      <p>Im CR-Abgleich-Modus werden keine Genauigkeitslabels (Ausgewogen / Über Budget) angezeigt, da die CR-Tabellen bereits eine eindeutige Antwort liefern; die prozentuale Übereinstimmung wäre redundant.</p>"
+      },
+      {
+        "heading": "Solo Boss vs. Horde/Gruppe",
+        "html": "<h3>Solo Boss</h3>\n      <p>Zählt Boss-CRs nahe dem Ziel auf, optional gepaart mit Handlangern niedrigeren CRs. Mit aktiviertem <strong>Handlanger einbeziehen</strong> sucht das Werkzeug nach verwandten Monstern (nach Terrain, Zugehörigkeit oder Gattung über den Beziehungsfilter), um den Handlanger-Slot zu füllen.</p>\n      <h3>Horde / Gruppe</h3>\n      <p>Erstellt Kompositionen mit gemischtem CR. Die Einstellung <strong>Mischtypen</strong> (2–5) begrenzt, wie viele unterschiedliche CR-Typen in einem Vorschlag erscheinen. Für N Monster insgesamt und T Typen:</p>\n      <ul>\n        <li>Zähle alle CR-Kombinationen der Größe T auf.</li>\n        <li>Zähle alle Möglichkeiten auf, N in T positive Ganzzahlen aufzuteilen.</li>\n        <li>Behalte Kombinationen, deren Budget-Übereinstimmung den Schwellenwert erfüllt.</li>\n      </ul>"
+      },
+      {
+        "heading": "Beziehungsfilter",
+        "html": "<p>Verfügbar, wenn Handlanger aktiviert sind (Solo), oder immer im Gruppenmodus. Beschränkt Kandidaten auf Monster, die eine gewählte Eigenschaft mit einer Referenzkreatur beim Ziel-CR teilen:</p>\n      <ul>\n        <li><strong>Beliebige Spezies</strong> — kein Filter.</li>\n        <li><strong>Gleiches Terrain</strong> — Monster, deren Terrainliste sich überschneidet.</li>\n        <li><strong>Gleiche Zugehörigkeit</strong> — Monster mit demselben Fraktions-Tag.</li>\n        <li><strong>Gleiche Gattung</strong> — Monster derselben Kreaturengattung (z. B. Untote, Drachen).</li>\n      </ul>"
+      },
+      {
+        "heading": "Schlachtfeldkarte",
+        "html": "<p>Ein interaktives Hexfeld mit flacher Oberseite. Gruppenmitglieder (grün) und Gegner (gold/rot für Bosse) werden automatisch platziert, wenn ein Vorschlag ausgewählt wird. Alle Knoten sind ziehbar.</p>\n      <h3>Werkzeugleisten-Modi</h3>\n      <ul>\n        <li><code>W</code> — <strong>Bewegen</strong>: Knoten frei ziehen. Mehrfachauswahl mit Strg/Cmd/Umschalt+Klick, um mehrere Knoten gleichzeitig zu ziehen.</li>\n        <li><code>A</code> — <strong>Umgebungsgefahr</strong>: Klicke auf ein leeres Hexfeld, um eine Umgebungsgefahr zu platzieren (orange).</li>\n        <li><code>S</code> — <strong>Zaubergefahr</strong>: Klicke auf ein leeres Hexfeld, um eine Zaubergefahr zu platzieren (lila).</li>\n        <li><code>C</code> — <strong>Deckung</strong>: Klicke auf ein leeres Hexfeld, um ein Deckungshindernis zu platzieren (hellblau).</li>\n        <li><code>L</code> — <strong>Kamera sperren</strong>: friert das Verschieben ein, während du Knoten ziehst.</li>\n        <li><code>+</code> / <code>−</code> — Vergrößern / Verkleinern.</li>\n        <li><code>Esc</code> — zurück zum Bewegungsmodus und Kamera entsperren.</li>\n      </ul>\n      <h3>Knoten entfernen</h3>\n      <p>Jeder Knoten zeigt eine kleine <code>×</code>-Schaltfläche. Das Entfernen eines Gruppenknotens verringert den äußeren Gruppengrößenzähler. Das Entfernen eines Gegnerknotens bleibt über erneute Synchronisierungen desselben Vorschlags erhalten und wird nur zurückgesetzt, wenn ein neuer Vorschlag ausgewählt wird.</p>\n      <h3>Raster</h3>\n      <p>Das Raster ist in alle Richtungen unbegrenzt. Verschiebe es durch Ziehen des Hintergrunds. Pinch-to-Zoom funktioniert auf Touch-Geräten. Die Ansicht zentriert sich automatisch auf die aktuellen Begegnungsknoten, sobald sich Vorschlag oder Gruppengröße ändern.</p>\n      <h3>Mobiler Vollbildmodus</h3>\n      <p>Auf dem Handy öffnet sich das Schlachtfeld nur als Vollbild-Overlay mit einer touch-freundlichen unteren Werkzeugleiste — tippe auf <strong>Schlachtfeld öffnen</strong>, um es zu betreten, und auf <strong>← Verlassen</strong>, um zurückzukehren.</p>"
+      },
+      {
+        "heading": "Gefahren & Wirkungsbereich",
+        "html": "<p>Beide Gefahrentypen (Umgebung und Zauber) unterstützen einen <strong>Wirkungsbereich (AoE)</strong> — standardmäßig eine Kugel/Würfel/Zylinder-Explosion, oder bei Zaubergefahren einen Kegel/Linie in einer der 6 Hexrichtungen (0–3 Hexfelder, Standard 1). Öffne nach dem Platzieren einer Gefahr ihren Editor, um Form, Richtung und Radius anzupassen.</p>\n      <ul>\n        <li>Der Wirkungsbereich füllt betroffene Hexfelder mit einer passenden Färbung (orange = Umgebung, lila = Zauber).</li>\n        <li>Ein <strong>Deckungsknoten</strong> innerhalb des Wirkungsbereichs färbt das Hexfeld blau — die Deckung blockiert die Gefahr dort.</li>\n        <li>Gruppen- oder Gegnerknoten in einem ungeschützten Wirkungsbereich-Hexfeld leuchten in der Farbe der Gefahr.</li>\n        <li>Gefahren stapeln sich über jedem anderen Knoten. Deckung, Gruppe und Gegner bleiben exklusiv (einer pro Hexfeld).</li>\n      </ul>"
+      },
+      {
+        "heading": "Deckung",
+        "html": "<p>Deckung folgt den Standard-D&amp;D-5e-Regeln. Drei Stufen sind über den Knoteneditor verfügbar:</p>\n      <ul>\n        <li><strong>Halbdeckung</strong> — +2 Bonus auf Rüstungsklasse und Geschicklichkeitsrettungswürfe.</li>\n        <li><strong>Dreiviertel-Deckung</strong> — +5 Bonus auf Rüstungsklasse und Geschicklichkeitsrettungswürfe.</li>\n        <li><strong>Volldeckung</strong> — kann nicht direkt von Angriffen oder Zaubern anvisiert werden.</li>\n      </ul>\n      <p>Der Bereich <strong>Vorteile / Nachteile</strong> in der Gruppenkarte listet automatisch jedes Gruppenmitglied auf, das angrenzend (1 Hexfeld entfernt) zu einem Deckungsknoten ist, und zeigt die beste verfügbare Deckungsstufe.</p>"
+      },
+      {
+        "heading": "Knoteneditor",
+        "html": "<p>Klicke auf einen Knoten, um seinen Editor zu öffnen. Die verfügbaren Felder variieren je nach Knotentyp:</p>\n      <ul>\n        <li><strong>Alle Knoten</strong> — benutzerdefinierte Beschriftung.</li>\n        <li><strong>Gefahren</strong> — Notiztext, Wirkungsbereichs-Form/Richtung (nur Zauber) und Radius (0 = einzelnes Hexfeld, 1–3 = erweiternde Ringe).</li>\n        <li><strong>Deckung</strong> — Deckungsstufe (Halb / Dreiviertel / Voll).</li>\n      </ul>"
+      }
+    ],
+    "note": "Regelgrundlage: D&D-5e-2014-DMG-Richtlinien zum Erstellen von Begegnungen und PHB-Deckungsregeln. Als Ausgangspunkt verwenden und an deinen Tisch anpassen."
+  },
+  "monsterScalerDocs": {
+    "title": "Monster-Skalierer – So funktioniert's",
+    "description": "Dokumentiert die genauen Schritte und Formeln des Monster-Skalierers. Die CR-Matrix ist bei den Regelwerken 2014 und 2024 identisch, daher funktioniert die Skalierung unabhängig davon, aus welchem Quellenbuch ein Monster stammt.",
+    "sections": [
+      {
+        "heading": "Eingaben",
+        "html": "<ul>\n        <li>Statblock des Quellmonsters: Name, Größe/Typ, aktueller <code>CR</code> und Werte (RK, TP, STÄ/GES/KON/INT/WEI/CHA).</li>\n        <li>Optionale Aktionsliste zur Schätzung des Schadens pro Runde aus Schadensausdrücken (z. B. <code>1d6+2</code>).</li>\n        <li>Ziel-CR (unterstützt gebrochene CR 1/8, 1/4, 1/2 sowie CR 1–30).</li>\n        <li>RK-Quelle: geschicklichkeitsbasiert, getragene Rüstung oder natürliche Rüstung — plus optionaler Schild-Schalter.</li>\n        <li>Optionale Boni pro Attributswert.</li>\n      </ul>"
+      },
+      {
+        "heading": "CR-Zeilensuche",
+        "html": "<p>Wir schlagen zwei Zeilen aus der CR-Matrix nach: eine für den Quell-CR und eine für den Ziel-CR. Jede Zeile enthält Referenzwerte für Übungsbonus, erwartete AC, HP, Angriffsbonus, DPR und Rettungswurf-SG — verwendet wird die höchste Zeile mit <code>row.cr ≤ cr</code>.</p>"
+      },
+      {
+        "heading": "Schaden pro Runde (DPR) – Schätzung",
+        "html": "<p>Wenn das Monster Aktionen mit Schadenszeichenketten hat, schätzen wir den durchschnittlichen Schaden für jede Aktion und summieren:</p>\n      <ul>\n        <li>Für jeden Ausdruck wie <code>XdY</code> (z. B. <code>2d6</code>) ist der Erwartungswert = <code>X × (Y + 1) / 2</code>.</li>\n        <li>Ein optionaler fester Modifikator <code>±N</code> wird einmal zum Gesamtwert dieser Aktion addiert.</li>\n        <li>Nicht-Würfel-Zahlen werden nach Möglichkeit als fester Wert interpretiert.</li>\n      </ul>\n      <p>Die Durchschnittswerte pro Aktion werden summiert und auf die nächste Ganzzahl gerundet. Werden keine Aktionen angegeben, überspringt der Skalierer das DPR-Verhältnis und zeigt stattdessen den erwarteten DPR des Ziel-CR als absolute Referenz.</p>"
+      },
+      {
+        "heading": "HP-Skalierung",
+        "html": "<p>HP wird proportional skaliert, wobei erhalten bleibt, wie weit über oder unter der CR-Grundlinie das ursprüngliche Monster liegt:</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, mit einem Minimum von 1.</p>\n      <p><em>Beispiel: Ein CR-1-Monster mit 156 HP (2× die CR-1-Grundlinie von 78), skaliert auf CR 5 (Grundlinie 138), ergibt <code>round(156 × 138/78) = 276</code> — immer noch etwa 2× die CR-5-Grundlinie.</em></p>"
+      },
+      {
+        "heading": "AC-Skalierung",
+        "html": "<p>Die RK wird unabhängig von der CR-Matrix aus einer von drei wählbaren Quellen berechnet, plus optionalem Schild:</p>\n      <ul>\n        <li><strong>Geschicklichkeitsbasiert</strong>: <code>10 + GES-Modifikator</code> — für unbewaffnete Kreaturen, die auf Beweglichkeit setzen.</li>\n        <li><strong>Getragene Rüstung</strong>: <code>10 + Rüstungsbonus</code> — der Bonus, den du für die getragene Rüstung einträgst.</li>\n        <li><strong>Natürliche Rüstung</strong>: ein fester Wert, den du direkt einträgst (z. B. die natürliche Rüstung eines Drachen oder Tortle) — nicht zu 10 addiert.</li>\n      </ul>\n      <p>Ein getragener <strong>Schild</strong> addiert immer pauschal <code>+2</code> auf eine der drei Quellen.</p>\n      <p>Geschicklichkeitsbasierte und natürliche Rüstung sind der Kreatur inhärent und bei Monstern auf <strong>RK 30</strong> gedeckelt — analog dazu, dass die Spieler-RK allein durch GES/natürliche Quellen bei 20 gedeckelt ist. Getragene Rüstung und ein Schild gelten als Gegenstände und dürfen die RK über die Obergrenze hinaus treiben: <code>finalAC = (Rüstung ? 10 + Rüstungsbonus : clamp(inhärenteRK, 1, 30)) + (Schild ? 2 : 0)</code>. Die RK 25 der Tarrasque ist ein guter Referenzpunkt dafür, wie hoch natürliche Rüstung reichen kann, ohne je einen Gegenstand zu benötigen.</p>\n      <p>Situative Deckung (siehe die Deckungsmechanik des Begegnungs-Generators) kann die effektive RK im Kampf zusätzlich erhöhen, ist aber nicht Teil des Basis-Statblocks des Monsters.</p>"
+      },
+      {
+        "heading": "Attributswert-Skalierung (STR/DEX/CON/INT/WIS/CHA)",
+        "html": "<p>Wir skalieren Attributswerte in Modifikator-Schritten, nicht in rohen Punkten:</p>\n      <ol>\n        <li>Berechne die CR-Differenz: <code>crDiff = targetCR − sourceCR</code>.</li>\n        <li>Erhöhe den Attributsmodifikator um <code>floor(crDiff / 2)</code> Schritte. Beispiel: von CR 1 zu CR 5, <code>crDiff=4</code> ⇒ <code>+2</code> Modifikator-Schritte.</li>\n        <li>Ordne den neuen Modifikator dem nächstliegenden kanonischen Wert über die Standardtabelle \"Wert ⇒ Modifikator\" zu.</li>\n        <li>Wende einen etwaigen Bonus pro Attribut an, dann auf den Bereich 1–30 begrenzen.</li>\n      </ol>"
+      },
+      {
+        "heading": "Angriffsbonus-Empfehlung",
+        "html": "<ul>\n        <li>Bester Angriffs-Attributsmodifikator: <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> für skalierte Werte.</li>\n        <li>Änderung der Matrix-Grundlinie: <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Anpassung an die eigene Werteänderung des Monsters: <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Vorschlag: <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
+      },
+      {
+        "heading": "Rettungswurf-SG-Empfehlung",
+        "html": "<p>Der vorgeschlagene Rettungswurf-SG beginnt beim SG der Zielzeile und verschiebt sich mit der Änderung des INT-Modifikators des Monsters (als Stellvertreter im Zauberwirker-Stil):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+      },
+      {
+        "heading": "DPR-Referenz",
+        "html": "<p>Wenn Aktionen angegeben sind, meldet der Skalierer einen Skalierungsfaktor, der dir hilft, den Schaden neu abzustimmen:</p>\n      <ul>\n        <li><code>srcDPR</code>: aus den eingegebenen Aktionen geschätzt.</li>\n        <li><code>tgtDPR</code>: Mittelwert des offiziellen DMG-Schadens-pro-Runde-Bereichs für den Ziel-CR, nur für das Verhältnis verwendet.</li>\n        <li><code>dprScale = tgtDPR / max(1, srcDPR)</code> — multipliziere den Schaden jeder Aktion damit, um die Zielspanne zu erreichen.</li>\n      </ul>\n      <p>Das angezeigte <code>dpr</code>-Feld des Monsters ist immer der offizielle DMG-Bereich selbst (z. B. <code>33–38</code> bei CR 5) — keine synthetische Spanne um einen Einzelwert.</p>"
+      },
+      {
+        "heading": "Grenzen, Begrenzungen & Determinismus",
+        "html": "<ul>\n        <li>AC wird nach allen Anpassungen auf 5–30 begrenzt.</li>\n        <li>Attributswerte werden auf 1–30 begrenzt.</li>\n        <li>HP hat ein Minimum von 1.</li>\n      </ul>\n      <p>Der Skalierer ist vollständig deterministisch. Alle Matrixwerte sind die Mittelpunkte der offiziellen DMG-Bereiche. Zur Laufzeit wird kein Zufall angewendet — dieselben Eingaben erzeugen immer dieselbe Ausgabe.</p>"
+      },
+      {
+        "heading": "CR-Matrix-Referenz",
+        "html": "<p>Dies sind die exakten Basiswerte, die der Skalierer verwendet, direkt aus der aktuellen Datenebene entnommen. Die Tabelle ist die offizielle DMG-Tabelle „Monster Statistics by Challenge Rating\" und ist bei den Regelwerken 2014 und 2024 identisch — CRealizr verwendet eine einzige, einheitliche Matrix unabhängig davon, aus welchem Quellenbuch ein Monster stammt.</p>"
+      }
+    ],
+    "note": "TP- und Schaden-pro-Runde-Werte sind die offiziellen Bereiche der DMG-CR-Tabelle — TP wird als Mittelwert angezeigt, DPR als vollständiger Bereich. Angriffsboni und Rettungswurf-SG entsprechen exakt der offiziellen Tabelle."
+  },
+  "artifactForgeDocs": {
+    "title": "Artefaktschmiede – So funktioniert's",
+    "description": "Details zur Seltenheit nach Stufe, vorgeschlagenen Boni und dem von der Artefaktschmiede erzeugten Gegenstands-Bauplan.",
+    "sections": [
+      {
+        "heading": "Eingaben",
+        "html": "<ul>\n        <li>Gegenstandsname (optional)</li>\n        <li>Gegenstandstyp: <code>Weapon</code> | <code>Armor</code> | <code>Wand</code> | <code>Wondrous</code></li>\n        <li>Spielerstufe (1–20) zur Abstimmung</li>\n        <li>Einrichtung der Bindungsanforderung des Spielers</li>\n        <li>Optionale Ziel-Monster-Tags zur Kennzeichnung der Wirksamkeit</li>\n        <li>Optionale Handwerkszutaten mit Menge (und optionaler Einheit)</li>\n        <li>Optionale Herstellungskosten, -zeit und besondere Anforderung (Ort, Beruf oder Spezialist)</li>\n        <li>Optionale Hintergrundbeschreibung (bis zu 100 Wörter)</li>\n      </ul>"
+      },
+      {
+        "heading": "Schnellaktionen",
+        "html": "<ul>\n        <li>Verwende Beispiel, um einen vollständigen Artefakt-Bauplan vorauszufüllen.</li>\n        <li>Mechanik sperren, um Typ/Stufe/Bindung beizubehalten, während du an der Ausgestaltung feilst.</li>\n        <li>Ausgestaltung löschen oder Handwerk löschen, um schnell zu iterieren.</li>\n      </ul>"
+      },
+      {
+        "heading": "Mechanik vs. Ausgestaltung",
+        "html": "<p>Die Schmiede trennt die mechanische Ausgabe (Seltenheit, Boni, abgestimmte Stufe) von der Ausgestaltung (Zutaten, Anforderungen und Hintergrund). Das hält Balance-Anpassungen schnell, während du an der Geschichte feilst.</p>"
+      },
+      {
+        "heading": "Export-Vorschau",
+        "html": "<p>Das Vorschaufenster spiegelt die JSON-Ausgabe, sodass du sie schnell kopieren oder als Screenshot festhalten kannst.</p>"
+      },
+      {
+        "heading": "Seltenheit nach Stufe",
+        "html": "<p>Die Seltenheit wird über eine einfache Kurve aus der Spielerstufe zugewiesen:</p>\n      <ul>\n        <li>≤3 → <code>Common</code></li>\n        <li>4–6 → <code>Uncommon</code></li>\n        <li>7–10 → <code>Rare</code></li>\n        <li>11–16 → <code>Very Rare</code></li>\n        <li>17–20 → <code>Legendary</code></li>\n      </ul>"
+      },
+      {
+        "heading": "Vorgeschlagene Boni",
+        "html": "<p>Boni sind bewusst konservativ und an Seltenheitsstufen gekoppelt:</p>\n      <ul>\n        <li>Magiebonus: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Durchschnittlicher Schadensbonus: spiegelt den Magiebonus je Seltenheit</li>\n        <li>Rettungswurf-SG (für Zauberstäbe): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Anwendung nach Typ:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: kein automatischer Kampfbonus (freies Design)</li>\n      </ul>"
+      },
+      {
+        "heading": "Gegenstands-Bauplan",
+        "html": "<p>Das Werkzeug liefert ein strukturiertes Bauplan-Objekt, das du exportieren oder kopieren kannst:</p>\n      <ul>\n        <li><code>name</code>: angegeben oder automatisch aus Typ und Seltenheit generiert</li>\n        <li><code>type</code>: einer der unterstützten Typen</li>\n        <li><code>attunement</code>: boolescher Wert (true/false)</li>\n        <li><code>rarity</code>: aus der Stufe abgeleitet</li>\n        <li><code>levelTuned</code>: begrenzte Stufe (1–20)</li>\n        <li><code>targetTags</code>: deine optionale Liste</li>\n        <li><code>ingredients</code>: Liste aus Name/Menge/Einheit</li>\n        <li><code>craftingCost</code>: numerische Goldkosten, falls angegeben</li>\n        <li><code>craftingTime</code> + <code>craftingTimeUnit</code>: Stunden/Tage/Wochen wie angegeben</li>\n        <li><code>craftingRequirement</code>: optionale Orts- oder Spezialistenanforderung</li>\n        <li><code>lore</code>: optionale Beschreibung mit 100 Wörtern</li>\n        <li><code>bonusToHit</code>, <code>bonusAC</code>, <code>bonusSaveDC</code>, <code>avgDamageBonus</code>: soweit zutreffend</li>\n        <li><code>notes</code>: Zusammenfassungstext, falls Ziele angegeben wurden</li>\n      </ul>"
+      }
+    ],
+    "note": "Dies sind Ausgangs-Heuristiken für schnelle Vorbereitung unterwegs. Passe sie an den Ton deines Tisches an oder erweitere sie."
+  },
+  "myMonstersDocs": {
+    "title": "Mein Bestiarium – Feldreferenz",
+    "description": "Erklärt jedes Feld im Formular von Mein Bestiarium und wie Homebrew-Monster mit den anderen CRealizr-Werkzeugen zusammenarbeiten.",
+    "sections": [
+      {
+        "heading": "Identität",
+        "html": "<ul>\n        <li><strong>Name</strong> — der Anzeigename des Monsters. Muss innerhalb deiner Bibliothek eindeutig sein (Groß-/Kleinschreibung wird ignoriert).</li>\n        <li><strong>Größe</strong> — eine von <code>Tiny</code>, <code>Small</code>, <code>Medium</code>, <code>Large</code>, <code>Huge</code> oder <code>Gargantuan</code>. Entspricht den 5e-Größenkategorien.</li>\n        <li><strong>Typ</strong> — ein Freitext-Kreaturentyp (z. B. \"monstrosity\", \"undead\"). Nur informativ; wird nicht zum Filtern verwendet.</li>\n        <li><strong>Gesinnung</strong> — eine Freitext-Gesinnungsangabe (z. B. \"chaotic evil\"). Nur informativ.</li>\n      </ul>"
+      },
+      {
+        "heading": "Edition, CR & XP",
+        "html": "<ul>\n        <li><strong>Edition</strong> — <code>2014</code> oder <code>2024</code>. Bestimmt, welche XP- und Schwellenwerttabellen gelten, wenn der Begegnungs-Generator dieses Monster verwendet.</li>\n        <li><strong>Herausforderungsgrad (CR)</strong> — reicht von 0 bis 30 (einschließlich 1/8, 1/4, 1/2). Der Begegnungs-Generator verwendet den CR, um XP-Budgets zu berechnen und Begegnungszusammensetzungen vorzuschlagen.</li>\n        <li><strong>XP</strong> — Erfahrungspunkte für das Besiegen dieses Monsters. Bei 0 greift der Begegnungs-Generator auf die Standard-XP-nach-CR-Tabelle zurück.</li>\n      </ul>"
+      },
+      {
+        "heading": "Statblock",
+        "html": "<p>Der Statblock-Bereich ist optional. Das Ausfüllen eines beliebigen Verteidigungs- oder Attributswertfelds aktiviert beim Speichern den vollständigen Statblock.</p>\n      <ul>\n        <li><strong>AC</strong> — Rüstungsklasse (0–30).</li>\n        <li><strong>HP</strong> — Trefferpunkte.</li>\n        <li><strong>Speed</strong> — Freitext (z. B. \"30 ft, fly 60 ft\").</li>\n        <li><strong>Attributswerte</strong> — STR, DEX, CON, INT, WIS, CHA (jeweils 0–30). Der Modifikator wird automatisch als <code>floor((score − 10) / 2)</code> berechnet.</li>\n      </ul>"
+      },
+      {
+        "heading": "Schaden pro Runde (DPR)",
+        "html": "<p>DPR-Felder helfen dem Monster-Skalierer einzuschätzen, wie gefährlich eine Kreatur bei verschiedenen CRs ist.</p>\n      <ul>\n        <li><strong>DPR Min / Max</strong> — die untere und obere Grenze des erwarteten Schadensausstoßes pro Runde.</li>\n        <li><strong>DPR-Bereich</strong> — ein lesbarer Würfelausdruck (z. B. <code>2d8+4</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Aktionen",
+        "html": "<p>Füge so viele benannte Aktionen hinzu wie nötig. Jede Aktion hat:</p>\n      <ul>\n        <li><strong>Aktionsname</strong> — z. B. \"Multiattack\", \"Bite\".</li>\n        <li><strong>Schaden</strong> — optionaler Würfelausdruck (z. B. <code>2d6+3</code>).</li>\n      </ul>"
+      },
+      {
+        "heading": "Begegnungsdaten",
+        "html": "<p>Diese Felder steuern, wie dein Monster im gefilterten Monster-Pool des Begegnungs-Generators erscheint.</p>\n      <ul>\n        <li><strong>Terrain</strong> — eines oder mehrere von <code>dungeon</code>, <code>wilderness</code>, <code>urban</code>, <code>underwater</code>, <code>planar</code> oder <code>any</code>. Monster mit dem Tag <code>any</code> erscheinen immer. Du kannst mehrere Terrains auswählen.</li>\n        <li><strong>Zugehörigkeit</strong> — die grobe Kategorie der Kreatur: <code>humanoid</code>, <code>beast</code>, <code>undead</code>, <code>construct</code>, <code>dragon</code>, <code>fiend</code>, <code>celestial</code>, <code>fey</code>, <code>monstrosity</code>, <code>giant</code>, <code>elemental</code>, <code>aberration</code>, <code>plant</code> oder <code>any</code>. Wird verwendet, um Vorschläge nach Kreaturenkategorie zu filtern.</li>\n        <li><strong>Gattung</strong> — ein optionales Gruppierungs-Tag (z. B. \"goblinoid\", \"dragon\", \"owlbear\"). Das Autovervollständigungs-Dropdown zeigt alle bereits über SRD- und Homebrew-Monster hinweg verwendeten Gattungen — tippe eine neue ein oder wähle eine vorhandene. Wird vom Begegnungs-Generator verwendet, um thematisch verwandte Kreaturen zu gruppieren.</li>\n      </ul>"
+      },
+      {
+        "heading": "Speicherung & Portabilität",
+        "html": "<ul>\n        <li>Monster werden in der <strong>IndexedDB</strong> deines Browsers gespeichert. Das Löschen von Browserdaten entfernt sie.</li>\n        <li>Verwende <strong>Exportieren</strong>, um deine gesamte Bibliothek als JSON-Datei herunterzuladen. Das ist deine Sicherung.</li>\n        <li>Verwende <strong>Importieren</strong>, um aus einer zuvor exportierten JSON-Datei wiederherzustellen. Doppelte Namen werden übersprungen.</li>\n        <li>Exportierte Dateien können mit anderen Spielleitungen geteilt oder zwischen Geräten übertragen werden.</li>\n      </ul>"
+      },
+      {
+        "heading": "Werkzeugübergreifende Integration",
+        "html": "<ul>\n        <li><strong>Begegnungs-Generator</strong> — Homebrew-Monster erscheinen neben SRD-Kreaturen im gefilterten Monster-Pool, abgeglichen nach CR, Terrain, Zugehörigkeit und Gattung.</li>\n        <li><strong>Monster-Skalierer</strong> — Homebrew-Monster mit einem Statblock können geladen und auf verschiedene CRs skaliert werden.</li>\n      </ul>"
+      }
+    ],
+    "note": "Alle Felder folgen den D&D-5e-Konventionen. Verwende diese Seite als Referenz beim Aufbau deiner Homebrew-Bibliothek."
   }
 }

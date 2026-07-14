@@ -30,11 +30,12 @@ export default function ScalePage() {
 
     const {
         monster, setMonster,
-        edition, setEdition,
         targetCR, setTargetCR,
         scaledMonster,
-        acEquipment, setAcEquipment,
-        acRace, setAcRace,
+        acSource, setAcSource,
+        armorBonus, setArmorBonus,
+        naturalArmor, setNaturalArmor,
+        hasShield, setHasShield,
         abilityBonus,
         catalogSearch, setCatalogSearch,
         saved, setSaved,
@@ -81,7 +82,7 @@ export default function ScalePage() {
 
                     <InfoGrid items={[
                         { label: t("whatScales"), description: t("whatScalesDesc") },
-                        { label: t("rulesetNotes"), description: t("rulesetNotesDesc") },
+                        { label: t("acSourceNotes"), description: t("acSourceNotesDesc") },
                         { label: t("guardrails"), description: t("guardrailsDesc") },
                     ]} />
 
@@ -95,13 +96,7 @@ export default function ScalePage() {
                                 <Input value={monster.type} onChange={(e) => setMonster({ ...monster, type: e.target.value })} placeholder={t("typePlaceholder")} />
                             </FormField>
                         </div>
-                        <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-3">
-                            <FormField label={t("ruleset")}>
-                                <Select value={edition} onChange={(e) => setEdition(e.target.value as "2014" | "2024")}>
-                                    <option value="2014">2014 Ruleset</option>
-                                    <option value="2024">2024 Ruleset</option>
-                                </Select>
-                            </FormField>
+                        <div className="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-2">
                             <FormField label={t("currentCR")}>
                                 <Select data-testid="current-cr" value={monster.cr} onChange={(e) => setMonster({ ...monster, cr: Number(e.target.value) })}>
                                     {CR_VALUES.filter((v) => v >= 0.125).map((cr) => (
@@ -141,12 +136,29 @@ export default function ScalePage() {
 
                     <Card className="p-6">
                         <SectionHeader>{t("defenseAdjustments")}</SectionHeader>
-                        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-                            <FormField label={t("equipmentACBonus")}>
-                                <Input type="number" value={acEquipment} onChange={(e) => setAcEquipment(Number(e.target.value))} />
+                        <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+                            <FormField label={t("acSource")}>
+                                <Select value={acSource} onChange={(e) => setAcSource(e.target.value as typeof acSource)}>
+                                    <option value="dex">{t("acSourceDex")}</option>
+                                    <option value="armor">{t("acSourceArmor")}</option>
+                                    <option value="natural">{t("acSourceNatural")}</option>
+                                </Select>
                             </FormField>
-                            <FormField label={t("naturalArmorBonus")}>
-                                <Input type="number" value={acRace} onChange={(e) => setAcRace(Number(e.target.value))} />
+                            {acSource === "armor" && (
+                                <FormField label={t("armorBonus")}>
+                                    <Input type="number" value={armorBonus} onChange={(e) => setArmorBonus(Number(e.target.value))} />
+                                </FormField>
+                            )}
+                            {acSource === "natural" && (
+                                <FormField label={t("naturalArmorValue")}>
+                                    <Input type="number" value={naturalArmor} onChange={(e) => setNaturalArmor(Number(e.target.value))} />
+                                </FormField>
+                            )}
+                            <FormField label={t("shield")}>
+                                <label className="flex items-center gap-3 cursor-pointer h-full">
+                                    <input type="checkbox" className="ui-checkbox" checked={hasShield} onChange={(e) => setHasShield(e.target.checked)} />
+                                    <span className="text-sm text-muted">{t("shieldHint")}</span>
+                                </label>
                             </FormField>
                         </div>
                         <SubLabel className="mt-8 mb-4">{t("abilityScoreBonuses")}</SubLabel>

@@ -63,10 +63,7 @@ export const StatBlockDisplay = forwardRef<HTMLDivElement, StatBlockDisplayProps
                 <div className="grid gap-3">
                     <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">
                         <span className="font-serif uppercase tracking-widest text-gold/80 text-sm">{l.challengeRating}</span>
-                        <span className="text-lg font-bold">
-                            {formatCR(monster.cr)}
-                            <span className="text-muted text-xs ml-1 font-sans">({monster.edition} Ruleset)</span>
-                        </span>
+                        <span className="text-lg font-bold">{formatCR(monster.cr)}</span>
                     </div>
                     {monster.dpr && (
                         <div className="flex justify-between items-baseline border-b border-gold/20 pb-2">

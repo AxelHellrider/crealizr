@@ -1,7 +1,5 @@
 import type { MonsterBase, MonsterAction } from "@/app/types/monster";
 import { CR_MATRIX, ABILITY_SCORE_MODIFIERS } from "@/app/data/constants";
-import { CR_MATRIX_2024, ABILITY_SCORE_MODIFIERS_2024 } from "@/app/data/constants2024";
-import type { Edition } from "@/app/types/monster";
 import { clamp } from "@/app/lib/number";
 
 function abilityModifier(score: number) {
@@ -47,7 +45,7 @@ function estimateDPR(monster: MonsterBase) {
 /**
  * Maps an ability score to its nearest equivalent at a new CR by shifting the
  * ability modifier by half the CR delta, then snapping to the closest score
- * that actually produces that modifier in the edition's modifier table.
+ * that actually produces that modifier in the modifier table.
  */
 function scaleAbilityScore(base: number, crDiff: number, modifiers: Record<string, readonly number[]>) {
     const mod = abilityModifier(base);
@@ -59,26 +57,56 @@ function scaleAbilityScore(base: number, crDiff: number, modifiers: Record<strin
     return possibleScores.reduce((a, b) => Math.abs(a - base) <= Math.abs(b - base) ? a : b);
 }
 
+/** How a monster's Armor Class is derived, before shield/cover situational bonuses. */
+export type ACSource = "dex" | "armor" | "natural";
+
+const MONSTER_AC_CAP = 30;
+
+/**
+ * Computes final AC from an AC source (Dex-based, equipped armor, or natural
+ * armor) plus an optional shield. Dex-based and natural-armor AC are inherent
+ * to the creature and capped at 30; equipped armor and a held shield are
+ * treated as items and are allowed to push AC past the cap, mirroring how
+ * player-character AC caps at 20 unless gear pushes it higher.
+ */
+function computeAC(
+    source: ACSource,
+    dexMod: number,
+    armorBonus: number,
+    naturalArmor: number,
+    hasShield: boolean,
+): number {
+    const inherent = source === "natural" ? naturalArmor : 10 + dexMod;
+    const cappedInherent = source === "armor" ? 0 : clamp(inherent, 1, MONSTER_AC_CAP);
+    const armorContribution = source === "armor" ? 10 + armorBonus : 0;
+    const shieldContribution = hasShield ? 2 : 0;
+    return cappedInherent + armorContribution + shieldContribution;
+}
+
+export type ScaleOptions = {
+    acSource?: ACSource;
+    armorBonus?: number;
+    naturalArmor?: number;
+    hasShield?: boolean;
+    abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
+};
+
 /**
  * Rescales a monster's stat block from its current CR to `targetCR`, using
- * the edition's CR matrix as the target baseline (HP, AC, attack bonus, save
- * DC, DPR) and preserving the monster's original CR-relative deviation from
- * that baseline rather than overwriting it outright. `_advice` on the result
- * surfaces the intermediate figures (suggested attack bonus/DC, DPR ratios)
- * so the caller can show the DM what changed and why.
+ * the CR matrix as the target baseline (HP, attack bonus, save DC, DPR) and
+ * preserving the monster's original CR-relative deviation from that baseline
+ * rather than overwriting it outright. AC is derived independently from the
+ * chosen AC source (see `computeAC`), not from the matrix. `_advice` on the
+ * result surfaces the intermediate figures (suggested attack bonus/DC, DPR
+ * ratios) so the caller can show the DM what changed and why.
  */
-function scaleMonster(
+export function scaleMonster(
     monster: MonsterBase,
     targetCR: number,
-    edition: Edition,
-    options?: {
-        acEquipment?: number;
-        acRace?: number;
-        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
-    }
+    options?: ScaleOptions,
 ): MonsterBase {
-    const matrix = edition === "2024" ? CR_MATRIX_2024 : CR_MATRIX;
-    const modifiers = edition === "2024" ? ABILITY_SCORE_MODIFIERS_2024 : ABILITY_SCORE_MODIFIERS;
+    const matrix = CR_MATRIX;
+    const modifiers = ABILITY_SCORE_MODIFIERS;
 
     const srcCR = monster.cr ?? 0.125;
     if (srcCR === targetCR) return { ...monster };
@@ -88,12 +116,12 @@ function scaleMonster(
 
     const hasActions = (monster.actions?.length ?? 0) > 0;
     const srcDPR = hasActions ? estimateDPR(monster) : null;
-    const tgtDPR = tgtRow.dpr;
+    const tgtDPRMid = Math.round((tgtRow.dpr.min + tgtRow.dpr.max) / 2);
 
     const finalDPR = {
-        min: Math.max(1, Math.round(tgtDPR * 0.75)),
-        max: Math.max(1, Math.round(tgtDPR * 1.25)),
-        range: `${Math.max(1, Math.round(tgtDPR * 0.75))}–${Math.max(1, Math.round(tgtDPR * 1.25))}`
+        min: tgtRow.dpr.min,
+        max: tgtRow.dpr.max,
+        range: `${tgtRow.dpr.min}–${tgtRow.dpr.max}`,
     };
 
     // Scale HP proportionally: preserve how far above/below this monster sits relative
@@ -102,17 +130,12 @@ function scaleMonster(
     const finalHp = Math.max(1, Math.round(monster.stats.hp * hpScale));
 
     // dprScale is only meaningful when actions were provided; otherwise tgtDPR is shown directly.
-    const dprScale = srcDPR !== null ? tgtDPR / Math.max(1, srcDPR) : null;
+    const dprScale = srcDPR !== null ? tgtDPRMid / Math.max(1, srcDPR) : null;
 
-    const acDiff = tgtRow.ac - monster.stats.ac;
-    let finalAC = clamp(monster.stats.ac + Math.sign(acDiff) * Math.min(2, Math.abs(acDiff)), 5, 30);
-
-    if (options?.acEquipment) finalAC += options.acEquipment;
-    if (options?.acRace) finalAC += options.acRace;
-
-    const newStats: MonsterBase["stats"] = { ...monster.stats, hp: finalHp, ac: finalAC };
     const crDiff = targetCR - srcCR;
     const abilityScores: (keyof Pick<MonsterBase["stats"], "str"|"dex"|"con"|"int"|"wis"|"cha">)[] = ["str","dex","con","int","wis","cha"];
+
+    const newStats: MonsterBase["stats"] = { ...monster.stats, hp: finalHp };
 
     for (const ab of abilityScores) {
         let base: number = monster.stats[ab] as number;
@@ -121,6 +144,15 @@ function scaleMonster(
         base += bonus;
         newStats[ab] = clamp(base, 1, 30) as number;
     }
+
+    const acSource = options?.acSource ?? "dex";
+    newStats.ac = computeAC(
+        acSource,
+        abilityModifier(newStats.dex),
+        options?.armorBonus ?? 0,
+        options?.naturalArmor ?? monster.stats.ac,
+        options?.hasShield ?? false,
+    );
 
     const atkAbilityMod = Math.max(abilityModifier(newStats.str), abilityModifier(newStats.dex));
     const srcAtkMod = Math.max(abilityModifier(monster.stats.str), abilityModifier(monster.stats.dex));
@@ -132,15 +164,14 @@ function scaleMonster(
     const scaled: MonsterBase & { _advice?: Record<string, number | unknown> } = {
         ...monster,
         cr: targetCR,
-        edition,
         stats: newStats,
         dpr: finalDPR,
-        raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled (${edition})`,
+        raw_source_ref: `${monster.raw_source_ref ?? ""} — scaled`,
         _advice: {
             suggestedAttackBonus: finalAttackBonus,
             suggestedSaveDC: finalSaveDC,
             srcDPR,
-            tgtDPR,
+            tgtDPR: tgtDPRMid,
             hpScale,
             ...(dprScale !== null
                 ? { dprScale }
@@ -150,30 +181,4 @@ function scaleMonster(
     };
 
     return scaled;
-}
-
-/** Scales `monster` to `targetCR` using the 2014 SRD CR matrix and ability modifier tables. */
-export function scaleMonster2014(
-    monster: MonsterBase,
-    targetCR: number,
-    options?: {
-        acEquipment?: number;
-        acRace?: number;
-        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
-    }
-): MonsterBase {
-    return scaleMonster(monster, targetCR, "2014", options);
-}
-
-/** Scales `monster` to `targetCR` using the 2024 SRD CR matrix and ability modifier tables. */
-export function scaleMonster2024(
-    monster: MonsterBase,
-    targetCR: number,
-    options?: {
-        acEquipment?: number;
-        acRace?: number;
-        abilityScoreBonus?: Partial<Record<keyof MonsterBase["stats"], number>>;
-    }
-): MonsterBase {
-    return scaleMonster(monster, targetCR, "2024", options);
 }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { Stage, Layer, Line, Group, Text, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
@@ -158,6 +159,7 @@ function RotateHintBanner({ onDismiss }: { onDismiss: () => void }) {
 
 // ── Main component ───────────────────────────────────────────────────────────
 export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyChange, onCoverBenefits, onHazardEffects }: EncounterHexMapProps) {
+    const t = useTranslations("encounterBuilder");
 
     const [size, setSize]               = useState({ width: 320, height: 320 });
     const [mapMode, setMapMode]         = useState<MapMode>("select");
@@ -251,6 +253,16 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     // Request re-centering whenever the encounter or viewport context changes.
     useEffect(() => { shouldCenterRef.current = true; }, [suggestion, partySize, isFullscreen]);
 
+    // Full view reset: mode, camera lock, zoom, and re-centered pan.
+    // (Previously "Esc" only reset mode + camera lock — zoom/pan were left
+    // untouched, so resetting while zoomed/panned away looked like it did nothing.)
+    const resetView = useCallback(() => {
+        setMapMode("select");
+        setCameraLocked(false);
+        setZoom(1);
+        shouldCenterRef.current = true;
+    }, []);
+
     // ── Keyboard shortcuts ───────────────────────────────────────────────────
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
@@ -300,7 +312,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         };
         document.addEventListener("keydown", onKey);
         return () => document.removeEventListener("keydown", onKey);
-    }, []);
+    }, [resetView]);
 
     // ── Derived values ───────────────────────────────────────────────────────
     const armed       = toArmedTool(mapMode);
@@ -311,16 +323,6 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
 
     const zoomIn  = () => setZoom(z => clamp(z * ZOOM_STEP, MIN_ZOOM, MAX_ZOOM));
     const zoomOut = () => setZoom(z => clamp(z / ZOOM_STEP, MIN_ZOOM, MAX_ZOOM));
-
-    // Full view reset: mode, camera lock, zoom, and re-centered pan.
-    // (Previously "Esc" only reset mode + camera lock — zoom/pan were left
-    // untouched, so resetting while zoomed/panned away looked like it did nothing.)
-    const resetView = useCallback(() => {
-        setMapMode("select");
-        setCameraLocked(false);
-        setZoom(1);
-        shouldCenterRef.current = true;
-    }, []);
 
     // ── Content centering ────────────────────────────────────────────────────
     useEffect(() => {
@@ -773,11 +775,11 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
             <div className="flex flex-col flex-1 min-h-0 gap-2">
                 <MapToolbar {...toolbarProps} isFullscreen={false} onFullscreenToggle={() => setIsFullscreen(true)} />
 
-                {/* Normal canvas — hidden (unmounted) while fullscreen is open */}
+                {/* Normal canvas — desktop only. On mobile the canvas only ever opens in fullscreen (below). */}
                 {!isFullscreen && (
                     <div
                         ref={normalContainerRef}
-                        className="relative flex-1 min-h-0 overflow-hidden rounded-sm border border-gold/10 bg-black/10 touch-none"
+                        className="relative flex-1 min-h-0 overflow-hidden rounded-sm border border-gold/10 bg-black/10 touch-none hidden sm:block"
                     >
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
@@ -786,6 +788,20 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                                 Click empty hex to place
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* Mobile prompt — canvas doesn't render inline on small screens, only in fullscreen */}
+                {!isFullscreen && (
+                    <div className="flex-1 min-h-0 rounded-sm border border-gold/10 bg-black/10 flex flex-col items-center justify-center gap-4 p-6 sm:hidden">
+                        <p className="text-xs text-muted text-center max-w-[220px]">{t("openBattlefieldHint")}</p>
+                        <button
+                            type="button"
+                            onClick={() => setIsFullscreen(true)}
+                            className="ui-button min-h-11 px-5 text-xs uppercase tracking-widest"
+                        >
+                            {t("openBattlefield")}
+                        </button>
                     </div>
                 )}
 

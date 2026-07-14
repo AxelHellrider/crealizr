@@ -3,6 +3,7 @@
 import { useReducer, useTransition, useMemo } from "react";
 import { useMergedCatalog } from "@/app/hooks/useMergedCatalog";
 import { scaleMonster, type ScaleOptions } from "@/app/services/scalerService";
+import type { ACSource } from "@/app/utils/scaler";
 import type { MonsterBase, Edition } from "@/app/types/monster";
 
 const DEFAULT_MONSTER: MonsterBase = {
@@ -27,8 +28,10 @@ type State = {
     edition: Edition;
     targetCR: number | null;
     scaledMonster: MonsterBase | null;
-    acEquipment: number;
-    acRace: number;
+    acSource: ACSource;
+    armorBonus: number;
+    naturalArmor: number;
+    hasShield: boolean;
     abilityBonus: AbilityBonus;
     catalogSearch: string;
     saved: boolean;
@@ -39,8 +42,10 @@ const initialState: State = {
     edition: "2014",
     targetCR: null,
     scaledMonster: null,
-    acEquipment: 0,
-    acRace: 0,
+    acSource: "dex",
+    armorBonus: 0,
+    naturalArmor: 10,
+    hasShield: false,
     abilityBonus: {},
     catalogSearch: "",
     saved: false,
@@ -50,8 +55,10 @@ type Action =
     | { type: "SET_MONSTER"; payload: MonsterBase }
     | { type: "SET_EDITION"; payload: Edition }
     | { type: "SET_TARGET_CR"; payload: number | null }
-    | { type: "SET_AC_EQUIPMENT"; payload: number }
-    | { type: "SET_AC_RACE"; payload: number }
+    | { type: "SET_AC_SOURCE"; payload: ACSource }
+    | { type: "SET_ARMOR_BONUS"; payload: number }
+    | { type: "SET_NATURAL_ARMOR"; payload: number }
+    | { type: "SET_HAS_SHIELD"; payload: boolean }
     | { type: "SET_CATALOG_SEARCH"; payload: string }
     | { type: "SET_SAVED"; payload: boolean }
     | { type: "LOAD_FROM_CATALOG"; payload: Partial<MonsterBase> & { edition: Edition } }
@@ -68,10 +75,14 @@ function reducer(state: State, action: Action): State {
             return { ...state, edition: action.payload };
         case "SET_TARGET_CR":
             return { ...state, targetCR: action.payload };
-        case "SET_AC_EQUIPMENT":
-            return { ...state, acEquipment: action.payload };
-        case "SET_AC_RACE":
-            return { ...state, acRace: action.payload };
+        case "SET_AC_SOURCE":
+            return { ...state, acSource: action.payload };
+        case "SET_ARMOR_BONUS":
+            return { ...state, armorBonus: action.payload };
+        case "SET_NATURAL_ARMOR":
+            return { ...state, naturalArmor: action.payload };
+        case "SET_HAS_SHIELD":
+            return { ...state, hasShield: action.payload };
         case "SET_CATALOG_SEARCH":
             return { ...state, catalogSearch: action.payload };
         case "SET_SAVED":
@@ -114,7 +125,7 @@ export function useMonsterScaler() {
     const [state, dispatch] = useReducer(reducer, initialState);
     const {
         monster, edition, targetCR, scaledMonster,
-        acEquipment, acRace, abilityBonus, catalogSearch, saved,
+        acSource, armorBonus, naturalArmor, hasShield, abilityBonus, catalogSearch, saved,
     } = state;
 
     const allMonsters = useMemo(() => {
@@ -163,8 +174,7 @@ export function useMonsterScaler() {
             const result = scaleMonster(
                 { ...monster, edition },
                 targetCR,
-                edition,
-                { acEquipment, acRace, abilityScoreBonus: abilityBonus },
+                { acSource, armorBonus, naturalArmor, hasShield, abilityScoreBonus: abilityBonus },
             );
             dispatch({ type: "SCALE_RESULT", payload: result });
         });
@@ -177,8 +187,10 @@ export function useMonsterScaler() {
         edition, setEdition: (payload: Edition) => dispatch({ type: "SET_EDITION", payload }),
         targetCR, setTargetCR: (payload: number | null) => dispatch({ type: "SET_TARGET_CR", payload }),
         scaledMonster,
-        acEquipment, setAcEquipment: (payload: number) => dispatch({ type: "SET_AC_EQUIPMENT", payload }),
-        acRace, setAcRace: (payload: number) => dispatch({ type: "SET_AC_RACE", payload }),
+        acSource, setAcSource: (payload: ACSource) => dispatch({ type: "SET_AC_SOURCE", payload }),
+        armorBonus, setArmorBonus: (payload: number) => dispatch({ type: "SET_ARMOR_BONUS", payload }),
+        naturalArmor, setNaturalArmor: (payload: number) => dispatch({ type: "SET_NATURAL_ARMOR", payload }),
+        hasShield, setHasShield: (payload: boolean) => dispatch({ type: "SET_HAS_SHIELD", payload }),
         abilityBonus,
         catalogSearch, setCatalogSearch: (payload: string) => dispatch({ type: "SET_CATALOG_SEARCH", payload }),
         saved, setSaved: (payload: boolean) => dispatch({ type: "SET_SAVED", payload }),
