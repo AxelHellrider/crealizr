@@ -98,20 +98,30 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                         type="button"
                         onClick={goPrev}
                         aria-label="Previous slide"
-                        className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 border border-gold/20 bg-background/40 text-gold/70 hover:text-gold hover:border-gold/50 transition-colors"
+                        className="group absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center text-gold/50 hover:text-gold transition-colors duration-300 focus-visible:outline-none focus-visible:text-gold"
+                        style={{ filter: "drop-shadow(0 0 6px rgba(197,160,89,0.25))" }}
                     >
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M15 18l-6-6 6-6" />
+                        <svg
+                            viewBox="0 0 40 40" width="32" height="32" className="sm:w-10 sm:h-10 transition-transform duration-300 group-hover:-translate-x-1.5"
+                            fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+                        >
+                            <path d="M26 8 L14 20 L26 32" />
+                            <path d="M14 20 Q22 20 32 20" strokeWidth="0.75" opacity="0.5" />
                         </svg>
                     </button>
                     <button
                         type="button"
                         onClick={goNext}
                         aria-label="Next slide"
-                        className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 border border-gold/20 bg-background/40 text-gold/70 hover:text-gold hover:border-gold/50 transition-colors"
+                        className="group absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center text-gold/50 hover:text-gold transition-colors duration-300 focus-visible:outline-none focus-visible:text-gold"
+                        style={{ filter: "drop-shadow(0 0 6px rgba(197,160,89,0.25))" }}
                     >
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M9 18l6-6-6-6" />
+                        <svg
+                            viewBox="0 0 40 40" width="32" height="32" className="sm:w-10 sm:h-10 transition-transform duration-300 group-hover:translate-x-1.5"
+                            fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+                        >
+                            <path d="M14 8 L26 20 L14 32" />
+                            <path d="M26 20 Q18 20 8 20" strokeWidth="0.75" opacity="0.5" />
                         </svg>
                     </button>
                 </>

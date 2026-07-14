@@ -63,9 +63,18 @@
   --color-special: var(--accent-special);
 
   /* Typography */
-  --font-serif: var(--font-alegreya-sc);
+  --font-serif: var(--font-cinzel);
   --font-sans:  var(--font-geist-sans);
   --font-mono:  var(--font-geist-mono);
+}
+
+/* Cinzel (Latin-only) can't render Greek/Cyrillic — swap the serif heading
+ * font for those locales. See src/app/[locale]/layout.tsx. */
+body.font-serif-ru {
+  --font-serif: var(--font-yeseva-one), serif;
+}
+body.font-serif-el {
+  --font-serif: var(--font-gentium-plus), serif;
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────── */
