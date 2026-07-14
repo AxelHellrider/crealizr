@@ -34,3 +34,8 @@ CRealizr is a D&D dungeon master toolkit built with Next.js 16, React 19, and Ty
 - Framer Motion for animations
 - Vitest for testing (node environment, tests in `tests/`)
 - Node >=20 <=22.x required
+
+## Git Workflow
+
+- **Branch naming**: any branch cut from `main` is named `DND-<4-digit number>-<short-slug>` (e.g. `DND-0015-fix-mobile-safe-area`). The number increments per branch ever created off `main` — find the next one with `git branch -a | grep -oE "DND-[0-9]{4}" | sort -u | tail -1`.
+- **Merging to `origin/main`**: always run `npm run release` first (bumps `package.json`'s version, commits `chore(release): vX.Y.Z`, and tags it — see `scripts/release.js`), *then* push the branch/commits and the new tag (`git push && git push origin vX.Y.Z`). Never push commits ahead of running the release step.
