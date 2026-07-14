@@ -72,7 +72,11 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             onFocus={() => setPaused(true)}
             onBlur={() => setPaused(false)}
         >
-            <AnimatePresence mode="wait">
+            {/* initial={false}: skip the enter transition for the slide present on mount, so
+                the hero (the page's LCP element) is visible in the very first paint instead of
+                sitting at opacity:0 until framer-motion hydrates and animates it in. Slide
+                changes after mount still animate normally. */}
+            <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                     key={index}
                     className="absolute inset-0 flex flex-col items-center justify-center"

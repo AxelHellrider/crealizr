@@ -36,11 +36,17 @@ const cinzel = Cinzel({
 
 // Cinzel is Latin-only. Greek and Cyrillic get their own display serif —
 // see the `--font-serif` overrides in globals.css and SERIF_OVERRIDE_LOCALES
-// below.
+// below. `next/font` emits a <link rel="preload"> for every font it loads
+// regardless of whether it ends up used on the page, so preloading all three
+// unconditionally would force every visitor (majority Latin-locale traffic
+// included) to eagerly fetch two serif fonts they'll never render — a real
+// hit to LCP. Only Cinzel (the default, used by 4 of 6 locales) preloads;
+// the minority-locale fonts still load, just without jumping the queue.
 const yesevaOne = Yeseva_One({
     weight: "400",
     variable: "--font-yeseva-one",
     subsets: ["latin", "cyrillic"],
+    preload: false,
 });
 
 const gentiumPlus = Gentium_Plus({
@@ -48,6 +54,7 @@ const gentiumPlus = Gentium_Plus({
     style: ["normal", "italic"],
     variable: "--font-gentium-plus",
     subsets: ["latin", "greek"],
+    preload: false,
 });
 
 /** Locale -> the CSS class that overrides `--font-serif` for it (see globals.css). Latin-script locales use Cinzel, no class needed. */
