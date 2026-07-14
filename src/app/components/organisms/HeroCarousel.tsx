@@ -15,7 +15,7 @@ export type HeroSlide = {
     preview?: React.ReactNode;
 };
 
-const AUTO_ADVANCE_MS = 4000;
+const AUTO_ADVANCE_MS = 6000;
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     const [index, setIndex] = useState(0);
@@ -27,6 +27,14 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     );
 
     const advance = useCallback(() => {
+        setIndex((i) => (i + 1) % slides.length);
+    }, [slides.length]);
+
+    const goPrev = useCallback(() => {
+        setIndex((i) => (i - 1 + slides.length) % slides.length);
+    }, [slides.length]);
+
+    const goNext = useCallback(() => {
         setIndex((i) => (i + 1) % slides.length);
     }, [slides.length]);
 
@@ -83,6 +91,31 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     ) : body}
                 </motion.div>
             </AnimatePresence>
+
+            {slides.length > 1 && (
+                <>
+                    <button
+                        type="button"
+                        onClick={goPrev}
+                        aria-label="Previous slide"
+                        className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 border border-gold/20 bg-background/40 text-gold/70 hover:text-gold hover:border-gold/50 transition-colors"
+                    >
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        aria-label="Next slide"
+                        className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 border border-gold/20 bg-background/40 text-gold/70 hover:text-gold hover:border-gold/50 transition-colors"
+                    >
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M9 18l6-6-6-6" />
+                        </svg>
+                    </button>
+                </>
+            )}
 
             {/* Slide indicators — flat segments, single crimson accent for the active slide */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">

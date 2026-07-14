@@ -110,7 +110,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
           <span className="text-[10px] uppercase tracking-[0.25em] text-silver/60 font-bold text-center">
             {t("home.reliability.point3.title")}
           </span>
-          <span className="text-silver/30" aria-hidden="true">|</span>
+          <span className="hidden sm:inline text-silver/30" aria-hidden="true">|</span>
           <span className="text-[10px] uppercase tracking-[0.25em] text-silver/60 font-bold text-center">
             {t("home.hero.rulesetNote")}
           </span>
@@ -222,7 +222,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
                       <span className="font-bold text-lg accent-gold">{m.count}</span>
                       <span className="text-muted mx-1 font-sans italic text-sm">&times;</span>
                       <span className="text-foreground text-base">CR {formatCR(m.cr)}</span>
-                      {i < encounterSample.members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
+                      {i < encounterSample.members.length - 1 && <span className="hidden sm:inline text-gold/30 mx-2">|</span>}
                     </span>
                   ))}
                 </div>

@@ -1,6 +1,6 @@
 import type {Metadata, Viewport} from "next";
 import { buildHreflang } from "@/app/lib/seo";
-import {Geist, Geist_Mono, Cinzel} from "next/font/google";
+import {Geist, Geist_Mono, Alegreya_SC} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import "../globals.css";
@@ -29,8 +29,10 @@ import {Locale} from "@/i18n/config";
 import MainContent from "@/app/components/organisms/MainContent";
 import SidebarToggle from "@/app/components/atoms/SidebarToggle";
 
-const cinzel = Cinzel({
-    variable: "--font-cinzel",
+const alegreyaSC = Alegreya_SC({
+    weight: ["400", "500", "700"],
+    style: ["normal", "italic"],
+    variable: "--font-alegreya-sc",
     subsets: ["latin"],
 });
 
@@ -131,7 +133,7 @@ export default async function LocaleLayout({
             '--border-glass':    'rgba(197, 160, 89, 0.15)',
         } as React.CSSProperties}>
         <body
-            className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
+            className={`${geistSans.variable} ${geistMono.variable} ${alegreyaSC.variable} antialiased overscroll-contain`}>
         <ConsentDefault/>
         <ConsentedGTM/>
         <SerwistProvider swUrl="/sw.js/sw.js" register={process.env.NODE_ENV === "production"} reloadOnOnline={false}>

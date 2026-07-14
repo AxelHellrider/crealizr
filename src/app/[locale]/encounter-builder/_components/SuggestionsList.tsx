@@ -64,7 +64,7 @@ export function SuggestionsList({ suggestions, mode, selectedIdx, useXP, budgetS
                                                 <span className="text-muted mx-1 font-sans italic text-sm">&times;</span>
                                                 <span className="text-foreground text-sm">CR {formatCR(m.cr)}</span>
                                                 {m.label && <span className="text-muted text-[10px] ml-0.5">({m.label})</span>}
-                                                {idx < members.length - 1 && <span className="text-gold/30 mx-1.5">|</span>}
+                                                {idx < members.length - 1 && <span className="hidden sm:inline text-gold/30 mx-1.5">|</span>}
                                             </span>
                                         ))}
                                     </div>

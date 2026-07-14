@@ -63,7 +63,7 @@
   --color-special: var(--accent-special);
 
   /* Typography */
-  --font-serif: var(--font-cinzel);
+  --font-serif: var(--font-alegreya-sc);
   --font-sans:  var(--font-geist-sans);
   --font-mono:  var(--font-geist-mono);
 }
