@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { TRAVEL_ENCOUNTER_TABLES } from "@/app/utils/travelEncounter";
 import { Select } from "@/app/components/atoms/Select";
@@ -9,6 +10,7 @@ import { FormField } from "@/app/components/molecules/FormField";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { useTravelEncounters, TERRAINS, type EncounterType } from "@/app/hooks/useTravelEncounters";
+import { DiceRoll } from "./_components/DiceRoll";
 
 export default function EncountersEnRoutePage() {
     const t = useTranslations("travelEncounters");
@@ -23,6 +25,13 @@ export default function EncountersEnRoutePage() {
         roll,
         builderParams,
     } = useTravelEncounters();
+
+    const [isRolling, setIsRolling] = useState(false);
+    const handleRoll = () => {
+        if (isRolling) return;
+        roll();
+        setIsRolling(true);
+    };
 
     return (
         <PageSection>
@@ -48,13 +57,19 @@ export default function EncountersEnRoutePage() {
                 </FormField>
             </div>
 
-            <Button data-testid="roll-btn" onClick={roll} variant="primary" className="w-full py-4 text-xl font-serif tracking-widest uppercase">
+            <Button data-testid="roll-btn" onClick={handleRoll} disabled={isRolling} variant="primary" className="w-full py-4 text-xl font-serif tracking-widest uppercase">
                 {t("rollForEncounter")}
             </Button>
 
             <div id="sr-announcer" className="sr-only" aria-live="polite"></div>
 
-            {result?.outcome && (
+            {result && (
+                <div className="flex justify-center py-2">
+                    <DiceRoll value={result.roll} rolling={isRolling} onSettle={() => setIsRolling(false)} label={t("roll")} />
+                </div>
+            )}
+
+            {result?.outcome && !isRolling && (
                 <Card className="p-8 border-gold/10">
                     <div className="flex justify-between items-center border-b border-gold/20 pb-4 mb-4">
                         <div className="flex items-center gap-3">
@@ -67,9 +82,6 @@ export default function EncountersEnRoutePage() {
                             }`}>
                                 {result.outcome.type}
                             </span>
-                        </div>
-                        <div className="text-sm font-medium uppercase tracking-widest">
-                            {t("roll")}: <span className="accent-gold font-bold">{result.roll}</span>
                         </div>
                     </div>
                     <p className="text-[10px] uppercase tracking-widest text-muted/60 mb-1">

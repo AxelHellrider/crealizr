@@ -15,7 +15,7 @@ export type HeroSlide = {
     preview?: React.ReactNode;
 };
 
-const AUTO_ADVANCE_MS = 4000;
+const AUTO_ADVANCE_MS = 6000;
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     const [index, setIndex] = useState(0);
@@ -27,6 +27,14 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     );
 
     const advance = useCallback(() => {
+        setIndex((i) => (i + 1) % slides.length);
+    }, [slides.length]);
+
+    const goPrev = useCallback(() => {
+        setIndex((i) => (i - 1 + slides.length) % slides.length);
+    }, [slides.length]);
+
+    const goNext = useCallback(() => {
         setIndex((i) => (i + 1) % slides.length);
     }, [slides.length]);
 
@@ -83,6 +91,41 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     ) : body}
                 </motion.div>
             </AnimatePresence>
+
+            {slides.length > 1 && (
+                <>
+                    <button
+                        type="button"
+                        onClick={goPrev}
+                        aria-label="Previous slide"
+                        className="group absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center text-gold/50 hover:text-gold transition-colors duration-300 focus-visible:outline-none focus-visible:text-gold"
+                        style={{ filter: "drop-shadow(0 0 6px rgba(197,160,89,0.25))" }}
+                    >
+                        <svg
+                            viewBox="0 0 40 40" width="32" height="32" className="sm:w-10 sm:h-10 transition-transform duration-300 group-hover:-translate-x-1.5"
+                            fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+                        >
+                            <path d="M26 8 L14 20 L26 32" />
+                            <path d="M14 20 Q22 20 32 20" strokeWidth="0.75" opacity="0.5" />
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goNext}
+                        aria-label="Next slide"
+                        className="group absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center text-gold/50 hover:text-gold transition-colors duration-300 focus-visible:outline-none focus-visible:text-gold"
+                        style={{ filter: "drop-shadow(0 0 6px rgba(197,160,89,0.25))" }}
+                    >
+                        <svg
+                            viewBox="0 0 40 40" width="32" height="32" className="sm:w-10 sm:h-10 transition-transform duration-300 group-hover:translate-x-1.5"
+                            fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+                        >
+                            <path d="M14 8 L26 20 L14 32" />
+                            <path d="M26 20 Q18 20 8 20" strokeWidth="0.75" opacity="0.5" />
+                        </svg>
+                    </button>
+                </>
+            )}
 
             {/* Slide indicators — flat segments, single crimson accent for the active slide */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">

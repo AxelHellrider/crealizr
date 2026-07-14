@@ -1,6 +1,6 @@
 import type {Metadata, Viewport} from "next";
 import { buildHreflang } from "@/app/lib/seo";
-import {Geist, Geist_Mono, Cinzel} from "next/font/google";
+import {Geist, Geist_Mono, Cinzel, Yeseva_One, Gentium_Plus} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import "../globals.css";
@@ -33,6 +33,28 @@ const cinzel = Cinzel({
     variable: "--font-cinzel",
     subsets: ["latin"],
 });
+
+// Cinzel is Latin-only. Greek and Cyrillic get their own display serif —
+// see the `--font-serif` overrides in globals.css and SERIF_OVERRIDE_LOCALES
+// below.
+const yesevaOne = Yeseva_One({
+    weight: "400",
+    variable: "--font-yeseva-one",
+    subsets: ["latin", "cyrillic"],
+});
+
+const gentiumPlus = Gentium_Plus({
+    weight: ["400", "700"],
+    style: ["normal", "italic"],
+    variable: "--font-gentium-plus",
+    subsets: ["latin", "greek"],
+});
+
+/** Locale -> the CSS class that overrides `--font-serif` for it (see globals.css). Latin-script locales use Cinzel, no class needed. */
+const SERIF_OVERRIDE_LOCALES: Record<string, string> = {
+    ru: "font-serif-ru",
+    el: "font-serif-el",
+};
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -131,7 +153,7 @@ export default async function LocaleLayout({
             '--border-glass':    'rgba(197, 160, 89, 0.15)',
         } as React.CSSProperties}>
         <body
-            className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} antialiased overscroll-contain`}>
+            className={`${geistSans.variable} ${geistMono.variable} ${cinzel.variable} ${yesevaOne.variable} ${gentiumPlus.variable} antialiased overscroll-contain ${SERIF_OVERRIDE_LOCALES[locale] ?? ""}`}>
         <ConsentDefault/>
         <ConsentedGTM/>
         <SerwistProvider swUrl="/sw.js/sw.js" register={process.env.NODE_ENV === "production"} reloadOnOnline={false}>

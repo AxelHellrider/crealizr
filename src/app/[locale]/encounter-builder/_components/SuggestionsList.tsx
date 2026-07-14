@@ -4,6 +4,7 @@ import type { GroupSuggestion, BossMinionSuggestion, EncounterMode } from "@/eng
 import { Card } from "@/app/components/atoms/Card";
 import { BudgetBar } from "./BudgetBar";
 import { formatCR } from "@/app/lib/format";
+import { IconMyBestiary } from "@/app/components/atoms/ToolIcons";
 
 type BudgetStatus = { label: string; color: string };
 
@@ -64,7 +65,7 @@ export function SuggestionsList({ suggestions, mode, selectedIdx, useXP, budgetS
                                                 <span className="text-muted mx-1 font-sans italic text-sm">&times;</span>
                                                 <span className="text-foreground text-sm">CR {formatCR(m.cr)}</span>
                                                 {m.label && <span className="text-muted text-[10px] ml-0.5">({m.label})</span>}
-                                                {idx < members.length - 1 && <span className="text-gold/30 mx-1.5">|</span>}
+                                                {idx < members.length - 1 && <span className="hidden sm:inline text-gold/30 mx-1.5">|</span>}
                                             </span>
                                         ))}
                                     </div>
@@ -77,10 +78,11 @@ export function SuggestionsList({ suggestions, mode, selectedIdx, useXP, budgetS
                                         <button
                                             type="button"
                                             onClick={(e) => { e.stopPropagation(); onExpand(i); }}
-                                            className="text-[10px] text-background font-bold uppercase tracking-widest px-2 py-1 bg-gold/70 hover:bg-gold transition-colors rounded-sm"
+                                            className="flex items-center justify-center text-background p-1.5 bg-gold/70 hover:bg-gold transition-colors rounded-sm"
                                             aria-label="View monster options"
+                                            title="Check monsters"
                                         >
-                                            Check Monsters
+                                            <IconMyBestiary className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>

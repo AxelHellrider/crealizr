@@ -66,7 +66,7 @@ export function EncounterModal({
                                     <span className="text-muted mx-1 font-sans italic">&times;</span>
                                     <span className="text-foreground text-lg">CR {formatCR(m.cr)}</span>
                                     {m.label && <span className="text-muted text-xs ml-1">({m.label})</span>}
-                                    {idx < members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
+                                    {idx < members.length - 1 && <span className="hidden sm:inline text-gold/30 mx-2">|</span>}
                                 </span>
                             ))}
                         </div>
