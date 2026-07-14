@@ -7,22 +7,23 @@ import { Stage, Layer, Line, Group, Text, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { useMapFullscreen } from "@/app/context/MapFullscreenContext";
-import { MapToolbar, type MapMode } from "./MapToolbar";
+import { MapToolbar } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
+import { MarqueeBox, type Marquee } from "./MarqueeBox";
+import { RotateHintBanner, ROTATE_HINT_KEY } from "./RotateHintBanner";
 import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
-import type { GroupSuggestion, BossMinionSuggestion, Ruleset } from "@/engine/encounter";
+import type { GroupSuggestion, BossMinionSuggestion, Ruleset, EncounterMode } from "@/engine/encounter";
 import {
     R, W, ROW_H, SX, SY, HORIZ_GRID_W, VERT_GRID_W, CELL_BUFFER, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP,
     HEX_OUTLINE, HEX_FILL, HEX_SELECT, HEX_AOE,
-    hexCenter, hexDistance, hexesInRadius, hexesInCone, hexesInLine, hexDirectionLabel, nearestCoord,
+    hexCenter, hexDistance, nearestCoord,
 } from "@/engine/encounter";
-import type { EncounterNode, GridCoord, HazardNode, HazardSource, CoverNode, PartyNode, EnemyNode, CoverLevel, CoverBenefit, HazardEffect } from "@/app/types/encounterLayout";
-import type { ArmedTool } from "./GridToolbar";
-import { formatCR } from "@/app/lib/format";
+import type {
+    EncounterNode, GridCoord, HazardNode, HazardSource, CoverNode, PartyNode, EnemyNode, CoverLevel, CoverBenefit, HazardEffect,
+    MapMode,
+} from "@/app/types/encounterLayout";
+import { conditionAbbrs, toArmedTool, nodeStyle, nodeLabel, nodeSettingsSummary, hazardAoEHexes } from "@/app/utils/encounterNodeDisplay";
 import { clamp } from "@/app/lib/number";
-import { getConditions } from "@/app/data/conditions";
-
-type EncounterMode = "solo" | "group";
 
 interface EncounterHexMapProps {
     partySize: number;
@@ -32,129 +33,6 @@ interface EncounterHexMapProps {
     onPartyChange?: (newSize: number) => void;
     onCoverBenefits?: (benefits: CoverBenefit[]) => void;
     onHazardEffects?: (effects: HazardEffect[]) => void;
-}
-
-function conditionAbbrs(node: EncounterNode, ruleset: Ruleset): string {
-    if (node.kind !== "party" && node.kind !== "enemy") return "";
-    if (!node.conditions?.length) return "";
-    const defs = getConditions(ruleset);
-    return node.conditions
-        .map(id => defs.find(c => c.id === id)?.abbr)
-        .filter(Boolean)
-        .join(" · ");
-}
-
-function toArmedTool(mode: MapMode): ArmedTool {
-    if (mode === "place-hazard-env")  return { kind: "hazard", source: "environment" };
-    if (mode === "place-hazard-spell") return { kind: "hazard", source: "spell" };
-    if (mode === "place-cover")        return { kind: "cover" };
-    return null;
-}
-
-function nodeStyle(node: EncounterNode) {
-    switch (node.kind) {
-        case "party":   return { fill: "rgba(52,211,153,0.08)",  stroke: "rgba(52,211,153,0.48)",  strokeWidth: 1.5, opacity: 1 };
-        case "enemy":   return node.isBoss
-            ? { fill: "rgba(220,38,38,0.11)",  stroke: "rgba(220,38,38,0.52)",  strokeWidth: 2,   opacity: 1 }
-            : { fill: "rgba(197,160,89,0.07)", stroke: "rgba(197,160,89,0.38)", strokeWidth: 1.5, opacity: 1 };
-        case "hazard":  return node.source === "spell"
-            ? { fill: "rgba(168,85,247,0.14)", stroke: "rgba(168,85,247,0.55)", strokeWidth: 1.5, opacity: 1 }
-            : { fill: "rgba(217,119,6,0.14)",  stroke: "rgba(217,119,6,0.55)",  strokeWidth: 1.5, opacity: 1 };
-        case "cover": {
-            const opacity = node.coverLevel === "full" ? 1 : node.coverLevel === "three-quarter" ? 0.80 : 0.58;
-            return { fill: "rgba(56,189,248,0.28)", stroke: "rgba(56,189,248,0.95)", strokeWidth: 2, opacity };
-        }
-    }
-}
-
-function nodeLabel(node: EncounterNode): string {
-    switch (node.kind) {
-        case "party":  return node.label || "PC";
-        case "enemy":  return node.label || (node.isBoss ? "Boss" : "Monster");
-        case "hazard": return node.label || (node.source === "spell" ? "Spell" : "Hazard");
-        case "cover":  return node.label || "Cover";
-    }
-}
-
-/** One-line summary of a node's current settings, shown on hover. */
-function nodeSettingsSummary(node: EncounterNode, ruleset: Ruleset): string {
-    switch (node.kind) {
-        case "party": {
-            const defs = getConditions(ruleset);
-            const names = (node.conditions ?? []).map(id => defs.find(c => c.id === id)?.name).filter(Boolean);
-            return names.length ? names.join(", ") : "No conditions";
-        }
-        case "enemy": {
-            const defs = getConditions(ruleset);
-            const names = (node.conditions ?? []).map(id => defs.find(c => c.id === id)?.name).filter(Boolean);
-            const conditionsText = names.length ? names.join(", ") : "No conditions";
-            return `CR ${formatCR(node.cr)}${node.isBoss ? " · Boss" : ""} · ${conditionsText}`;
-        }
-        case "cover": {
-            const levels: Record<string, string> = { half: "Half Cover", "three-quarter": "Three-Quarters Cover", full: "Full Cover" };
-            return levels[node.coverLevel];
-        }
-        case "hazard": {
-            const parts = [node.source === "spell" ? "Spell hazard" : "Environmental hazard"];
-            if (node.aoeRadius <= 0) {
-                parts.push("No AoE");
-            } else if (node.aoeShape === "cone" && node.source === "spell") {
-                parts.push(`Cone · ${hexDirectionLabel(node.aoeDirection ?? 0)}`);
-            } else if (node.aoeShape === "line" && node.source === "spell") {
-                parts.push(`Line · ${hexDirectionLabel(node.aoeDirection ?? 0)}`);
-            } else {
-                parts.push(`Radius ${node.aoeRadius}`);
-            }
-            return parts.join(" · ");
-        }
-    }
-}
-
-/** Hexes covered by a hazard's area of effect, per its 5e AoE template — Sphere/Cube/Cylinder ("burst", radiates from origin), Cone, or Line. */
-function hazardAoEHexes(hazard: HazardNode): GridCoord[] {
-    const { col, row } = hazard.coord;
-    const shape = hazard.aoeShape ?? "burst";
-    const direction = hazard.aoeDirection ?? 0;
-    switch (shape) {
-        case "cone": return hexesInCone(col, row, hazard.aoeRadius, direction);
-        case "line": return hexesInLine(col, row, hazard.aoeRadius, direction);
-        default:     return hexesInRadius(col, row, hazard.aoeRadius);
-    }
-}
-
-// ── Marquee selection box overlay ────────────────────────────────────────────
-function MarqueeBox({ marquee }: { marquee: { x0: number; y0: number; x1: number; y1: number } }) {
-    const left   = Math.min(marquee.x0, marquee.x1);
-    const top    = Math.min(marquee.y0, marquee.y1);
-    const width  = Math.abs(marquee.x1 - marquee.x0);
-    const height = Math.abs(marquee.y1 - marquee.y0);
-    return (
-        <div
-            className="absolute pointer-events-none border border-gold/70 bg-gold/10"
-            style={{ left, top, width, height }}
-        />
-    );
-}
-
-const ROTATE_HINT_KEY = "hexmap-rotate-hint-dismissed";
-
-// ── Rotate-phone suggestion banner (mobile portrait, fullscreen only) ──────
-function RotateHintBanner({ onDismiss }: { onDismiss: () => void }) {
-    return (
-        <div className="absolute top-2 left-2 right-2 z-10 flex items-center gap-3 border border-gold/30 bg-card px-3 py-2 sm:hidden">
-            <span className="text-lg leading-none text-gold" aria-hidden="true">⟳</span>
-            <p className="flex-1 text-[11px] text-muted leading-snug">
-                Rotate your device for a better view of the battlefield.
-            </p>
-            <button
-                type="button"
-                onClick={onDismiss}
-                className="text-[10px] uppercase tracking-widest text-muted/70 hover:text-gold transition-colors shrink-0"
-            >
-                Got it
-            </button>
-        </div>
-    );
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -190,7 +68,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const resizeObserver  = useRef<ResizeObserver | null>(null);
 
     // Marquee (rubber-band) multiselect — drag with Shift held over empty canvas.
-    const [marquee, setMarquee] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
+    const [marquee, setMarquee] = useState<Marquee | null>(null);
 
     // Hover tooltip — desktop-only affordance to preview a node's current settings without opening the editor.
     const [hoveredNode, setHoveredNode] = useState<{ node: EncounterNode; x: number; y: number } | null>(null);

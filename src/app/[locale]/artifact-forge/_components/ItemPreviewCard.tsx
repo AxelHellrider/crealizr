@@ -6,30 +6,10 @@ import { Card, CardContent } from "@/app/components/atoms/Card";
 import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { StatRow } from "@/app/components/molecules/StatRow";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
-
-// Mirrors the shape returned by buildItem()
-interface BuiltItem {
-    name: string;
-    type: string;
-    rarity: string;
-    levelTuned: number;
-    attunement: boolean;
-    targetTags: string[];
-    craftingCost?: number;
-    craftingTime?: number;
-    craftingTimeUnit?: string;
-    craftingRequirement?: string;
-    lore?: string;
-    notes?: string;
-    ingredients: { name: string; quantity: number; unit?: string }[];
-    bonusToHit?: number;
-    bonusAC?: number;
-    bonusSaveDC?: number;
-    avgDamageBonus?: number;
-}
+import type { ItemBlueprint } from "@/app/types/item";
 
 interface ItemPreviewCardProps {
-    item: BuiltItem;
+    item: ItemBlueprint;
 }
 
 export const ItemPreviewCard = forwardRef<HTMLDivElement, ItemPreviewCardProps>(

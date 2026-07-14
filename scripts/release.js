@@ -7,18 +7,22 @@
  *   - anything else (fix, bugfix, refactor, chore…) -> patch
  * Highest-precedence bump wins.
  *
- * Locally (`npm run release`), the range scanned is every commit since the
- * last "chore(release): vX.Y.Z" commit, then the bump is committed and
- * tagged so the base version in git actually advances.
+ * This ONLY runs locally, via `npm run release`: it scans every commit
+ * since the last "chore(release): vX.Y.Z" commit, bumps package.json, then
+ * commits and tags — so the version in git actually advances, permanently.
  *
- * On CI/deploy hosts, only the single HEAD commit is classified and bumped
- * once on top of whatever version is already committed in package.json —
- * deliberately not a git-log range. Deploy hosts commonly do a shallow
- * clone, where neither `git describe --tags` nor `git log --grep` across
- * history can see far enough back; relying on either re-derives the bump
- * from scratch every build and can never advance past one step from the
- * hardcoded base. HEAD's message is the one thing guaranteed present even
- * at clone depth 1, so that's the only thing CI trusts.
+ * Deploy hosts (Hostinger, Vercel, etc.) never bump anything. Earlier
+ * versions of this script tried to guess a bump on the deploy host itself,
+ * writing an uncommitted version to package.json during the build. That
+ * depends on git history being available to find the last release, but
+ * Hostinger's deploy does a shallow clone (depth 1) — only HEAD is ever
+ * visible, so "since the last release" can't be computed there, and
+ * bumping from HEAD alone every build can never advance past one step
+ * from whatever's actually committed (the guess is never saved back). The
+ * production version was getting stuck / bumping the wrong amount because
+ * of this. The fix is to not guess on the deploy host at all: package.json
+ * already has the correct version once you've run `npm run release` and
+ * pushed — the deploy build just needs to leave it alone.
  *
  * Usage: node scripts/release.js [--dry-run]
  */
@@ -27,19 +31,9 @@ const fs = require("fs");
 const path = require("path");
 
 const dryRun = process.argv.includes("--dry-run");
-// On CI/deploy platforms (Vercel, generic CI) we only want the version bump
-// baked into the build output — there's no point (and often no permission)
-// to commit/tag from an ephemeral, detached-HEAD checkout.
+// On CI/deploy platforms (Vercel, Hostinger, generic CI) there's nothing to
+// do here — see the module doc comment above for why.
 const isCI = Boolean(process.env.CI || process.env.VERCEL || process.env.NODE_ENV === "production");
-// "build" runs this via the `prebuild` hook on every local build too — only
-// auto-bump there when we're actually on a CI/deploy platform. A dev running
-// `npm run build` locally to sanity-check a production build shouldn't get
-// a surprise commit; `npm run release` (this same script, run directly)
-// still works locally regardless of lifecycle event.
-if (process.env.npm_lifecycle_event === "prebuild" && !isCI) {
-    console.log("Skipping auto-release: local build (not CI). Run `npm run release` manually when ready.");
-    process.exit(0);
-}
 const pkgPath = path.join(__dirname, "..", "package.json");
 
 function sh(cmd) {
@@ -77,30 +71,6 @@ function bumpVersion(version, level) {
     return `${major}.${minor}.${patch + 1}`;
 }
 
-function mainCI() {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-    let head;
-    try {
-        head = sh("git log -1 --format=%s");
-    } catch {
-        console.log("Could not read HEAD commit — leaving version as-is.");
-        return;
-    }
-
-    const level = classify([head]) ?? "patch";
-    const nextVersion = bumpVersion(pkg.version, level);
-    console.log(`${pkg.version} -> v${nextVersion}  [${level} bump, from HEAD: "${head}"]`);
-
-    if (dryRun) {
-        console.log("\nDry run — no files changed.");
-        return;
-    }
-
-    pkg.version = nextVersion;
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-    console.log(`\nCI build — bumped package.json to v${nextVersion} for this build only (no commit/tag).`);
-}
-
 function mainLocal() {
     const releaseCommit = lastReleaseCommit();
     const subjects = commitsSince(releaseCommit);
@@ -135,10 +105,11 @@ function mainLocal() {
 
 function main() {
     if (isCI) {
-        mainCI();
-    } else {
-        mainLocal();
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+        console.log(`CI/deploy build — building committed version v${pkg.version} as-is. Run \`npm run release\` locally and push to bump it.`);
+        return;
     }
+    mainLocal();
 }
 
 main();

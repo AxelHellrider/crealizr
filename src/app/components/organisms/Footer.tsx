@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {useLocale, useTranslations} from 'next-intl';
 import CrealizrLogo from "@/app/components/atoms/CrealizrLogo";
+import { IconGithub, IconInstagram } from "@/app/components/atoms/SocialIcons";
 import { useCookieConsent } from "@/app/context/CookieConsentContext";
 import { version } from "../../../../package.json";
 
@@ -23,14 +24,26 @@ export default function Footer() {
                         </p>
                     </div>
 
-                    {/* Links */}
-                    <nav className="flex flex-wrap gap-6 text-sm font-semibold tracking-widest">
-                        <Link href={`/${locale}/encounter-builder`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.encounterBuilder")}</Link>
-                        <Link href={`/${locale}/monster-scaler`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.monsterScaler")}</Link>
-                        <Link href={`/${locale}/travel-encounters`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.travelEncounters")}</Link>
-                        <Link href={`/${locale}/artifact-forge`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.artifactForge")}</Link>
-                        <Link href={`/${locale}/my-monsters`} scroll={false} className="ui-link transition uppercase hover:text-gold">{t("nav.myMonsters")}</Link>
-                        <a href="https://github.com/AxelHellrider" target="_blank" rel="noreferrer" className="ui-link transition uppercase hover:text-gold">{t("sidebar.github")}</a>
+                    {/* Social links */}
+                    <nav className="flex items-center gap-4">
+                        <a
+                            href="https://www.instagram.com/crealizr.dnd"
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Instagram"
+                            className="text-muted transition hover:text-gold"
+                        >
+                            <IconInstagram width="20" height="20" />
+                        </a>
+                        <a
+                            href="https://github.com/AxelHellrider"
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="GitHub"
+                            className="text-muted transition hover:text-gold"
+                        >
+                            <IconGithub width="20" height="20" />
+                        </a>
                     </nav>
                 </div>
 

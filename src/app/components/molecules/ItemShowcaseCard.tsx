@@ -1,4 +1,4 @@
-interface ItemCardPreviewProps {
+interface ItemShowcaseCardProps {
     className?: string;
     name?: string;
     rarity?: string;
@@ -10,13 +10,13 @@ interface ItemCardPreviewProps {
 // A small flat card mimicking Artifact Forge's generated item output —
 // a name, rarity tag, and a hint of flavor text. Defaults to a decorative
 // mockup; pass real fields to show actual tool output.
-export function ItemCardPreview({
+export function ItemShowcaseCard({
     className = "",
     name = "Ember-Kissed Blade",
     rarity = "Rare",
     flavor = "Forged in dragon-fire, it hums faintly whenever danger draws near.",
     decorative = true,
-}: ItemCardPreviewProps) {
+}: ItemShowcaseCardProps) {
     return (
         <div className={`border border-gold/20 bg-background/60 p-3 flex flex-col gap-1.5 ${className}`} aria-hidden={decorative || undefined}>
             <div className="flex items-center justify-between gap-2">

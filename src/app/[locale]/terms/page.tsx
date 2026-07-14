@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { buildHreflang } from "@/app/lib/seo";
+import type { LegalSection } from "@/app/types/legal";
 
 export const metadata: Metadata = {
     title: "Terms of Use | CRealizr",
@@ -27,11 +28,9 @@ export const metadata: Metadata = {
     },
 };
 
-type Section = { heading: string; body: string[] };
-
 export default async function TermsPage() {
     const t = await getTranslations();
-    const sections = t.raw("terms.sections") as Section[];
+    const sections = t.raw("terms.sections") as LegalSection[];
 
     return (
         <PageSection>

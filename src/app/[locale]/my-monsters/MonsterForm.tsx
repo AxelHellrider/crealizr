@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo, useReducer } from "react";
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import type { Monster, Terrain, Affiliation, Edition, MonsterSize, MonsterAction } from "@/app/types/monster";
+import type { Monster, Terrain, Affiliation, Edition, MonsterSize } from "@/app/types/monster";
 import { Button } from "@/app/components/atoms/Button";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
 import { Autocomplete } from "@/app/components/atoms/Autocomplete";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
-import { AbilityScoreGrid, type AbilityScores } from "@/app/components/molecules/AbilityScoreGrid";
+import { AbilityScoreGrid } from "@/app/components/molecules/AbilityScoreGrid";
 import { Card } from "@/app/components/atoms/Card";
 import { FormField } from "@/app/components/molecules/FormField";
 import { MONSTER_MANUAL_2014_CATALOG, MONSTER_MANUAL_2024_CATALOG } from "@/app/data/monsters";
 import { useCustomMonsters } from "@/app/context/CustomMonstersContext";
+import { useMonsterForm } from "@/app/hooks/useMonsterForm";
 import { formatCR } from "@/app/lib/format";
-import { clamp } from "@/app/lib/number";
 
 const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar", "any"];
 const AFFILIATIONS: Affiliation[] = ["humanoid", "beast", "undead", "construct", "dragon", "fiend", "celestial", "fey", "monstrosity", "giant", "elemental", "aberration", "plant", "any"];
@@ -28,136 +28,6 @@ type Props = {
     onCancel: () => void;
 };
 
-type FormState = {
-    name: string;
-    cr: number;
-    edition: Edition;
-    terrain: Terrain[];
-    affiliation: Affiliation;
-    genus: string;
-    showStats: boolean;
-    size: MonsterSize;
-    type: string;
-    alignment: string;
-    ac: number;
-    hp: number;
-    speed: string;
-    abilityScores: AbilityScores;
-    dprMin: number;
-    dprMax: number;
-    dprRange: string;
-    xp: number;
-    actions: MonsterAction[];
-    error: string;
-};
-
-function initFormState(initial?: Monster): FormState {
-    return {
-        name: initial?.name ?? "",
-        cr: initial?.cr ?? 1,
-        edition: initial?.edition ?? "2014",
-        terrain: initial?.terrain ?? ["any"],
-        affiliation: initial?.affiliation ?? "humanoid",
-        genus: initial?.genus ?? "",
-        showStats: !!initial?.stats,
-        size: initial?.size ?? "Medium",
-        type: initial?.type ?? "",
-        alignment: initial?.alignment ?? "",
-        ac: initial?.stats?.ac ?? 10,
-        hp: initial?.stats?.hp ?? 10,
-        speed: initial?.stats?.speed ?? "30 ft",
-        abilityScores: {
-            str: initial?.stats?.str ?? 10,
-            dex: initial?.stats?.dex ?? 10,
-            con: initial?.stats?.con ?? 10,
-            int: initial?.stats?.int ?? 10,
-            wis: initial?.stats?.wis ?? 10,
-            cha: initial?.stats?.cha ?? 10,
-        },
-        dprMin: initial?.dpr?.min ?? 0,
-        dprMax: initial?.dpr?.max ?? 0,
-        dprRange: initial?.dpr?.range ?? "",
-        xp: initial?.xp ?? 0,
-        actions: initial?.actions ?? [],
-        error: "",
-    };
-}
-
-type Action =
-    | { type: "SET_NAME"; value: string }
-    | { type: "SET_CR"; value: number }
-    | { type: "SET_EDITION"; value: Edition }
-    | { type: "SET_TERRAIN"; value: Terrain[] }
-    | { type: "SET_AFFILIATION"; value: Affiliation }
-    | { type: "SET_GENUS"; value: string }
-    | { type: "SET_SIZE"; value: MonsterSize }
-    | { type: "SET_TYPE"; value: string }
-    | { type: "SET_ALIGNMENT"; value: string }
-    | { type: "SET_AC"; value: number }
-    | { type: "SET_HP"; value: number }
-    | { type: "SET_SPEED"; value: string }
-    | { type: "SET_ABILITY_SCORE"; key: keyof AbilityScores; value: number }
-    | { type: "SET_DPR_MIN"; value: number }
-    | { type: "SET_DPR_MAX"; value: number }
-    | { type: "SET_DPR_RANGE"; value: string }
-    | { type: "SET_XP"; value: number }
-    | { type: "UPDATE_ACTION"; index: number; patch: Partial<MonsterAction> }
-    | { type: "REMOVE_ACTION"; index: number }
-    | { type: "ADD_ACTION" }
-    | { type: "SET_ERROR"; value: string };
-
-function formReducer(state: FormState, action: Action): FormState {
-    switch (action.type) {
-        case "SET_NAME":
-            return { ...state, name: action.value, error: "" };
-        case "SET_CR":
-            return { ...state, cr: action.value };
-        case "SET_EDITION":
-            return { ...state, edition: action.value };
-        case "SET_TERRAIN":
-            return { ...state, terrain: action.value };
-        case "SET_AFFILIATION":
-            return { ...state, affiliation: action.value };
-        case "SET_GENUS":
-            return { ...state, genus: action.value };
-        case "SET_SIZE":
-            return { ...state, size: action.value, showStats: true };
-        case "SET_TYPE":
-            return { ...state, type: action.value };
-        case "SET_ALIGNMENT":
-            return { ...state, alignment: action.value };
-        case "SET_AC":
-            return { ...state, ac: clamp(action.value, 0, 30), showStats: true };
-        case "SET_HP":
-            return { ...state, hp: Math.max(0, action.value), showStats: true };
-        case "SET_SPEED":
-            return { ...state, speed: action.value, showStats: true };
-        case "SET_ABILITY_SCORE":
-            return { ...state, abilityScores: { ...state.abilityScores, [action.key]: action.value }, showStats: true };
-        case "SET_DPR_MIN":
-            return { ...state, dprMin: Math.max(0, action.value) };
-        case "SET_DPR_MAX":
-            return { ...state, dprMax: Math.max(0, action.value) };
-        case "SET_DPR_RANGE":
-            return { ...state, dprRange: action.value };
-        case "SET_XP":
-            return { ...state, xp: Math.max(0, action.value) };
-        case "UPDATE_ACTION": {
-            const actions = [...state.actions];
-            actions[action.index] = { ...actions[action.index], ...action.patch };
-            return { ...state, actions };
-        }
-        case "REMOVE_ACTION":
-            return { ...state, actions: state.actions.filter((_, j) => j !== action.index) };
-        case "ADD_ACTION":
-            return { ...state, actions: [...state.actions, { name: "" }] };
-        case "SET_ERROR":
-            return { ...state, error: action.value };
-        default:
-            return state;
-    }
-}
-
 export default function MonsterForm({ initial, existingNames, onSave, onCancel }: Props) {
     const t = useTranslations("myMonsters");
     const { customMonsters } = useCustomMonsters();
@@ -167,51 +37,15 @@ export default function MonsterForm({ initial, existingNames, onSave, onCancel }
         return [...new Set(all.map((m) => m.genus).filter(Boolean) as string[])].sort();
     }, [customMonsters]);
 
-    const [state, dispatch] = useReducer(formReducer, initial, initFormState);
+    const { state, dispatch, handleSubmit } = useMonsterForm(initial, existingNames, onSave, {
+        nameRequired: t("form.nameRequired"),
+        nameDuplicate: t("form.nameDuplicate"),
+    });
     const {
         name, cr, edition, terrain, affiliation, genus,
-        showStats, size, type, alignment, ac, hp, speed, abilityScores,
+        size, type, alignment, ac, hp, speed, abilityScores,
         dprMin, dprMax, dprRange, xp, actions, error,
     } = state;
-
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        const trimmed = name.trim();
-        if (!trimmed) {
-            dispatch({ type: "SET_ERROR", value: t("form.nameRequired") });
-            return;
-        }
-        if (!initial && existingNames.has(trimmed.toLowerCase())) {
-            dispatch({ type: "SET_ERROR", value: t("form.nameDuplicate") });
-            return;
-        }
-        if (initial && trimmed.toLowerCase() !== initial.name.toLowerCase() && existingNames.has(trimmed.toLowerCase())) {
-            dispatch({ type: "SET_ERROR", value: t("form.nameDuplicate") });
-            return;
-        }
-
-        const monster: Monster = {
-            name: trimmed,
-            cr,
-            edition,
-            terrain,
-            affiliation,
-            genus: genus || undefined,
-            source: "homebrew",
-        };
-
-        if (showStats) {
-            monster.size = size;
-            monster.type = type || undefined;
-            monster.alignment = alignment || undefined;
-            monster.xp = xp;
-            monster.stats = { ac, hp, speed, ...abilityScores };
-            monster.dpr = { min: dprMin, max: dprMax, range: dprRange };
-            if (actions.length > 0) monster.actions = actions;
-        }
-
-        onSave(monster);
-    }
 
     return (
         <form onSubmit={handleSubmit} className="grid gap-6">

@@ -3,14 +3,13 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import type { Terrain, Affiliation } from "@/app/types/monster";
+import type { RelationCriteria } from "@/engine/encounter";
 import { Input } from "@/app/components/atoms/Input";
 import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { FormField } from "@/app/components/molecules/FormField";
 import { ToggleChip } from "@/app/components/molecules/ToggleChip";
 import { Card } from "@/app/components/atoms/Card";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
-
-export type RelationCriteria = "terrain" | "affiliation" | "genus" | "any";
 
 const TERRAINS: Terrain[] = ["dungeon", "wilderness", "urban", "underwater", "planar"];
 const AFFILIATIONS: Affiliation[] = [

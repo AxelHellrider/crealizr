@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { getMonstersForCR } from "@/engine/encounter";
 import { formatCR } from "@/app/lib/format";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
@@ -19,6 +16,8 @@ import { SliderToggle } from "@/app/components/atoms/SliderToggle";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { SectionHeader } from "@/app/components/atoms/SectionHeader";
 import { MonsterFilterPanel } from "./_components/MonsterFilterPanel";
+import { EncounterModal } from "./_components/EncounterModal";
+import { SuggestionsList } from "./_components/SuggestionsList";
 
 const EncounterHexMap = dynamic(
     () => import("./_components/EncounterHexMap").then((mod) => mod.EncounterHexMap),
@@ -34,124 +33,8 @@ import {
     type BossMinionSuggestion,
     type GroupSuggestion,
 } from "@/app/hooks/useEncounterBuilder";
-import type { Monster } from "@/app/types/monster";
 import type { CoverBenefit, HazardEffect } from "@/app/types/encounterLayout";
 import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
-
-function EncounterModal({
-    suggestion, mode, ruleset, catalog, filterMonsterPool, hasActiveFilter, onClose,
-}: {
-    suggestion: GroupSuggestion | BossMinionSuggestion | null;
-    mode: EncounterMode;
-    ruleset: Ruleset;
-    catalog: readonly Monster[];
-    filterMonsterPool: (monsters: Monster[]) => Monster[];
-    hasActiveFilter: boolean;
-    onClose: () => void;
-}) {
-    useEffect(() => {
-        if (!suggestion) return;
-        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-        document.addEventListener("keydown", onKey);
-        return () => document.removeEventListener("keydown", onKey);
-    }, [suggestion, onClose]);
-
-    if (!suggestion) return null;
-
-    const members = mode === "solo"
-        ? [
-            { cr: (suggestion as BossMinionSuggestion).boss.cr, count: (suggestion as BossMinionSuggestion).boss.count, label: "Boss" },
-            ...(suggestion as BossMinionSuggestion).minions.map((m) => ({ cr: m.cr, count: m.count, label: "Minion" })),
-          ]
-        : (suggestion as GroupSuggestion).members.map((m) => ({ cr: m.cr, count: m.count, label: undefined as string | undefined }));
-
-    const uniqueCRs = [...new Set(members.map((m) => m.cr))];
-
-    const modal = (
-        <AnimatePresence>
-            <motion.div
-                key="backdrop"
-                className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            >
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-                <motion.div
-                    key="panel"
-                    className="relative z-10 w-full max-w-lg bg-card border border-gold/20 rounded-sm shadow-2xl overflow-hidden"
-                    initial={{ opacity: 0, scale: 0.92, y: 24 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.92, y: 24 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                    <div data-testid="encounter-modal" className="flex justify-between items-start gap-3 p-5 border-b border-gold/10">
-                        <div className="flex flex-wrap items-baseline gap-x-1">
-                            {members.map((m, idx) => (
-                                <span key={idx}>
-                                    <span className="font-bold text-xl accent-gold">{m.count}</span>
-                                    <span className="text-muted mx-1 font-sans italic">&times;</span>
-                                    <span className="text-foreground text-lg">CR {formatCR(m.cr)}</span>
-                                    {m.label && <span className="text-muted text-xs ml-1">({m.label})</span>}
-                                    {idx < members.length - 1 && <span className="text-gold/30 mx-2">|</span>}
-                                </span>
-                            ))}
-                        </div>
-                        <button type="button" onClick={onClose}
-                            className="text-muted hover:text-foreground transition-colors text-lg leading-none shrink-0 mt-0.5"
-                            aria-label="Close">✕</button>
-                    </div>
-                    <div className="p-5 grid gap-3 max-h-[60vh] overflow-y-auto">
-                        {uniqueCRs.map((cr) => {
-                            const allMonsters = getMonstersForCR(cr, ruleset, catalog);
-                            const monsters = filterMonsterPool(allMonsters);
-                            const slot = members.find((m) => m.cr === cr);
-                            const filtered = hasActiveFilter && monsters.length < allMonsters.length;
-                            return (
-                                <div key={cr}>
-                                    <SubLabel className="mb-1.5">
-                                        CR {formatCR(cr)} {slot?.label ? `(${slot.label})` : ""}{" — "}
-                                        {monsters.length} available
-                                        {filtered && <span className="text-gold/40 ml-1">({allMonsters.length} total)</span>}
-                                    </SubLabel>
-                                    {monsters.length === 0 ? (
-                                        <p className="text-muted text-xs italic">No monsters match the current filter at this CR.</p>
-                                    ) : (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {monsters.map((m) => (
-                                                <span key={m.name}
-                                                    className={`inline-flex items-center px-2.5 py-1 text-xs rounded-sm border transition-colors ${
-                                                        m.source === "homebrew"
-                                                            ? "border-gold/30 bg-gold/10 text-gold"
-                                                            : "border-gold/10 bg-gold/5 text-foreground"
-                                                    }`}
-                                                    title={`${m.name} — ${m.affiliation}${m.genus ? `, ${m.genus}` : ""}${m.terrain?.length ? ` · ${m.terrain.join(", ")}` : ""}`}>
-                                                    {m.name}
-                                                    {m.source === "homebrew" && <span className="ml-1 text-[9px] text-gold/60">★</span>}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </motion.div>
-            </motion.div>
-        </AnimatePresence>
-    );
-
-    return typeof document !== "undefined" ? createPortal(modal, document.body) : null;
-}
-
-function BudgetBar({ fit, accent = "gold" }: { fit: number; accent?: "gold" | "silver" }) {
-    return (
-        <div className={`mt-2.5 h-px w-full ${accent === "silver" ? "bg-silver/10" : "bg-gold/10"} rounded-full overflow-hidden`}>
-            <div
-                className={`h-full ${accent === "silver" ? "bg-silver shadow-[0_0_8px_rgba(148,163,184,0.5)]" : "bg-gold shadow-[0_0_8px_rgba(197,160,89,0.5)]"}`}
-                style={{ width: `${Math.min(fit * 100, 100)}%` }}
-            />
-        </div>
-    );
-}
 
 export default function CombatBalancerPage() {
     const locale = useLocale();
@@ -459,82 +342,15 @@ export default function CombatBalancerPage() {
                             )}
                         </div>
 
-                        <ul className="flex flex-col gap-2">
-                            {suggestions.map((suggestion, i) => {
-                                const members = state.mode === "solo"
-                                    ? [
-                                        { cr: (suggestion as BossMinionSuggestion).boss.cr, count: (suggestion as BossMinionSuggestion).boss.count, label: "Boss" },
-                                        ...(suggestion as BossMinionSuggestion).minions.map((m) => ({ cr: m.cr, count: m.count, label: "Minion" })),
-                                      ]
-                                    : (suggestion as GroupSuggestion).members.map((m) => ({ cr: m.cr, count: m.count, label: undefined as string | undefined }));
-
-                                const isSelected = safeSelectedIdx === i;
-
-                                return (
-                                    <li key={i} data-testid="suggestion-card">
-                                        <Card
-                                            className={`border transition-all duration-150 cursor-pointer relative ${
-                                                isSelected
-                                                    ? ""
-                                                    : (state.mode === "solo" ? "border-gold/10 bg-background/50" : "border-silver/10 bg-background/50")
-                                            }`}
-                                            style={isSelected ? {
-                                                borderColor: "var(--accent-tertiary)",
-                                                boxShadow: "0 0 0 1px var(--accent-tertiary)",
-                                                backgroundColor: "color-mix(in srgb, var(--accent-tertiary) 6%, var(--surface-card))",
-                                            } : undefined}
-                                            onClick={() => dispatch({ type: "SET_SELECTED_IDX", payload: i })}
-                                            role="button"
-                                            tabIndex={0}
-                                            aria-pressed={isSelected}
-                                            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") dispatch({ type: "SET_SELECTED_IDX", payload: i }); }}
-                                        >
-                                            {isSelected && (
-                                                <span className="absolute -top-2 left-3 z-10 bg-crimson text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5">
-                                                    Active
-                                                </span>
-                                            )}
-                                            <div className="p-3">
-                                                <div className="flex justify-between items-start gap-2">
-                                                    <div className="flex flex-wrap items-baseline gap-x-1 flex-1">
-                                                        {members.map((m, idx) => (
-                                                            <span key={idx}>
-                                                                <span className="font-bold text-base accent-gold">{m.count}</span>
-                                                                <span className="text-muted mx-1 font-sans italic text-sm">&times;</span>
-                                                                <span className="text-foreground text-sm">CR {formatCR(m.cr)}</span>
-                                                                {m.label && <span className="text-muted text-[10px] ml-0.5">({m.label})</span>}
-                                                                {idx < members.length - 1 && <span className="text-gold/30 mx-1.5">|</span>}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                    <div className="shrink-0 flex items-center gap-1.5">
-                                                        {useXP && (
-                                                            <span className="text-muted text-[10px] font-bold uppercase">
-                                                                {suggestion.adjustedXP.toLocaleString()} XP
-                                                            </span>
-                                                        )}
-                                                        <button
-                                                            type="button"
-                                                            onClick={(e) => { e.stopPropagation(); dispatch({ type: "SET_EXPANDED_IDX", payload: i }); }}
-                                                            className="text-[10px] text-background font-bold uppercase tracking-widest px-2 py-1 bg-gold/70 hover:bg-gold transition-colors rounded-sm"
-                                                            aria-label="View monster options"
-                                                        >
-                                                            Check Monsters
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                {useXP && (
-                                                    <div className={`mt-0.5 text-[10px] uppercase tracking-widest font-bold ${budgetStatus(suggestion.fit).color}`}>
-                                                        {budgetStatus(suggestion.fit).label} · {(suggestion.fit * 100).toFixed(0)}%
-                                                    </div>
-                                                )}
-                                                <BudgetBar fit={suggestion.fit} accent={state.mode === "solo" ? "gold" : "silver"} />
-                                            </div>
-                                        </Card>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                        <SuggestionsList
+                            suggestions={suggestions}
+                            mode={state.mode}
+                            selectedIdx={safeSelectedIdx}
+                            useXP={useXP}
+                            budgetStatus={budgetStatus}
+                            onSelect={(i) => dispatch({ type: "SET_SELECTED_IDX", payload: i })}
+                            onExpand={(i) => dispatch({ type: "SET_EXPANDED_IDX", payload: i })}
+                        />
                     </Card>
 
                     <div className="shrink-0 pb-2">

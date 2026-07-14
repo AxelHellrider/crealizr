@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
 import { buildHreflang } from "@/app/lib/seo";
+import type { LegalSection } from "@/app/types/legal";
 
 export const metadata: Metadata = {
     title: "Disclaimer | CRealizr",
@@ -27,11 +28,9 @@ export const metadata: Metadata = {
     },
 };
 
-type Section = { heading: string; body: string[] };
-
 export default async function DisclaimerPage() {
     const t = await getTranslations();
-    const sections = t.raw("disclaimer.sections") as Section[];
+    const sections = t.raw("disclaimer.sections") as LegalSection[];
 
     return (
         <PageSection>

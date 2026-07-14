@@ -1,6 +1,6 @@
 "use client";
 
-export type MapMode = "select" | "place-hazard-env" | "place-hazard-spell" | "place-cover";
+import type { MapMode } from "@/app/types/encounterLayout";
 
 type ModeConfig = { mode: MapMode; label: string; shortcut?: string };
 

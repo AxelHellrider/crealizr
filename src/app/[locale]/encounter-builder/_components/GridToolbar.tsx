@@ -1,8 +1,6 @@
 "use client";
 
-import type { HazardSource } from "@/app/types/encounterLayout";
-
-export type ArmedTool = { kind: "hazard"; source: HazardSource } | { kind: "cover" } | null;
+import type { ArmedTool } from "@/app/types/encounterLayout";
 
 interface GridToolbarProps {
     armed: ArmedTool;

@@ -64,3 +64,9 @@ export type HazardEffect = {
     source: HazardSource;
     notes?: string;
 };
+
+/** Battlefield map interaction mode, driven by the toolbar. */
+export type MapMode = "select" | "place-hazard-env" | "place-hazard-spell" | "place-cover";
+
+/** The tool currently armed for click-to-place on an empty hex, if any. */
+export type ArmedTool = { kind: "hazard"; source: HazardSource } | { kind: "cover" } | null;

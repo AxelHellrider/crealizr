@@ -18,7 +18,7 @@ import { SubLabel } from "@/app/components/atoms/SubLabel";
 import { StatRow } from "@/app/components/molecules/StatRow";
 import { AbilityScoreGrid, type AbilityKey, type AbilityScores } from "@/app/components/molecules/AbilityScoreGrid";
 import { Autocomplete } from "@/app/components/atoms/Autocomplete";
-import { StatBlockDisplay } from "./_components/StatBlockDisplay";
+import { StatBlockDisplay } from "@/app/components/molecules/StatBlockDisplay";
 import { useMonsterScaler } from "@/app/hooks/useMonsterScaler";
 import { useMonsterExport } from "@/app/hooks/useExport";
 import type { MonsterBase } from "@/app/types/monster";

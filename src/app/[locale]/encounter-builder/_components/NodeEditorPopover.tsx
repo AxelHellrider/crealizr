@@ -4,13 +4,13 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { Input } from "@/app/components/atoms/Input";
 import { Select } from "@/app/components/atoms/Select";
-import { formatCR } from "@/app/lib/format";
 import type { EncounterNode, CoverLevel, AoEShape, HexDirection } from "@/app/types/encounterLayout";
 import type { ConditionId } from "@/app/data/conditions";
 import { getConditions } from "@/app/data/conditions";
 import { getHazardPresets } from "@/app/data/hazards";
 import type { Ruleset } from "@/engine/encounter";
 import { hexDirectionLabel } from "@/engine/encounter";
+import { nodeTitle } from "@/app/utils/encounterNodeDisplay";
 
 const AOE_SHAPES: { value: AoEShape; label: string }[] = [
     { value: "burst", label: "Sphere / Cube / Cylinder (radiates outward)" },
@@ -31,15 +31,6 @@ interface NodeEditorPopoverProps {
     onChange: (patch: { label?: string; notes?: string; coverLevel?: CoverLevel; aoeRadius?: number; aoeShape?: AoEShape; aoeDirection?: HexDirection; conditions?: ConditionId[] }) => void;
     onRemove: () => void;
     onClose: () => void;
-}
-
-function nodeTitle(node: EncounterNode): string {
-    switch (node.kind) {
-        case "party": return "Party member";
-        case "enemy": return `${node.isBoss ? "Boss" : "Enemy"} · CR ${formatCR(node.cr)}`;
-        case "hazard": return `${node.source} hazard`;
-        case "cover": return "cover";
-    }
 }
 
 export function NodeEditorPopover({ node, containerRect, ruleset, onChange, onRemove, onClose }: NodeEditorPopoverProps) {

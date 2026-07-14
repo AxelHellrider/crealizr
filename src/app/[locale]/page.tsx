@@ -5,7 +5,7 @@ import { buildHreflang } from "@/app/lib/seo";
 
 import { Button } from "@/app/components/atoms/Button";
 import { StatScalePreview } from "@/app/components/molecules/StatScalePreview";
-import { ItemCardPreview } from "@/app/components/molecules/ItemCardPreview";
+import { ItemShowcaseCard } from "@/app/components/molecules/ItemShowcaseCard";
 import { IconMonsterScaler, IconEncounterBuilder, IconArtifactForge, IconTravelEncounters, IconMyBestiary, IconQuill } from "@/app/components/atoms/ToolIcons";
 import CrealizrMark from "@/app/components/atoms/CrealizrMark";
 import { HeroCarousel, type HeroSlide } from "@/app/components/organisms/HeroCarousel";
@@ -152,7 +152,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
       description: t("home.coreToolkit.artifactForge.description"),
       action: t("home.coreToolkit.artifactForge.action"),
       icon: <IconArtifactForge className="w-full h-full" />,
-      preview: <ItemCardPreview className="w-full max-w-64" />,
+      preview: <ItemShowcaseCard className="w-full max-w-64" />,
     },
     {
       href: `/${locale}/travel-encounters`,
@@ -270,7 +270,7 @@ export default async function Home({params}: {params: Promise<{locale: string}>}
               <div className="text-xs uppercase tracking-[0.2em] text-gold/70 font-bold">{t("home.coreToolkit.artifactForge.title")}</div>
               <p className="text-muted mt-2 text-sm">{t("home.showcase.itemInputs")}</p>
             </div>
-            <ItemCardPreview
+            <ItemShowcaseCard
                 decorative={false}
                 name={itemSample.name}
                 rarity={itemSample.rarity}
