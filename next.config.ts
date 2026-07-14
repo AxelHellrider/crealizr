@@ -24,6 +24,32 @@ const nextConfig: NextConfig = {
             { source: "/encounters-en-route", destination: "/travel-encounters",    permanent: true },
         ];
     },
+    async headers() {
+        // These public/ assets are unhashed (no content fingerprint in the
+        // filename, unlike /_next/static/*, which Next.js already caches
+        // immutably by default), so nothing was telling browsers/CDNs how
+        // long to keep them — flagged by PageSpeed Insights as "Use
+        // efficient cache lifetimes". They're static branding assets that
+        // effectively never change in place (a real content change would
+        // ship under a new filename), so a long cache is safe. manifest.json
+        // gets a shorter lifetime since its content (e.g. shortcuts) is more
+        // likely to change without a filename bump.
+        const longCache = "public, max-age=31536000, immutable";
+        return [
+            {
+                source: "/icons/:path*",
+                headers: [{ key: "Cache-Control", value: longCache }],
+            },
+            {
+                source: "/:file(crealizr_favicon\\.svg|og-.*\\.svg)",
+                headers: [{ key: "Cache-Control", value: longCache }],
+            },
+            {
+                source: "/manifest.json",
+                headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+            },
+        ];
+    },
 };
 
 // The service worker itself is compiled by the route handler at
