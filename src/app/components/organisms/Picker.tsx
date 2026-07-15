@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { usePicker } from "@/app/context/PickerContext";
+import { useMountTransition, useLastNonNull } from "@/app/hooks/useMountTransition";
 
 const ROW_H = 44;
 const VISIBLE_ROWS = 5;
 const WHEEL_H = ROW_H * VISIBLE_ROWS;
 const PAD = (WHEEL_H - ROW_H) / 2;
+const SHEET_TRANSITION_MS = 300;
 
 export function Picker() {
     const picker = usePicker();
@@ -16,7 +17,15 @@ export function Picker() {
     const [centerOffset, setCenterOffset] = useState(0);
 
     const config = picker?.config ?? null;
-    const options = config?.options ?? [];
+
+    // Keeps rendering the last non-null config while the sheet plays its
+    // close transition — config itself goes null the instant the sheet
+    // starts closing, but useMountTransition keeps the node mounted a bit
+    // longer, so its content needs to survive that window too.
+    const renderedConfig = useLastNonNull(config);
+    const options = renderedConfig?.options ?? [];
+
+    const { mounted, visible } = useMountTransition(!!config, SHEET_TRANSITION_MS);
 
     // Position the wheel on the current value whenever the sheet opens.
     useEffect(() => {
@@ -37,12 +46,12 @@ export function Picker() {
     }, []);
 
     const commitIndex = useCallback((idx: number) => {
-        if (!config) return;
+        if (!renderedConfig) return;
         const clamped = Math.max(0, Math.min(options.length - 1, idx));
         const opt = options[clamped];
-        if (opt) config.onCommit(opt.value);
+        if (opt) renderedConfig.onCommit(opt.value);
         picker?.close();
-    }, [config, options, picker]);
+    }, [renderedConfig, options, picker]);
 
     const commitCentered = useCallback(() => commitIndex(Math.round(centerOffset)), [commitIndex, centerOffset]);
 
@@ -67,82 +76,77 @@ export function Picker() {
         if (dx < TAP_THRESHOLD && dy < TAP_THRESHOLD) tapRow(i);
     };
 
+    if (!mounted || !renderedConfig) return null;
+
     return (
-        <AnimatePresence>
-            {config && (
-                <>
-                    <motion.div
-                        className="fixed inset-0 z-[10000] bg-black/50"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onPointerDown={commitCentered}
-                    />
-                    <motion.div
-                        className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden"
-                        initial={{ y: "100%" }}
-                        animate={{ y: 0 }}
-                        exit={{ y: "100%" }}
-                        transition={{ type: "spring", damping: 32, stiffness: 320 }}
+        <>
+            <div
+                className={`fixed inset-0 z-[10000] bg-black/50 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+                onPointerDown={commitCentered}
+            />
+            <div
+                className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden transition-transform duration-300"
+                style={{
+                    transform: visible ? "translateY(0)" : "translateY(100%)",
+                    transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                }}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-gold/10">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gold/60 font-bold min-w-0 truncate">
+                        {renderedConfig.label ?? "Select value"}
+                    </span>
+                    <button
+                        type="button"
+                        onPointerDown={(e) => { e.preventDefault(); commitCentered(); }}
+                        className="shrink-0 px-5 py-2 rounded-sm bg-gold/10 border border-gold/30 text-gold text-sm font-bold uppercase tracking-widest hover:bg-gold/20 active:scale-95 transition-all"
                     >
-                        {/* Header */}
-                        <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-gold/10">
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-gold/60 font-bold min-w-0 truncate">
-                                {config.label ?? "Select value"}
-                            </span>
-                            <button
-                                type="button"
-                                onPointerDown={(e) => { e.preventDefault(); commitCentered(); }}
-                                className="shrink-0 px-5 py-2 rounded-sm bg-gold/10 border border-gold/30 text-gold text-sm font-bold uppercase tracking-widest hover:bg-gold/20 active:scale-95 transition-all"
-                            >
-                                Done
-                            </button>
-                        </div>
+                        Done
+                    </button>
+                </div>
 
-                        {/* Wheel */}
-                        <div className="relative">
-                            <div
-                                aria-hidden="true"
-                                className="pointer-events-none absolute left-4 right-4 border-y border-gold/30 bg-gold/5 z-10"
-                                style={{ top: PAD, height: ROW_H }}
-                            />
-                            <div
-                                ref={containerRef}
-                                onScroll={handleScroll}
-                                role="listbox"
-                                aria-label={config.label}
-                                className="overflow-y-scroll no-scrollbar"
-                                style={{ height: WHEEL_H, scrollSnapType: "y mandatory", overscrollBehavior: "contain" }}
-                            >
-                                <div style={{ height: PAD }} aria-hidden="true" />
-                                {options.map((opt, i) => {
-                                    const distance = Math.abs(i - centerOffset);
-                                    const opacity = Math.max(0.25, 1 - distance * 0.35);
-                                    const scale = Math.max(0.8, 1 - distance * 0.1);
-                                    const isCentered = Math.round(centerOffset) === i;
-                                    return (
-                                        <div
-                                            key={opt.value + i}
-                                            role="option"
-                                            aria-selected={isCentered}
-                                            onPointerDown={handleRowPointerDown}
-                                            onPointerUp={(e) => handleRowPointerUp(e, i)}
-                                            className="flex items-center justify-center select-none cursor-pointer font-serif text-lg uppercase tracking-wide text-foreground"
-                                            style={{ height: ROW_H, scrollSnapAlign: "center", opacity, transform: `scale(${scale})` }}
-                                        >
-                                            {opt.label}
-                                        </div>
-                                    );
-                                })}
-                                <div style={{ height: PAD }} aria-hidden="true" />
-                            </div>
-                        </div>
+                {/* Wheel */}
+                <div className="relative">
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute left-4 right-4 border-y border-gold/30 bg-gold/5 z-10"
+                        style={{ top: PAD, height: ROW_H }}
+                    />
+                    <div
+                        ref={containerRef}
+                        onScroll={handleScroll}
+                        role="listbox"
+                        aria-label={renderedConfig.label}
+                        className="overflow-y-scroll no-scrollbar"
+                        style={{ height: WHEEL_H, scrollSnapType: "y mandatory", overscrollBehavior: "contain" }}
+                    >
+                        <div style={{ height: PAD }} aria-hidden="true" />
+                        {options.map((opt, i) => {
+                            const distance = Math.abs(i - centerOffset);
+                            const opacity = Math.max(0.25, 1 - distance * 0.35);
+                            const scale = Math.max(0.8, 1 - distance * 0.1);
+                            const isCentered = Math.round(centerOffset) === i;
+                            return (
+                                <div
+                                    key={opt.value + i}
+                                    role="option"
+                                    aria-selected={isCentered}
+                                    onPointerDown={handleRowPointerDown}
+                                    onPointerUp={(e) => handleRowPointerUp(e, i)}
+                                    className="flex items-center justify-center select-none cursor-pointer font-serif text-lg uppercase tracking-wide text-foreground"
+                                    style={{ height: ROW_H, scrollSnapAlign: "center", opacity, transform: `scale(${scale})` }}
+                                >
+                                    {opt.label}
+                                </div>
+                            );
+                        })}
+                        <div style={{ height: PAD }} aria-hidden="true" />
+                    </div>
+                </div>
 
-                        {/* Safe-area bottom spacer */}
-                        <div style={{ height: "env(safe-area-inset-bottom, 0px)" }} />
-                    </motion.div>
-                </>
-            )}
-        </AnimatePresence>
+                {/* Safe-area bottom spacer */}
+                <div style={{ height: "env(safe-area-inset-bottom, 0px)" }} />
+            </div>
+        </>
     );
 }
