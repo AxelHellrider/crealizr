@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
 
 export type HeroSlide = {
     href?: string;
@@ -16,11 +15,23 @@ export type HeroSlide = {
 };
 
 const AUTO_ADVANCE_MS = 6000;
+const TRANSITION_MS = 600;
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     const [index, setIndex] = useState(0);
+    // The slide actually rendered — deliberately decoupled from `index` so
+    // content only swaps once the old slide has fully faded out (see the
+    // effect below). Swapping content in the same render as `index` changes
+    // (with only a CSS class flip to hide it) let the new slide flash in at
+    // full opacity for a frame before fading — this is what made the
+    // transition look snappy/cut instead of smooth.
+    const [displayIndex, setDisplayIndex] = useState(0);
     const [paused, setPaused] = useState(false);
+    // Starts true to match the server-rendered state (the hero is the page's
+    // LCP element and must be visible in the very first paint).
+    const [entered, setEntered] = useState(true);
     const timer = useRef<number | null>(null);
+    const isFirstIndexRender = useRef(true);
 
     const [prefersReducedMotion] = useState(
         () => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -45,10 +56,38 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         return () => { if (timer.current) window.clearInterval(timer.current); };
     }, [paused, prefersReducedMotion, advance, slides.length]);
 
-    const slide = slides[index];
+    // Plain CSS crossfade instead of framer-motion — the hero is above the
+    // fold and was previously shipping an animation library's full client
+    // bundle just to fade in text. Fade the currently-displayed slide out,
+    // swap `displayIndex` to the new slide only once it's fully invisible,
+    // then fade the new one in — content changes while the class change
+    // isn't in the process of that fade for two separate transitions.
+    useEffect(() => {
+        if (isFirstIndexRender.current) {
+            isFirstIndexRender.current = false;
+            return;
+        }
+        // Deferred into setTimeout (rather than called synchronously in the
+        // effect body) to avoid a cascading-render lint warning — same
+        // pattern used in RouteProgress.tsx.
+        if (prefersReducedMotion) {
+            const t = window.setTimeout(() => setDisplayIndex(index), 0);
+            return () => window.clearTimeout(t);
+        }
+        const fadeOutTimer = window.setTimeout(() => setEntered(false), 0);
+        const swapTimer = window.setTimeout(() => setDisplayIndex(index), TRANSITION_MS);
+        const fadeInTimer = window.setTimeout(() => setEntered(true), TRANSITION_MS + 20);
+        return () => {
+            window.clearTimeout(fadeOutTimer);
+            window.clearTimeout(swapTimer);
+            window.clearTimeout(fadeInTimer);
+        };
+    }, [index, prefersReducedMotion]);
+
+    const slide = slides[displayIndex];
     const accentClasses = slide.accent === "gold"
-        ? { text: "text-gold", kicker: "text-gold/50", border: "border-gold/15" }
-        : { text: "text-silver", kicker: "text-silver/50", border: "border-silver/15" };
+        ? { text: "text-gold", kicker: "text-gold/90", border: "border-gold/15" }
+        : { text: "text-silver", kicker: "text-silver/90", border: "border-silver/15" };
 
     const body = (
         <div className="relative z-10 flex flex-col items-center text-center gap-5 max-w-2xl px-4">
@@ -72,25 +111,20 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             onFocus={() => setPaused(true)}
             onBlur={() => setPaused(false)}
         >
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={index}
-                    className="absolute inset-0 flex flex-col items-center justify-center"
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -24 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                    <div className={`absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none ${accentClasses.text}`} aria-hidden="true">
-                        <div className="w-[60vmin] h-[60vmin]">{slide.icon}</div>
-                    </div>
-                    {slide.href ? (
-                        <Link href={slide.href} scroll={false} className="contents">
-                            {body}
-                        </Link>
-                    ) : body}
-                </motion.div>
-            </AnimatePresence>
+            <div
+                className={`absolute inset-0 flex flex-col items-center justify-center transition-[opacity,transform] duration-[600ms] ease-in-out ${
+                    entered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-6"
+                }`}
+            >
+                <div className={`absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none ${accentClasses.text}`} aria-hidden="true">
+                    <div className="w-[60vmin] h-[60vmin]">{slide.icon}</div>
+                </div>
+                {slide.href ? (
+                    <Link href={slide.href} scroll={false} className="contents">
+                        {body}
+                    </Link>
+                ) : body}
+            </div>
 
             {slides.length > 1 && (
                 <>

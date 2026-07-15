@@ -21,7 +21,7 @@ export function ItemShowcaseCard({
         <div className={`border border-gold/20 bg-background/60 p-3 flex flex-col gap-1.5 ${className}`} aria-hidden={decorative || undefined}>
             <div className="flex items-center justify-between gap-2">
                 <span className="font-serif text-sm accent-gold truncate">{name}</span>
-                <span className="ui-tag border-crimson/40 text-crimson shrink-0">{rarity}</span>
+                <span className="ui-tag border-crimson/40 text-red-400 shrink-0">{rarity}</span>
             </div>
             <div className="h-px w-full bg-gold/10" />
             <p className="text-[10px] text-muted italic leading-relaxed line-clamp-2">

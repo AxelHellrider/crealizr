@@ -38,7 +38,7 @@ export function AdvantagesPanel({ coverBenefits, hazardEffects, className = "" }
                     <li key={`hazard-${i}`} className="flex items-baseline justify-between gap-2 text-xs">
                         <span className="text-foreground/80 font-medium truncate">
                             {h.creatureLabel}
-                            <span className="ml-1.5 text-[9px] uppercase tracking-widest text-muted/60">
+                            <span className="ml-1.5 text-[9px] uppercase tracking-widest text-muted">
                                 {h.creatureKind === "party" ? "PC" : "NPC"}
                             </span>
                         </span>

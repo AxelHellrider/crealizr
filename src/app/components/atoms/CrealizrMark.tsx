@@ -1,7 +1,6 @@
 "use client";
 
 import type { SVGProps } from "react";
-import { motion } from "framer-motion";
 
 type CrealizrMarkProps = SVGProps<SVGSVGElement> & {
   /**
@@ -28,17 +27,18 @@ export default function CrealizrMark({ activeBars, ...props }: CrealizrMarkProps
     >
       <g id="Layer_1-2">
         {BARS.map((bar, i) => (
-          <motion.g
+          <g
             key={i}
             fill="currentColor"
-            style={{ transformOrigin: bar.origin }}
-            initial={false}
-            animate={{ scaleX: activeBars === undefined || i < activeBars ? 1 : 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            style={{
+              transformOrigin: bar.origin,
+              transform: `scaleX(${activeBars === undefined || i < activeBars ? 1 : 0})`,
+              transition: "transform 350ms cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
           >
             <rect {...bar.rect} />
             <polygon points={bar.polygon} />
-          </motion.g>
+          </g>
         ))}
         <g fill="currentColor">
           <path d="M130.33,33.81c-7.74,9.18-16.74,16.29-26.74,21.07h-60.7c-5-2.98-9.28-6.99-12.04-12.07,13.34,6.83,26.58,7.53,40.43,5.52,10.51-1.35,21.18-3.95,30.73-8.88,7.3-3.69,14.09-8.47,20.5-13.56,8.93-7.14,16.7-15.4,21.59-25.89.94,12.45-5.97,24.52-13.77,33.81Z"/>

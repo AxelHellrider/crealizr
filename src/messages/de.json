@@ -28,7 +28,7 @@
     "coreToolkit": {
       "monsterScaler": {
         "title": "Monster-Skalierer",
-        "description": "Passt TP, RK, SDR und empfohlene Kampfw erte an einen neuen CR an. Enthält exportfertige Statblöcke.",
+        "description": "Passt HP, AC, DPR und empfohlene Kampfwerte an einen neuen CR an. Enthält exportfertige Statblöcke.",
         "action": "Monster skalieren"
       },
       "encounterBuilder": {
@@ -107,11 +107,11 @@
   },
   "monsterScaler": {
     "title": "Monster-Skalierer",
-    "description": "Skaliere TP, RK, SDR und Zielwerte auf einen neuen CR, ohne das Wesen unkenntlich zu machen.",
+    "description": "Skaliere HP, AC, DPR und Zielwerte auf einen neuen CR, ohne das Wesen unkenntlich zu machen.",
     "viewDocs": "Dokumentation ansehen",
     "whatScales": "Was skaliert wird",
-    "whatScalesDesc": "RK-, TP-, SDR-Ziele und Fähigkeitsmodifikatoren.",
-    "acSourceNotes": "RK-Quellen",
+    "whatScalesDesc": "AC-, HP-, DPR-Ziele und Fähigkeitsmodifikatoren.",
+    "acSourceNotes": "AC-Quellen",
     "acSourceNotesDesc": "Geschicklichkeitsbasiert, getragene Rüstung oder natürliche Rüstung — plus optionaler Schild.",
     "guardrails": "Leitplanken",
     "guardrailsDesc": "Prüfe nach dem Skalieren Aktionsökonomie, legendäre Aktionen und einzigartige Eigenschaften.",
@@ -125,31 +125,31 @@
     "selectTargetCR": "Ziel-CR auswählen",
     "baseAttributes": "Basiswerte",
     "defenseAdjustments": "Verteidigungs- & Attributanpassungen",
-    "acSource": "RK-Quelle",
+    "acSource": "AC-Quelle",
     "acSourceDex": "Geschicklichkeitsbasiert (10 + GES-Mod)",
     "acSourceArmor": "Getragene Rüstung (10 + Bonus)",
     "acSourceNatural": "Natürliche Rüstung (fester Wert)",
     "armorBonus": "Rüstungsbonus",
     "naturalArmorValue": "Wert der natürlichen Rüstung",
     "shield": "Schild",
-    "shieldHint": "Trägt einen Schild (+2 RK)",
+    "shieldHint": "Trägt einen Schild (+2 AC)",
     "abilityScoreBonuses": "Attributsboni",
     "scaleMonster": "MONSTER SKALIEREN",
     "scaling": "SKALIERUNG...",
     "tuningNotes": "Feinabstimmungsnotizen",
     "derivedFromMatrix": "Abgeleitet aus der CR-Matrix.",
     "suggestedAttackBonus": "Empfohlener Angriffsbonus",
-    "suggestedSaveDC": "Empfohlener Rettungswurf-SG",
+    "suggestedSaveDC": "Empfohlener Rettungswurf-DC",
     "beforeAfter": "Vor / Nach",
     "snapshotOutput": "Schnappschuss der exakten Exportausgabe.",
     "original": "Original",
     "scaled": "Skaliert",
-    "ac": "RK",
-    "hp": "TP",
-    "dpr": "SDR",
+    "ac": "AC",
+    "hp": "HP",
+    "dpr": "DPR",
     "cr": "CR",
-    "acChange": "RK-Änderung",
-    "hpChange": "TP-Änderung",
+    "acChange": "AC-Änderung",
+    "hpChange": "HP-Änderung",
     "crShift": "CR-Verschiebung",
     "exportPreview": "Export-Vorschau",
     "pngPdfLayout": "PNG/PDF verwendet genau dieses Layout.",
@@ -210,8 +210,8 @@
     "unnamedArtifact": "Unbenanntes Artefakt",
     "noAttunement": "Keine Einstimmung",
     "toHit": "+{value} auf Trefferwurf",
-    "acBonus": "+{value} RK",
-    "saveDC": "SG {value}",
+    "acBonus": "+{value} AC",
+    "saveDC": "DC {value}",
     "avgDmg": "+{value} durchschnittl. Schaden",
     "mechanicalSummary": "Mechanische Übersicht",
     "name": "Name",
@@ -225,8 +225,8 @@
     "craftCost": "Herstellungskosten",
     "craftTime": "Herstellungszeit",
     "toHitLabel": "Trefferbonus",
-    "acBonusLabel": "RK-Bonus",
-    "saveDCLabel": "SG",
+    "acBonusLabel": "AC-Bonus",
+    "saveDCLabel": "DC",
     "damageBonus": "Schadensbonus",
     "avg": "Ø",
     "loreCrafting": "Lore & Herstellung",
@@ -619,11 +619,11 @@
     "sections": [
       {
         "heading": "Eingaben",
-        "html": "<ul>\n        <li>Statblock des Quellmonsters: Name, Größe/Typ, aktueller <code>CR</code> und Werte (RK, TP, STÄ/GES/KON/INT/WEI/CHA).</li>\n        <li>Optionale Aktionsliste zur Schätzung des Schadens pro Runde aus Schadensausdrücken (z. B. <code>1d6+2</code>).</li>\n        <li>Ziel-CR (unterstützt gebrochene CR 1/8, 1/4, 1/2 sowie CR 1–30).</li>\n        <li>RK-Quelle: geschicklichkeitsbasiert, getragene Rüstung oder natürliche Rüstung — plus optionaler Schild-Schalter.</li>\n        <li>Optionale Boni pro Attributswert.</li>\n      </ul>"
+        "html": "<ul>\n        <li>Statblock des Quellmonsters: Name, Größe/Typ, aktueller <code>CR</code> und Werte (AC, HP, STÄ/GES/KON/INT/WEI/CHA).</li>\n        <li>Optionale Aktionsliste zur Schätzung des Schadens pro Runde aus Schadensausdrücken (z. B. <code>1d6+2</code>).</li>\n        <li>Ziel-CR (unterstützt gebrochene CR 1/8, 1/4, 1/2 sowie CR 1–30).</li>\n        <li>AC-Quelle: geschicklichkeitsbasiert, getragene Rüstung oder natürliche Rüstung — plus optionaler Schild-Schalter.</li>\n        <li>Optionale Boni pro Attributswert.</li>\n      </ul>"
       },
       {
         "heading": "CR-Zeilensuche",
-        "html": "<p>Wir schlagen zwei Zeilen aus der CR-Matrix nach: eine für den Quell-CR und eine für den Ziel-CR. Jede Zeile enthält Referenzwerte für Übungsbonus, erwartete AC, HP, Angriffsbonus, DPR und Rettungswurf-SG — verwendet wird die höchste Zeile mit <code>row.cr ≤ cr</code>.</p>"
+        "html": "<p>Wir schlagen zwei Zeilen aus der CR-Matrix nach: eine für den Quell-CR und eine für den Ziel-CR. Jede Zeile enthält Referenzwerte für Übungsbonus, erwartete AC, HP, Angriffsbonus, DPR und Rettungswurf-DC — verwendet wird die höchste Zeile mit <code>row.cr ≤ cr</code>.</p>"
       },
       {
         "heading": "Schaden pro Runde (DPR) – Schätzung",
@@ -635,7 +635,7 @@
       },
       {
         "heading": "AC-Skalierung",
-        "html": "<p>Die RK wird unabhängig von der CR-Matrix aus einer von drei wählbaren Quellen berechnet, plus optionalem Schild:</p>\n      <ul>\n        <li><strong>Geschicklichkeitsbasiert</strong>: <code>10 + GES-Modifikator</code> — für unbewaffnete Kreaturen, die auf Beweglichkeit setzen.</li>\n        <li><strong>Getragene Rüstung</strong>: <code>10 + Rüstungsbonus</code> — der Bonus, den du für die getragene Rüstung einträgst.</li>\n        <li><strong>Natürliche Rüstung</strong>: ein fester Wert, den du direkt einträgst (z. B. die natürliche Rüstung eines Drachen oder Tortle) — nicht zu 10 addiert.</li>\n      </ul>\n      <p>Ein getragener <strong>Schild</strong> addiert immer pauschal <code>+2</code> auf eine der drei Quellen.</p>\n      <p>Geschicklichkeitsbasierte und natürliche Rüstung sind der Kreatur inhärent und bei Monstern auf <strong>RK 30</strong> gedeckelt — analog dazu, dass die Spieler-RK allein durch GES/natürliche Quellen bei 20 gedeckelt ist. Getragene Rüstung und ein Schild gelten als Gegenstände und dürfen die RK über die Obergrenze hinaus treiben: <code>finalAC = (Rüstung ? 10 + Rüstungsbonus : clamp(inhärenteRK, 1, 30)) + (Schild ? 2 : 0)</code>. Die RK 25 der Tarrasque ist ein guter Referenzpunkt dafür, wie hoch natürliche Rüstung reichen kann, ohne je einen Gegenstand zu benötigen.</p>\n      <p>Situative Deckung (siehe die Deckungsmechanik des Begegnungs-Generators) kann die effektive RK im Kampf zusätzlich erhöhen, ist aber nicht Teil des Basis-Statblocks des Monsters.</p>"
+        "html": "<p>Die AC wird unabhängig von der CR-Matrix aus einer von drei wählbaren Quellen berechnet, plus optionalem Schild:</p>\n      <ul>\n        <li><strong>Geschicklichkeitsbasiert</strong>: <code>10 + GES-Modifikator</code> — für unbewaffnete Kreaturen, die auf Beweglichkeit setzen.</li>\n        <li><strong>Getragene Rüstung</strong>: <code>10 + Rüstungsbonus</code> — der Bonus, den du für die getragene Rüstung einträgst.</li>\n        <li><strong>Natürliche Rüstung</strong>: ein fester Wert, den du direkt einträgst (z. B. die natürliche Rüstung eines Drachen oder Tortle) — nicht zu 10 addiert.</li>\n      </ul>\n      <p>Ein getragener <strong>Schild</strong> addiert immer pauschal <code>+2</code> auf eine der drei Quellen.</p>\n      <p>Geschicklichkeitsbasierte und natürliche Rüstung sind der Kreatur inhärent und bei Monstern auf <strong>AC 30</strong> gedeckelt — analog dazu, dass die Spieler-AC allein durch GES/natürliche Quellen bei 20 gedeckelt ist. Getragene Rüstung und ein Schild gelten als Gegenstände und dürfen die AC über die Obergrenze hinaus treiben: <code>finalAC = (Rüstung ? 10 + Rüstungsbonus : clamp(inhärenteAC, 1, 30)) + (Schild ? 2 : 0)</code>. Die AC 25 der Tarrasque ist ein guter Referenzpunkt dafür, wie hoch natürliche Rüstung reichen kann, ohne je einen Gegenstand zu benötigen.</p>\n      <p>Situative Deckung (siehe die Deckungsmechanik des Begegnungs-Generators) kann die effektive AC im Kampf zusätzlich erhöhen, ist aber nicht Teil des Basis-Statblocks des Monsters.</p>"
       },
       {
         "heading": "Attributswert-Skalierung (STR/DEX/CON/INT/WIS/CHA)",
@@ -646,8 +646,8 @@
         "html": "<ul>\n        <li>Bester Angriffs-Attributsmodifikator: <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> für skalierte Werte.</li>\n        <li>Änderung der Matrix-Grundlinie: <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Anpassung an die eigene Werteänderung des Monsters: <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Vorschlag: <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
       },
       {
-        "heading": "Rettungswurf-SG-Empfehlung",
-        "html": "<p>Der vorgeschlagene Rettungswurf-SG beginnt beim SG der Zielzeile und verschiebt sich mit der Änderung des INT-Modifikators des Monsters (als Stellvertreter im Zauberwirker-Stil):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+        "heading": "Rettungswurf-DC-Empfehlung",
+        "html": "<p>Der vorgeschlagene Rettungswurf-DC beginnt beim DC der Zielzeile und verschiebt sich mit der Änderung des INT-Modifikators des Monsters (als Stellvertreter im Zauberwirker-Stil):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
       },
       {
         "heading": "DPR-Referenz",
@@ -662,7 +662,7 @@
         "html": "<p>Dies sind die exakten Basiswerte, die der Skalierer verwendet, direkt aus der aktuellen Datenebene entnommen. Die Tabelle ist die offizielle DMG-Tabelle „Monster Statistics by Challenge Rating\" und ist bei den Regelwerken 2014 und 2024 identisch — CRealizr verwendet eine einzige, einheitliche Matrix unabhängig davon, aus welchem Quellenbuch ein Monster stammt.</p>"
       }
     ],
-    "note": "TP- und Schaden-pro-Runde-Werte sind die offiziellen Bereiche der DMG-CR-Tabelle — TP wird als Mittelwert angezeigt, DPR als vollständiger Bereich. Angriffsboni und Rettungswurf-SG entsprechen exakt der offiziellen Tabelle."
+    "note": "HP- und Schaden-pro-Runde-Werte sind die offiziellen Bereiche der DMG-CR-Tabelle — HP wird als Mittelwert angezeigt, DPR als vollständiger Bereich. Angriffsboni und Rettungswurf-DC entsprechen exakt der offiziellen Tabelle."
   },
   "artifactForgeDocs": {
     "title": "Artefaktschmiede – So funktioniert's",
@@ -690,7 +690,7 @@
       },
       {
         "heading": "Vorgeschlagene Boni",
-        "html": "<p>Boni sind bewusst konservativ und an Seltenheitsstufen gekoppelt:</p>\n      <ul>\n        <li>Magiebonus: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Durchschnittlicher Schadensbonus: spiegelt den Magiebonus je Seltenheit</li>\n        <li>Rettungswurf-SG (für Zauberstäbe): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Anwendung nach Typ:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: kein automatischer Kampfbonus (freies Design)</li>\n      </ul>"
+        "html": "<p>Boni sind bewusst konservativ und an Seltenheitsstufen gekoppelt:</p>\n      <ul>\n        <li>Magiebonus: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Durchschnittlicher Schadensbonus: spiegelt den Magiebonus je Seltenheit</li>\n        <li>Rettungswurf-DC (für Zauberstäbe): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Anwendung nach Typ:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: kein automatischer Kampfbonus (freies Design)</li>\n      </ul>"
       },
       {
         "heading": "Gegenstands-Bauplan",

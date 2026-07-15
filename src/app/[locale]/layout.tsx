@@ -1,4 +1,5 @@
 import type {Metadata, Viewport} from "next";
+import { headers } from "next/headers";
 import { buildHreflang } from "@/app/lib/seo";
 import {Geist, Geist_Mono, Cinzel, Yeseva_One, Gentium_Plus} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
@@ -36,11 +37,17 @@ const cinzel = Cinzel({
 
 // Cinzel is Latin-only. Greek and Cyrillic get their own display serif —
 // see the `--font-serif` overrides in globals.css and SERIF_OVERRIDE_LOCALES
-// below.
+// below. `next/font` emits a <link rel="preload"> for every font it loads
+// regardless of whether it ends up used on the page, so preloading all three
+// unconditionally would force every visitor (majority Latin-locale traffic
+// included) to eagerly fetch two serif fonts they'll never render — a real
+// hit to LCP. Only Cinzel (the default, used by 4 of 6 locales) preloads;
+// the minority-locale fonts still load, just without jumping the queue.
 const yesevaOne = Yeseva_One({
     weight: "400",
     variable: "--font-yeseva-one",
     subsets: ["latin", "cyrillic"],
+    preload: false,
 });
 
 const gentiumPlus = Gentium_Plus({
@@ -48,6 +55,7 @@ const gentiumPlus = Gentium_Plus({
     style: ["normal", "italic"],
     variable: "--font-gentium-plus",
     subsets: ["latin", "greek"],
+    preload: false,
 });
 
 /** Locale -> the CSS class that overrides `--font-serif` for it (see globals.css). Latin-script locales use Cinzel, no class needed. */
@@ -71,11 +79,12 @@ const siteUrl = "https://crealizr.net";
 // viewport-fit=cover is required for env(safe-area-inset-*) to resolve to
 // non-zero values on notch/home-indicator devices — see the safe-area
 // padding in globals.css (.page-wrap, Header, Sidebar) that depends on it.
+// user-scalable/maximum-scale are deliberately left at their defaults
+// (pinch-zoom enabled) — disabling zoom is a Lighthouse accessibility
+// violation and blocks low-vision users from zooming in on content.
 export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
     viewportFit: "cover",
 };
 
@@ -85,6 +94,16 @@ export async function generateMetadata({
     params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
     const { locale } = await params;
+    // The middleware rewrites bare "/" to "/${defaultLocale}" internally so
+    // it can serve content without a redirect round-trip, but that means
+    // the resolved locale here is indistinguishable from an actual visit to
+    // "/en" unless we check for the header it sets. Self-canonicalizing to
+    // "/" in that case (instead of "/en") avoids a canonical pointing at a
+    // different URL than the one in the address bar — a URL that also
+    // happens to be one of the hreflang alternates below, which Lighthouse
+    // flags as an invalid canonical.
+    const isRewrittenFromRoot = (await headers()).get('x-rewritten-from-root') === '1';
+    const canonicalPath = isRewrittenFromRoot ? "/" : `/${locale}`;
     return {
         metadataBase: new URL(siteUrl),
         title: "CRealizr | Dungeons & Dragons Toolkit",
@@ -103,12 +122,12 @@ export async function generateMetadata({
             title: "CRealizr",
         },
         alternates: {
-            canonical: `/${locale}`,
+            canonical: canonicalPath,
             languages: buildHreflang("/"),
         },
         openGraph: {
             type: "website",
-            url: `/${locale}`,
+            url: canonicalPath,
             title: "CRealizr | Dungeons & Dragons Toolkit",
             description: "DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.",
             images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr Toolkit" }],

@@ -350,14 +350,27 @@ h1, h2, h3, h4, .font-serif {
 }
 
 /* ─── Links ────────────────────────────────────────────────────────────── */
+/* Underlined at rest (not just on :hover) — links that differ from body
+   text by color alone fail WCAG's "use of color" criterion and are
+   indistinguishable for colorblind users. */
 .ui-link {
   color: var(--accent-primary);
-  text-decoration: none;
-  transition: color 200ms ease;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+  text-underline-offset: 2px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
 }
 .ui-link:hover {
   color: #e0c080;
+  text-decoration-color: currentColor;
+}
+
+/* Fallback for any <a> rendered into translated docs/prose HTML that
+   doesn't explicitly carry the .ui-link class. */
+.doc-body a {
+  color: var(--accent-primary);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* ─── Layout ───────────────────────────────────────────────────────────── */

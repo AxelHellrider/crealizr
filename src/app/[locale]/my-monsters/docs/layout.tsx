@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "My Monsters – Field Reference | CRealizr";
 const description =
     "Field reference for the CRealizr custom monster library: stat fields, terrain and affiliation tags, JSON import/export format, and integration with other tools.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -16,14 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "CRealizr monster reference",
             "homebrew statblock fields",
         ],
-        alternates: {
-            canonical: "/my-monsters/docs",
-            languages: buildHreflang("/my-monsters/docs"),
-        },
+        alternates: buildAlternates(locale, "/my-monsters/docs"),
         openGraph: {
             title,
             description,
-            url: "/my-monsters/docs",
+            url: buildCanonicalPath(locale, "/my-monsters/docs"),
             type: "website",
             siteName: "CRealizr",
             images: [

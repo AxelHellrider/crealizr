@@ -28,7 +28,7 @@
     "coreToolkit": {
       "monsterScaler": {
         "title": "Ajusteur de monstres",
-        "description": "Ajuste les PV, la CA, le DPR et les cibles de statistiques vers un nouveau CR. Inclut des blocs de stat prêts à l’export.",
+        "description": "Ajuste les HP, la AC, le DPR et les cibles de statistiques vers un nouveau CR. Inclut des blocs de stat prêts à l’export.",
         "action": "Adapter un monstre"
       },
       "encounterBuilder": {
@@ -107,11 +107,11 @@
   },
   "monsterScaler": {
     "title": "Ajusteur de monstres",
-    "description": "Ajustez les PV, la CA, le DPR et les statistiques cibles vers un nouveau CR tout en gardant la créature reconnaissable.",
+    "description": "Ajustez les HP, l'AC, le DPR et les statistiques cibles vers un nouveau CR tout en gardant la créature reconnaissable.",
     "viewDocs": "Voir la documentation",
     "whatScales": "Ce qui s’adapte",
-    "whatScalesDesc": "CA, PV, cibles de DPR et modificateurs de caractéristiques.",
-    "acSourceNotes": "Sources de CA",
+    "whatScalesDesc": "AC, HP, cibles de DPR et modificateurs de caractéristiques.",
+    "acSourceNotes": "Sources d'AC",
     "acSourceNotesDesc": "Basée sur la Dextérité, armure équipée ou armure naturelle — plus un bouclier optionnel.",
     "guardrails": "Garde-fous",
     "guardrailsDesc": "Vérifiez l’économie d’actions, les actions légendaires et les traits uniques après l’adaptation.",
@@ -125,31 +125,31 @@
     "selectTargetCR": "Sélectionnez le CR cible",
     "baseAttributes": "Attributs de base",
     "defenseAdjustments": "Ajustements de défense et de caractéristiques",
-    "acSource": "Source de CA",
+    "acSource": "Source d'AC",
     "acSourceDex": "Basée sur la Dextérité (10 + mod. DEX)",
     "acSourceArmor": "Armure équipée (10 + bonus)",
     "acSourceNatural": "Armure naturelle (valeur fixe)",
     "armorBonus": "Bonus d'armure",
     "naturalArmorValue": "Valeur d'armure naturelle",
     "shield": "Bouclier",
-    "shieldHint": "Porte un bouclier (+2 CA)",
+    "shieldHint": "Porte un bouclier (+2 AC)",
     "abilityScoreBonuses": "Bonus de caractéristiques",
     "scaleMonster": "ADAPTER LE MONSTRE",
     "scaling": "ADAPTATION...",
     "tuningNotes": "Notes d’ajustement",
     "derivedFromMatrix": "Dérivé de la matrice de CR.",
     "suggestedAttackBonus": "Bonus d’attaque suggéré",
-    "suggestedSaveDC": "DD de jet de sauvegarde suggéré",
+    "suggestedSaveDC": "DC de jet de sauvegarde suggéré",
     "beforeAfter": "Avant / Après",
     "snapshotOutput": "Instantané de l’export exact.",
     "original": "Original",
     "scaled": "Adapté",
-    "ac": "CA",
-    "hp": "PV",
+    "ac": "AC",
+    "hp": "HP",
     "dpr": "DPR",
     "cr": "CR",
-    "acChange": "Variation de CA",
-    "hpChange": "Variation de PV",
+    "acChange": "Variation d'AC",
+    "hpChange": "Variation de HP",
     "crShift": "Variation de CR",
     "exportPreview": "Aperçu de l’export",
     "pngPdfLayout": "Le PNG/PDF utilise exactement cette mise en page.",
@@ -210,8 +210,8 @@
     "unnamedArtifact": "Artefact sans nom",
     "noAttunement": "Aucune harmonisation",
     "toHit": "+{value} au jet d’attaque",
-    "acBonus": "+{value} CA",
-    "saveDC": "DD {value}",
+    "acBonus": "+{value} AC",
+    "saveDC": "DC {value}",
     "avgDmg": "+{value} dégâts moy.",
     "mechanicalSummary": "Résumé mécanique",
     "name": "Nom",
@@ -225,8 +225,8 @@
     "craftCost": "Coût de fabrication",
     "craftTime": "Temps de fabrication",
     "toHitLabel": "Pour toucher",
-    "acBonusLabel": "Bonus de CA",
-    "saveDCLabel": "DD",
+    "acBonusLabel": "Bonus d'AC",
+    "saveDCLabel": "DC",
     "damageBonus": "Bonus de dégâts",
     "avg": "moy.",
     "loreCrafting": "Histoire et fabrication",
@@ -604,7 +604,7 @@
       },
       {
         "heading": "Couverture",
-        "html": "<p>La couverture suit les règles standard de D&amp;D 5e. Trois niveaux sont disponibles via l'éditeur de nœud :</p>\n      <ul>\n        <li><strong>Demi-couverture</strong> — bonus de +2 à la CA et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture aux trois quarts</strong> — bonus de +5 à la CA et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture totale</strong> — ne peut pas être ciblé directement par des attaques ou des sorts.</li>\n      </ul>\n      <p>La section <strong>Avantages / Désavantages</strong> de la carte du groupe liste automatiquement chaque membre du groupe adjacent (à 1 hexagone) à un nœud de couverture, en indiquant le meilleur niveau de couverture disponible.</p>"
+        "html": "<p>La couverture suit les règles standard de D&amp;D 5e. Trois niveaux sont disponibles via l'éditeur de nœud :</p>\n      <ul>\n        <li><strong>Demi-couverture</strong> — bonus de +2 à la AC et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture aux trois quarts</strong> — bonus de +5 à la AC et aux jets de sauvegarde de Dextérité.</li>\n        <li><strong>Couverture totale</strong> — ne peut pas être ciblé directement par des attaques ou des sorts.</li>\n      </ul>\n      <p>La section <strong>Avantages / Désavantages</strong> de la carte du groupe liste automatiquement chaque membre du groupe adjacent (à 1 hexagone) à un nœud de couverture, en indiquant le meilleur niveau de couverture disponible.</p>"
       },
       {
         "heading": "Éditeur de nœud",
@@ -619,23 +619,23 @@
     "sections": [
       {
         "heading": "Entrées",
-        "html": "<ul>\n        <li>Bloc de statistiques du monstre source : nom, taille/type, <code>CR</code> actuel, et statistiques (CA, PV, FOR/DEX/CON/INT/SAG/CHA).</li>\n        <li>Liste d'actions optionnelle utilisée pour estimer les DPR à partir d'expressions de dégâts (ex. <code>1d6+2</code>).</li>\n        <li>CR cible (prend en charge les CR fractionnaires 1/8, 1/4, 1/2 et CR 1–30).</li>\n        <li>Source de CA : basée sur la Dextérité, armure équipée, ou armure naturelle — plus un bouclier optionnel.</li>\n        <li>Bonus optionnels par caractéristique.</li>\n      </ul>"
+        "html": "<ul>\n        <li>Bloc de statistiques du monstre source : nom, taille/type, <code>CR</code> actuel, et statistiques (AC, HP, FOR/DEX/CON/INT/SAG/CHA).</li>\n        <li>Liste d'actions optionnelle utilisée pour estimer les DPR à partir d'expressions de dégâts (ex. <code>1d6+2</code>).</li>\n        <li>CR cible (prend en charge les CR fractionnaires 1/8, 1/4, 1/2 et CR 1–30).</li>\n        <li>Source de AC : basée sur la Dextérité, armure équipée, ou armure naturelle — plus un bouclier optionnel.</li>\n        <li>Bonus optionnels par caractéristique.</li>\n      </ul>"
       },
       {
         "heading": "Recherche de ligne CR",
-        "html": "<p>Nous recherchons deux lignes dans la matrice de CR : une pour le CR source et une pour le CR cible. Chaque ligne contient des valeurs de référence pour le bonus de maîtrise, la CA attendue, les PV, le bonus d'attaque, le DPR et le DD de sauvegarde — la ligne la plus élevée avec <code>row.cr ≤ cr</code> est utilisée.</p>"
+        "html": "<p>Nous recherchons deux lignes dans la matrice de CR : une pour le CR source et une pour le CR cible. Chaque ligne contient des valeurs de référence pour le bonus de maîtrise, la AC attendue, les HP, le bonus d'attaque, le DPR et le DC de sauvegarde — la ligne la plus élevée avec <code>row.cr ≤ cr</code> est utilisée.</p>"
       },
       {
         "heading": "Estimation des dégâts par round (DPR)",
         "html": "<p>Si le monstre a des actions avec des chaînes de dégâts, nous estimons les dégâts moyens pour chaque action et faisons la somme :</p>\n      <ul>\n        <li>Pour chaque terme comme <code>XdY</code> (ex. <code>2d6</code>), la valeur attendue = <code>X × (Y + 1) / 2</code>.</li>\n        <li>Un modificateur fixe optionnel <code>±N</code> est ajouté une fois au total de cette action.</li>\n        <li>Les nombres non-dés sont interprétés comme une valeur fixe lorsque c'est possible.</li>\n      </ul>\n      <p>Les moyennes par action sont additionnées et arrondies à l'entier le plus proche. Si aucune action n'est fournie, l'ajusteur ignore le ratio de DPR et affiche à la place le DPR attendu du CR cible comme référence absolue.</p>"
       },
       {
-        "heading": "Mise à l'échelle des PV",
-        "html": "<p>Les PV sont mis à l'échelle proportionnellement, en préservant l'écart du monstre original par rapport à la référence de CR :</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, avec un minimum de 1.</p>\n      <p><em>Exemple : un monstre CR 1 avec 156 PV (2× la référence de CR 1 de 78), mis à l'échelle en CR 5 (référence 138), donne <code>round(156 × 138/78) = 276</code> — toujours environ 2× la référence de CR 5.</em></p>"
+        "heading": "Mise à l'échelle des HP",
+        "html": "<p>Les HP sont mis à l'échelle proportionnellement, en préservant l'écart du monstre original par rapport à la référence de CR :</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, avec un minimum de 1.</p>\n      <p><em>Exemple : un monstre CR 1 avec 156 HP (2× la référence de CR 1 de 78), mis à l'échelle en CR 5 (référence 138), donne <code>round(156 × 138/78) = 276</code> — toujours environ 2× la référence de CR 5.</em></p>"
       },
       {
-        "heading": "Mise à l'échelle de la CA",
-        "html": "<p>La CA est calculée indépendamment de la matrice de CR, à partir de l'une des trois sources choisies, plus un bouclier optionnel :</p>\n      <ul>\n        <li><strong>Basée sur la Dextérité</strong> : <code>10 + mod. de Dextérité</code> — pour les créatures non blindées qui comptent sur l'agilité.</li>\n        <li><strong>Armure équipée</strong> : <code>10 + bonus d'armure</code> — le bonus que vous saisissez pour l'armure portée par la créature.</li>\n        <li><strong>Armure naturelle</strong> : une valeur fixe que vous saisissez directement (ex. l'armure naturelle d'un dragon ou d'un tortue) — non ajoutée à 10.</li>\n      </ul>\n      <p>Un <strong>bouclier</strong> porté ajoute toujours un forfait de <code>+2</code> au-dessus de l'une des trois sources.</p>\n      <p>La CA basée sur la Dextérité et l'armure naturelle sont inhérentes à la créature et plafonnées à <strong>CA 30</strong> pour les monstres — reflétant le fait que la CA d'un joueur plafonne à 20 à partir des seules sources Dextérité/naturelle. L'armure équipée et un bouclier sont considérés comme des objets et peuvent faire dépasser ce plafond : <code>finalAC = (armure ? 10 + bonusArmure : clamp(caInhérente, 1, 30)) + (bouclier ? 2 : 0)</code>. La CA 25 du Tarrasque est un bon point de référence pour savoir jusqu'où l'armure naturelle peut monter sans jamais nécessiter d'objet.</p>\n      <p>La couverture situationnelle (voir le mécanisme de couverture du Générateur de rencontres) peut encore augmenter la CA effective en combat, mais ne fait pas partie du bloc de statistiques de base du monstre.</p>"
+        "heading": "Mise à l'échelle de la AC",
+        "html": "<p>La AC est calculée indépendamment de la matrice de CR, à partir de l'une des trois sources choisies, plus un bouclier optionnel :</p>\n      <ul>\n        <li><strong>Basée sur la Dextérité</strong> : <code>10 + mod. de Dextérité</code> — pour les créatures non blindées qui comptent sur l'agilité.</li>\n        <li><strong>Armure équipée</strong> : <code>10 + bonus d'armure</code> — le bonus que vous saisissez pour l'armure portée par la créature.</li>\n        <li><strong>Armure naturelle</strong> : une valeur fixe que vous saisissez directement (ex. l'armure naturelle d'un dragon ou d'un tortue) — non ajoutée à 10.</li>\n      </ul>\n      <p>Un <strong>bouclier</strong> porté ajoute toujours un forfait de <code>+2</code> au-dessus de l'une des trois sources.</p>\n      <p>La AC basée sur la Dextérité et l'armure naturelle sont inhérentes à la créature et plafonnées à <strong>AC 30</strong> pour les monstres — reflétant le fait que la AC d'un joueur plafonne à 20 à partir des seules sources Dextérité/naturelle. L'armure équipée et un bouclier sont considérés comme des objets et peuvent faire dépasser ce plafond : <code>finalAC = (armure ? 10 + bonusArmure : clamp(caInhérente, 1, 30)) + (bouclier ? 2 : 0)</code>. La AC 25 du Tarrasque est un bon point de référence pour savoir jusqu'où l'armure naturelle peut monter sans jamais nécessiter d'objet.</p>\n      <p>La couverture situationnelle (voir le mécanisme de couverture du Générateur de rencontres) peut encore augmenter la AC effective en combat, mais ne fait pas partie du bloc de statistiques de base du monstre.</p>"
       },
       {
         "heading": "Mise à l'échelle des caractéristiques (FOR/DEX/CON/INT/SAG/CHA)",
@@ -646,8 +646,8 @@
         "html": "<ul>\n        <li>Meilleur modificateur de caractéristique d'attaque : <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> pour les statistiques mises à l'échelle.</li>\n        <li>Changement de la référence de matrice : <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Ajustement pour le propre changement de statistiques du monstre : <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Suggestion : <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
       },
       {
-        "heading": "Conseil de DD de sauvegarde",
-        "html": "<p>Le DD de sauvegarde suggéré part du DD de la ligne cible et se décale selon le changement du modificateur d'INT du monstre (comme approximation de style lanceur de sorts) :</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+        "heading": "Conseil de DC de sauvegarde",
+        "html": "<p>Le DC de sauvegarde suggéré part du DC de la ligne cible et se décale selon le changement du modificateur d'INT du monstre (comme approximation de style lanceur de sorts) :</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
       },
       {
         "heading": "Référence DPR",
@@ -655,14 +655,14 @@
       },
       {
         "heading": "Limites, plafonds et déterminisme",
-        "html": "<ul>\n        <li>La CA est limitée à 5–30 après tous les ajustements.</li>\n        <li>Les caractéristiques sont limitées à 1–30.</li>\n        <li>Les PV ont un minimum de 1.</li>\n      </ul>\n      <p>L'ajusteur est entièrement déterministe. Toutes les valeurs de matrice sont le point médian des fourchettes officielles du DMG. Aucun hasard n'est appliqué à l'exécution — les mêmes entrées produisent toujours la même sortie.</p>"
+        "html": "<ul>\n        <li>La AC est limitée à 5–30 après tous les ajustements.</li>\n        <li>Les caractéristiques sont limitées à 1–30.</li>\n        <li>Les HP ont un minimum de 1.</li>\n      </ul>\n      <p>L'ajusteur est entièrement déterministe. Toutes les valeurs de matrice sont le point médian des fourchettes officielles du DMG. Aucun hasard n'est appliqué à l'exécution — les mêmes entrées produisent toujours la même sortie.</p>"
       },
       {
         "heading": "Référence de la matrice CR",
         "html": "<p>Ce sont les valeurs de référence exactes utilisées par le redimensionneur, tirées directement de la couche de données en direct. Le tableau est le tableau officiel du DMG « Monster Statistics by Challenge Rating » et est identique pour les règles 2014 et 2024 — CRealizr utilise une matrice unique et unifiée quel que soit le livre source d'un monstre.</p>"
       }
     ],
-    "note": "Les valeurs de PV et de Dégâts par round sont les plages officielles du tableau de CR du DMG — les PV sont affichés comme leur point médian, les DPR sont affichés comme la plage complète. Les bonus d'attaque et les Sl de sauvegarde correspondent exactement au tableau officiel."
+    "note": "Les valeurs de HP et de Dégâts par round sont les plages officielles du tableau de CR du DMG — les HP sont affichés comme leur point médian, les DPR sont affichés comme la plage complète. Les bonus d'attaque et les Sl de sauvegarde correspondent exactement au tableau officiel."
   },
   "artifactForgeDocs": {
     "title": "Forge d'artefacts – Comment ça marche",
@@ -690,7 +690,7 @@
       },
       {
         "heading": "Bonus suggérés",
-        "html": "<p>Les bonus sont volontairement conservateurs et liés aux bandes de rareté :</p>\n      <ul>\n        <li>Bonus magique : <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Bonus de dégâts moyen : reflète le bonus magique selon la rareté</li>\n        <li>DD de sauvegarde (pour les baguettes) : <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Application par type :</p>\n      <ul>\n        <li><code>Weapon</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code> : <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code> : aucun bonus de combat automatique (design libre)</li>\n      </ul>"
+        "html": "<p>Les bonus sont volontairement conservateurs et liés aux bandes de rareté :</p>\n      <ul>\n        <li>Bonus magique : <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Bonus de dégâts moyen : reflète le bonus magique selon la rareté</li>\n        <li>DC de sauvegarde (pour les baguettes) : <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Application par type :</p>\n      <ul>\n        <li><code>Weapon</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code> : <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code> : <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code> : aucun bonus de combat automatique (design libre)</li>\n      </ul>"
       },
       {
         "heading": "Plan d'objet",
@@ -713,7 +713,7 @@
       },
       {
         "heading": "Bloc de statistiques",
-        "html": "<p>La section bloc de statistiques est optionnelle. Remplir n'importe quel champ de défense ou de caractéristique active le bloc de statistiques complet à l'enregistrement.</p>\n      <ul>\n        <li><strong>CA</strong> — Classe d'Armure (0–30).</li>\n        <li><strong>PV</strong> — Points de Vie.</li>\n        <li><strong>Vitesse</strong> — texte libre (ex. « 30 ft, fly 60 ft »).</li>\n        <li><strong>Caractéristiques</strong> — FOR, DEX, CON, INT, SAG, CHA (0–30 chacune). Le modificateur est calculé automatiquement comme <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
+        "html": "<p>La section bloc de statistiques est optionnelle. Remplir n'importe quel champ de défense ou de caractéristique active le bloc de statistiques complet à l'enregistrement.</p>\n      <ul>\n        <li><strong>AC</strong> — Classe d'Armure (0–30).</li>\n        <li><strong>HP</strong> — Points de Vie.</li>\n        <li><strong>Vitesse</strong> — texte libre (ex. « 30 ft, fly 60 ft »).</li>\n        <li><strong>Caractéristiques</strong> — FOR, DEX, CON, INT, SAG, CHA (0–30 chacune). Le modificateur est calculé automatiquement comme <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
       },
       {
         "heading": "Dégâts par round (DPR)",

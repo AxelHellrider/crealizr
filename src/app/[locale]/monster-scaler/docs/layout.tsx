@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "Monster Scaler – Formulas & CR Matrix | CRealizr";
 const description =
     "Exact formulas used by the CRealizr monster scaler: HP scaling, AC guardrails, ability score steps, DPR estimation, and the full 2014/2024 CR matrix tables.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -18,14 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "2014 CR table",
             "2024 CR table",
         ],
-        alternates: {
-            canonical: "/monster-scaler/docs",
-            languages: buildHreflang("/monster-scaler/docs"),
-        },
+        alternates: buildAlternates(locale, "/monster-scaler/docs"),
         openGraph: {
             title,
             description,
-            url: "/monster-scaler/docs",
+            url: buildCanonicalPath(locale, "/monster-scaler/docs"),
             type: "website",
             siteName: "CRealizr",
             images: [

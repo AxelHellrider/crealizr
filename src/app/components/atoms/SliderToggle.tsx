@@ -34,7 +34,7 @@ export function SliderToggle<T extends string>({ value, options, onChange }: Sli
                 ))}
             </div>
             {activeLabel && (
-                <span className="text-[10px] uppercase tracking-[0.15em] text-gold/60 font-bold text-center">
+                <span className="text-[10px] uppercase tracking-[0.15em] text-gold/90 font-bold text-center">
                     {activeLabel}
                 </span>
             )}
