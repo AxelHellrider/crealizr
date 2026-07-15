@@ -78,11 +78,12 @@ const siteUrl = "https://crealizr.net";
 // viewport-fit=cover is required for env(safe-area-inset-*) to resolve to
 // non-zero values on notch/home-indicator devices — see the safe-area
 // padding in globals.css (.page-wrap, Header, Sidebar) that depends on it.
+// user-scalable/maximum-scale are deliberately left at their defaults
+// (pinch-zoom enabled) — disabling zoom is a Lighthouse accessibility
+// violation and blocks low-vision users from zooming in on content.
 export const viewport: Viewport = {
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
     viewportFit: "cover",
 };
 

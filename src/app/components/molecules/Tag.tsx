@@ -16,7 +16,7 @@ export function Tag({ children, onRemove, className = "" }: TagProps) {
                 <button
                     type="button"
                     onClick={onRemove}
-                    className="text-gold/40 hover:text-red-400 ml-2 transition-colors text-base leading-none"
+                    className="text-gold/90 hover:text-red-400 ml-2 transition-colors text-base leading-none"
                     aria-label="Remove"
                 >
                     ×

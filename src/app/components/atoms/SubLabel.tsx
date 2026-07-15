@@ -7,7 +7,7 @@ interface SubLabelProps {
 }
 
 export function SubLabel({ children, variant = "gold", className = "" }: SubLabelProps) {
-    const color = variant === "muted" ? "text-muted" : "text-gold/70";
+    const color = variant === "muted" ? "text-muted" : "text-gold/90";
     return (
         <div className={`text-xs uppercase tracking-[0.2em] ${color} font-bold ${className}`}>
             {children}

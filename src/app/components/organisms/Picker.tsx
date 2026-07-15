@@ -93,7 +93,7 @@ export function Picker() {
             >
                 {/* Header */}
                 <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-gold/10">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-gold/60 font-bold min-w-0 truncate">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gold/90 font-bold min-w-0 truncate">
                         {renderedConfig.label ?? "Select value"}
                     </span>
                     <button

@@ -132,7 +132,7 @@ export default function Sidebar() {
           >
               {/* Language Switcher */}
               <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
+                  <label className="text-xs uppercase tracking-[0.2em] text-gold/90 font-bold mb-2 block">
                       {t("sidebar.language")}
                   </label>
                   <LanguageSwitcher/>
@@ -140,7 +140,7 @@ export default function Sidebar() {
 
               {/* Season Selector */}
               <div>
-                  <label className="text-xs uppercase tracking-[0.2em] text-gold/60 font-bold mb-2 block">
+                  <label className="text-xs uppercase tracking-[0.2em] text-gold/90 font-bold mb-2 block">
                       {t("sidebar.season")}
                   </label>
                   {mounted && (

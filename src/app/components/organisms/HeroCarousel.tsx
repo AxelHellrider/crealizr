@@ -86,8 +86,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
     const slide = slides[displayIndex];
     const accentClasses = slide.accent === "gold"
-        ? { text: "text-gold", kicker: "text-gold/50", border: "border-gold/15" }
-        : { text: "text-silver", kicker: "text-silver/50", border: "border-silver/15" };
+        ? { text: "text-gold", kicker: "text-gold/90", border: "border-gold/15" }
+        : { text: "text-silver", kicker: "text-silver/90", border: "border-silver/15" };
 
     const body = (
         <div className="relative z-10 flex flex-col items-center text-center gap-5 max-w-2xl px-4">
