@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
+import { CombatProvider } from "@/app/context/CombatContext";
 
 const title = "D&D 5e Encounter Builder | CRealizr";
 const description =
@@ -48,5 +49,5 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function EncounterBuilderLayout({ children }: { children: React.ReactNode }) {
-    return <Suspense>{children}</Suspense>;
+    return <Suspense><CombatProvider>{children}</CombatProvider></Suspense>;
 }

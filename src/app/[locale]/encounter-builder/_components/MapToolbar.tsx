@@ -22,6 +22,8 @@ interface MapToolbarProps {
     onClearAll: () => void;
     isFullscreen: boolean;
     onFullscreenToggle: () => void;
+    combatOpen: boolean;
+    onCombatToggle: () => void;
 }
 
 export function MapToolbar({
@@ -30,6 +32,7 @@ export function MapToolbar({
     onZoomIn, onZoomOut,
     canClearAll, onClearAll,
     isFullscreen, onFullscreenToggle,
+    combatOpen, onCombatToggle,
 }: MapToolbarProps) {
 
     if (isFullscreen) {
@@ -62,6 +65,11 @@ export function MapToolbar({
                         Clear
                     </button>
                 )}
+
+                <button type="button" onClick={onCombatToggle}
+                    className={`${base} ${active(combatOpen)}`} aria-pressed={combatOpen}>
+                    Combat
+                </button>
 
                 <button type="button" onClick={onFullscreenToggle}
                     className={`${base} text-foreground/70 hover:text-gold ml-auto border-l border-gold/10`}
@@ -114,6 +122,12 @@ export function MapToolbar({
                 <button type="button" onClick={onClearAll} disabled={!canClearAll}
                     className={`${btn(false, true)} disabled:opacity-30 disabled:pointer-events-none`}>
                     Clear hazards &amp; cover
+                </button>
+
+                <span className="w-px self-stretch bg-gold/10" aria-hidden />
+
+                <button type="button" onClick={onCombatToggle} className={btn(combatOpen)} aria-pressed={combatOpen}>
+                    Combat
                 </button>
 
                 {mode !== "select" && (

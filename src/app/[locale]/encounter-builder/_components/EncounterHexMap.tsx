@@ -9,6 +9,7 @@ import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { useMapFullscreen } from "@/app/context/MapFullscreenContext";
 import { MapToolbar } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
+import { InitiativeTracker } from "./InitiativeTracker";
 import { MarqueeBox, type Marquee } from "./MarqueeBox";
 import { RotateHintBanner, ROTATE_HINT_KEY } from "./RotateHintBanner";
 import { AdvantagesPanel } from "@/app/components/molecules/AdvantagesPanel";
@@ -42,6 +43,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const [size, setSize]               = useState({ width: 320, height: 320 });
     const [mapMode, setMapMode]         = useState<MapMode>("select");
     const [cameraLocked, setCameraLocked] = useState(false);
+    const [combatOpen, setCombatOpen]   = useState(false);
     // Shared with the rest of the app (e.g. the PWA install badge hides itself while this is true).
     const { isFullscreen, setIsFullscreen } = useMapFullscreen();
     const [showRotateHint, setShowRotateHint] = useState(false);
@@ -503,6 +505,8 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
             }
             layout.clearManualNodes();
         },
+        combatOpen,
+        onCombatToggle: () => setCombatOpen(v => !v),
     };
 
     // ── Konva Stage (shared JSX, rendered in ONE place) ──────────────────────
@@ -655,15 +659,22 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
 
                 {/* Normal canvas — desktop only. On mobile the canvas only ever opens in fullscreen (below). */}
                 {!isFullscreen && (
-                    <div
-                        ref={normalContainerRef}
-                        className="relative flex-1 min-h-0 overflow-hidden rounded-sm border border-gold/10 bg-black/10 touch-none hidden sm:block"
-                    >
-                        {stageJSX}
-                        {marquee && <MarqueeBox marquee={marquee} />}
-                        {mapMode !== "select" && (
-                            <div className="absolute bottom-2 left-2 pointer-events-none select-none text-[8px] text-muted/50 italic hidden sm:block">
-                                Click empty hex to place
+                    <div className="flex-1 min-h-0 hidden sm:flex gap-2">
+                        <div
+                            ref={normalContainerRef}
+                            className="relative flex-1 min-h-0 overflow-hidden rounded-sm border border-gold/10 bg-black/10 touch-none"
+                        >
+                            {stageJSX}
+                            {marquee && <MarqueeBox marquee={marquee} />}
+                            {mapMode !== "select" && (
+                                <div className="absolute bottom-2 left-2 pointer-events-none select-none text-[8px] text-muted/50 italic">
+                                    Click empty hex to place
+                                </div>
+                            )}
+                        </div>
+                        {combatOpen && (
+                            <div className="w-64 shrink-0 border border-gold/10 rounded-sm bg-card/40 p-2 overflow-y-auto">
+                                <InitiativeTracker nodes={layout.nodes} ruleset={ruleset} />
                             </div>
                         )}
                     </div>
@@ -736,6 +747,11 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         {showRotateHint && <RotateHintBanner onDismiss={dismissRotateHint} />}
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
+                        {combatOpen && (
+                            <div className="absolute top-0 right-0 bottom-0 w-72 max-w-[85vw] border-l border-gold/20 bg-background p-3 overflow-y-auto z-10">
+                                <InitiativeTracker nodes={layout.nodes} ruleset={ruleset} />
+                            </div>
+                        )}
                     </div>
 
                     {/* Party advantages/disadvantages — otherwise only visible in the sidebar, which fullscreen hides */}
