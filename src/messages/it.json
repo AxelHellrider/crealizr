@@ -28,7 +28,7 @@
     "coreToolkit": {
       "monsterScaler": {
         "title": "Scalatore di mostri",
-        "description": "Regola PF, CA, DPR e obiettivi statistici a un nuovo CR. Include statblock pronti per l'esportazione.",
+        "description": "Regola HP, AC, DPR e obiettivi statistici a un nuovo CR. Include statblock pronti per l'esportazione.",
         "action": "Scala un mostro"
       },
       "encounterBuilder": {
@@ -107,11 +107,11 @@
   },
   "monsterScaler": {
     "title": "Scalatore di mostri",
-    "description": "Scala PF, CA, DPR e valori statistici verso un nuovo CR mantenendo la creatura riconoscibile.",
+    "description": "Scala HP, AC, DPR e valori statistici verso un nuovo CR mantenendo la creatura riconoscibile.",
     "viewDocs": "Visualizza la documentazione",
     "whatScales": "Cosa scala",
-    "whatScalesDesc": "CA, PF, obiettivi DPR e modificatori delle abilità.",
-    "acSourceNotes": "Fonti di CA",
+    "whatScalesDesc": "AC, HP, obiettivi DPR e modificatori delle abilità.",
+    "acSourceNotes": "Fonti di AC",
     "acSourceNotesDesc": "Basata su Destrezza, armatura equipaggiata o armatura naturale — più uno scudo opzionale.",
     "guardrails": "Vincoli",
     "guardrailsDesc": "Verifica economia delle azioni, azioni leggendarie e tratti unici dopo la scalatura.",
@@ -125,31 +125,31 @@
     "selectTargetCR": "Seleziona il CR target",
     "baseAttributes": "Attributi di base",
     "defenseAdjustments": "Aggiustamenti difensivi e delle abilità",
-    "acSource": "Fonte di CA",
+    "acSource": "Fonte di AC",
     "acSourceDex": "Basata su Destrezza (10 + mod. DES)",
     "acSourceArmor": "Armatura equipaggiata (10 + bonus)",
     "acSourceNatural": "Armatura naturale (valore fisso)",
     "armorBonus": "Bonus armatura",
     "naturalArmorValue": "Valore armatura naturale",
     "shield": "Scudo",
-    "shieldHint": "Impugna uno scudo (+2 CA)",
+    "shieldHint": "Impugna uno scudo (+2 AC)",
     "abilityScoreBonuses": "Bonus ai punteggi di caratteristica",
     "scaleMonster": "SCALA UN MOSTRO",
     "scaling": "SCALANDO...",
     "tuningNotes": "Note di regolazione",
     "derivedFromMatrix": "Derivato dalla matrice CR.",
     "suggestedAttackBonus": "Bonus di attacco suggerito",
-    "suggestedSaveDC": "CD tiri salvezza suggerita",
+    "suggestedSaveDC": "DC tiri salvezza suggerita",
     "beforeAfter": "Prima / Dopo",
     "snapshotOutput": "Istantanea dell'esatto output di esportazione.",
     "original": "Originale",
     "scaled": "Scalato",
-    "ac": "CA",
-    "hp": "PF",
+    "ac": "AC",
+    "hp": "HP",
     "dpr": "DPR",
     "cr": "CR",
-    "acChange": "Variazione CA",
-    "hpChange": "Variazione PF",
+    "acChange": "Variazione AC",
+    "hpChange": "Variazione HP",
     "crShift": "Cambio CR",
     "exportPreview": "Anteprima esportazione",
     "pngPdfLayout": "PNG/PDF usa esattamente questo layout.",
@@ -210,8 +210,8 @@
     "unnamedArtifact": "Artefatto senza nome",
     "noAttunement": "Nessuna sintonia",
     "toHit": "+{value} al tiro per colpire",
-    "acBonus": "+{value} CA",
-    "saveDC": "CD {value}",
+    "acBonus": "+{value} AC",
+    "saveDC": "DC {value}",
     "avgDmg": "+{value} danni medi",
     "mechanicalSummary": "Riepilogo meccanico",
     "name": "Nome",
@@ -225,8 +225,8 @@
     "craftCost": "Costo di creazione",
     "craftTime": "Tempo di creazione",
     "toHitLabel": "Tiro per colpire",
-    "acBonusLabel": "Bonus CA",
-    "saveDCLabel": "CD",
+    "acBonusLabel": "Bonus AC",
+    "saveDCLabel": "DC",
     "damageBonus": "Bonus danni",
     "avg": "media",
     "loreCrafting": "Lore e creazione",
@@ -604,7 +604,7 @@
       },
       {
         "heading": "Copertura",
-        "html": "<p>La copertura segue le regole standard di D&amp;D 5e. Tre livelli sono disponibili tramite l'editor dei nodi:</p>\n      <ul>\n        <li><strong>Mezza copertura</strong> — bonus di +2 alla CA e ai tiri salvezza su Destrezza.</li>\n        <li><strong>Copertura dei tre quarti</strong> — bonus di +5 alla CA e ai tiri salvezza su Destrezza.</li>\n        <li><strong>Copertura totale</strong> — non può essere bersaglio diretto di attacchi o incantesimi.</li>\n      </ul>\n      <p>La sezione <strong>Vantaggi / Svantaggi</strong> nella scheda del gruppo elenca automaticamente ogni membro del gruppo adiacente (a 1 esagono di distanza) a un nodo di copertura, mostrando il miglior livello di copertura disponibile.</p>"
+        "html": "<p>La copertura segue le regole standard di D&amp;D 5e. Tre livelli sono disponibili tramite l'editor dei nodi:</p>\n      <ul>\n        <li><strong>Mezza copertura</strong> — bonus di +2 alla AC e ai tiri salvezza su Destrezza.</li>\n        <li><strong>Copertura dei tre quarti</strong> — bonus di +5 alla AC e ai tiri salvezza su Destrezza.</li>\n        <li><strong>Copertura totale</strong> — non può essere bersaglio diretto di attacchi o incantesimi.</li>\n      </ul>\n      <p>La sezione <strong>Vantaggi / Svantaggi</strong> nella scheda del gruppo elenca automaticamente ogni membro del gruppo adiacente (a 1 esagono di distanza) a un nodo di copertura, mostrando il miglior livello di copertura disponibile.</p>"
       },
       {
         "heading": "Editor dei nodi",
@@ -619,23 +619,23 @@
     "sections": [
       {
         "heading": "Input",
-        "html": "<ul>\n        <li>Statblock del mostro sorgente: nome, taglia/tipo, <code>CR</code> attuale e statistiche (CA, PF, FOR/DES/COS/INT/SAG/CAR).</li>\n        <li>Elenco di azioni opzionale usato per stimare il DPR da espressioni di danno (es. <code>1d6+2</code>).</li>\n        <li>CR obiettivo (supporta CR frazionari 1/8, 1/4, 1/2 e CR 1–30).</li>\n        <li>Fonte di CA: basata su Destrezza, armatura equipaggiata o armatura naturale — più uno scudo opzionale.</li>\n        <li>Bonus opzionali per caratteristica.</li>\n      </ul>"
+        "html": "<ul>\n        <li>Statblock del mostro sorgente: nome, taglia/tipo, <code>CR</code> attuale e statistiche (AC, HP, FOR/DES/COS/INT/SAG/CAR).</li>\n        <li>Elenco di azioni opzionale usato per stimare il DPR da espressioni di danno (es. <code>1d6+2</code>).</li>\n        <li>CR obiettivo (supporta CR frazionari 1/8, 1/4, 1/2 e CR 1–30).</li>\n        <li>Fonte di AC: basata su Destrezza, armatura equipaggiata o armatura naturale — più uno scudo opzionale.</li>\n        <li>Bonus opzionali per caratteristica.</li>\n      </ul>"
       },
       {
         "heading": "Ricerca della riga CR",
-        "html": "<p>Cerchiamo due righe nella matrice CR: una per il CR sorgente e una per il CR obiettivo. Ogni riga contiene valori di riferimento per bonus di competenza, CA attesa, PF, bonus d'attacco, DPR e CD di salvezza — viene usata la riga più alta con <code>row.cr ≤ cr</code>.</p>"
+        "html": "<p>Cerchiamo due righe nella matrice CR: una per il CR sorgente e una per il CR obiettivo. Ogni riga contiene valori di riferimento per bonus di competenza, AC attesa, HP, bonus d'attacco, DPR e DC di salvezza — viene usata la riga più alta con <code>row.cr ≤ cr</code>.</p>"
       },
       {
         "heading": "Stima dei danni per round (DPR)",
         "html": "<p>Se il mostro ha azioni con stringhe di danno, stimiamo il danno medio per ogni azione e sommiamo:</p>\n      <ul>\n        <li>Per ogni token come <code>XdY</code> (es. <code>2d6</code>), valore atteso = <code>X × (Y + 1) / 2</code>.</li>\n        <li>Un modificatore fisso opzionale <code>±N</code> viene aggiunto una volta al totale di quell'azione.</li>\n        <li>I numeri non-dado vengono interpretati come valore fisso dove possibile.</li>\n      </ul>\n      <p>Le medie per azione vengono sommate e arrotondate all'intero più vicino. Se non vengono fornite azioni, lo scalatore salta il rapporto DPR e mostra invece il DPR atteso del CR obiettivo come riferimento assoluto.</p>"
       },
       {
-        "heading": "Scalatura dei PF",
-        "html": "<p>I PF vengono scalati proporzionalmente, preservando quanto il mostro originale si trova sopra o sotto la base del CR:</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, con un minimo di 1.</p>\n      <p><em>Esempio: un mostro CR 1 con 156 PF (2× la base CR 1 di 78), scalato a CR 5 (base 138), dà <code>round(156 × 138/78) = 276</code> — ancora circa 2× la base CR 5.</em></p>"
+        "heading": "Scalatura dei HP",
+        "html": "<p>I HP vengono scalati proporzionalmente, preservando quanto il mostro originale si trova sopra o sotto la base del CR:</p>\n      <p><code>hpScale = tgtRow.hp / max(1, srcRow.hp)</code></p>\n      <p><code>finalHP = round(srcHP × hpScale)</code>, con un minimo di 1.</p>\n      <p><em>Esempio: un mostro CR 1 con 156 HP (2× la base CR 1 di 78), scalato a CR 5 (base 138), dà <code>round(156 × 138/78) = 276</code> — ancora circa 2× la base CR 5.</em></p>"
       },
       {
-        "heading": "Scalatura della CA",
-        "html": "<p>La CA viene calcolata indipendentemente dalla matrice CR, da una delle tre fonti scelte, più uno scudo opzionale:</p>\n      <ul>\n        <li><strong>Basata su Destrezza</strong>: <code>10 + mod. Destrezza</code> — per creature senza armatura che contano sull'agilità.</li>\n        <li><strong>Armatura equipaggiata</strong>: <code>10 + bonus armatura</code> — il bonus che inserisci per l'armatura indossata dalla creatura.</li>\n        <li><strong>Armatura naturale</strong>: un valore fisso che inserisci direttamente (es. l'armatura naturale di un drago o di una tartaruga tortle) — non aggiunto a 10.</li>\n      </ul>\n      <p>Uno <strong>scudo</strong> impugnato aggiunge sempre un fisso <code>+2</code> sopra una qualsiasi delle tre fonti.</p>\n      <p>La CA basata su Destrezza e l'armatura naturale sono intrinseche alla creatura e limitate a <strong>CA 30</strong> per i mostri — rispecchiando come la CA dei giocatori sia limitata a 20 dalle sole fonti Destrezza/naturali. L'armatura equipaggiata e uno scudo sono considerati oggetti e possono spingere la CA oltre il limite: <code>finalAC = (armatura ? 10 + bonusArmatura : clamp(caIntrinseca, 1, 30)) + (scudo ? 2 : 0)</code>. La CA 25 del Tarrasque è un buon punto di riferimento per quanto in alto possa arrivare l'armatura naturale senza mai richiedere un oggetto.</p>\n      <p>La copertura situazionale (vedi il meccanismo di copertura del Generatore di incontri) può aumentare ulteriormente la CA effettiva in combattimento, ma non fa parte dello statblock base del mostro.</p>"
+        "heading": "Scalatura della AC",
+        "html": "<p>La AC viene calcolata indipendentemente dalla matrice CR, da una delle tre fonti scelte, più uno scudo opzionale:</p>\n      <ul>\n        <li><strong>Basata su Destrezza</strong>: <code>10 + mod. Destrezza</code> — per creature senza armatura che contano sull'agilità.</li>\n        <li><strong>Armatura equipaggiata</strong>: <code>10 + bonus armatura</code> — il bonus che inserisci per l'armatura indossata dalla creatura.</li>\n        <li><strong>Armatura naturale</strong>: un valore fisso che inserisci direttamente (es. l'armatura naturale di un drago o di una tartaruga tortle) — non aggiunto a 10.</li>\n      </ul>\n      <p>Uno <strong>scudo</strong> impugnato aggiunge sempre un fisso <code>+2</code> sopra una qualsiasi delle tre fonti.</p>\n      <p>La AC basata su Destrezza e l'armatura naturale sono intrinseche alla creatura e limitate a <strong>AC 30</strong> per i mostri — rispecchiando come la AC dei giocatori sia limitata a 20 dalle sole fonti Destrezza/naturali. L'armatura equipaggiata e uno scudo sono considerati oggetti e possono spingere la AC oltre il limite: <code>finalAC = (armatura ? 10 + bonusArmatura : clamp(caIntrinseca, 1, 30)) + (scudo ? 2 : 0)</code>. La AC 25 del Tarrasque è un buon punto di riferimento per quanto in alto possa arrivare l'armatura naturale senza mai richiedere un oggetto.</p>\n      <p>La copertura situazionale (vedi il meccanismo di copertura del Generatore di incontri) può aumentare ulteriormente la AC effettiva in combattimento, ma non fa parte dello statblock base del mostro.</p>"
       },
       {
         "heading": "Scalatura delle caratteristiche (FOR/DES/COS/INT/SAG/CAR)",
@@ -646,8 +646,8 @@
         "html": "<ul>\n        <li>Miglior modificatore di caratteristica d'attacco: <code>atkAbilityMod = max(mod(STR), mod(DEX))</code> per le statistiche scalate.</li>\n        <li>Variazione della base della matrice: <code>attackDelta = tgtRow.atkb − srcRow.atkb</code>.</li>\n        <li>Aggiustamento per la variazione delle statistiche del mostro stesso: <code>atkAbilityMod − srcAtkMod</code>.</li>\n        <li>Suggerito: <code>finalAttackBonus = round(srcRow.atkb + attackDelta + atkAbilityMod − srcAtkMod)</code>.</li>\n      </ul>"
       },
       {
-        "heading": "Consiglio sulla CD di salvezza",
-        "html": "<p>La CD di salvezza suggerita parte dalla CD della riga obiettivo e si sposta con la variazione del modificatore INT del mostro (come proxy in stile lanciaincantesimi):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
+        "heading": "Consiglio sulla DC di salvezza",
+        "html": "<p>La DC di salvezza suggerita parte dalla DC della riga obiettivo e si sposta con la variazione del modificatore INT del mostro (come proxy in stile lanciaincantesimi):</p>\n      <p><code>finalSaveDC = tgtRow.save_dc + (mod(INT_scaled) − mod(INT_source))</code></p>"
       },
       {
         "heading": "Riferimento DPR",
@@ -655,14 +655,14 @@
       },
       {
         "heading": "Limiti, vincoli e determinismo",
-        "html": "<ul>\n        <li>La CA è limitata a 5–30 dopo tutti gli aggiustamenti.</li>\n        <li>Le caratteristiche sono limitate a 1–30.</li>\n        <li>I PF hanno un minimo di 1.</li>\n      </ul>\n      <p>Lo scalatore è completamente deterministico. Tutti i valori della matrice sono il punto medio degli intervalli ufficiali del DMG. Nessuna casualità viene applicata a runtime — gli stessi input producono sempre lo stesso output.</p>"
+        "html": "<ul>\n        <li>La AC è limitata a 5–30 dopo tutti gli aggiustamenti.</li>\n        <li>Le caratteristiche sono limitate a 1–30.</li>\n        <li>I HP hanno un minimo di 1.</li>\n      </ul>\n      <p>Lo scalatore è completamente deterministico. Tutti i valori della matrice sono il punto medio degli intervalli ufficiali del DMG. Nessuna casualità viene applicata a runtime — gli stessi input producono sempre lo stesso output.</p>"
       },
       {
         "heading": "Riferimento della matrice CR",
         "html": "<p>Questi sono i valori di riferimento esatti usati dallo scalatore, presi direttamente dal livello dati live. La tabella è la tabella ufficiale del DMG \"Monster Statistics by Challenge Rating\" ed è identica per i regolamenti 2014 e 2024 — CRealizr usa un'unica matrice unificata indipendentemente dal manuale di provenienza di un mostro.</p>"
       }
     ],
-    "note": "I valori di PF e Danno per round sono gli intervalli ufficiali della tabella CR del DMG — i PF sono mostrati come punto medio, il DPR come intervallo completo. I bonus d'attacco e le CD di salvezza corrispondono esattamente alla tabella ufficiale."
+    "note": "I valori di HP e Danno per round sono gli intervalli ufficiali della tabella CR del DMG — i HP sono mostrati come punto medio, il DPR come intervallo completo. I bonus d'attacco e le DC di salvezza corrispondono esattamente alla tabella ufficiale."
   },
   "artifactForgeDocs": {
     "title": "Forgia di artefatti – Come funziona",
@@ -690,7 +690,7 @@
       },
       {
         "heading": "Bonus suggeriti",
-        "html": "<p>I bonus sono intenzionalmente conservativi e legati alle fasce di rarità:</p>\n      <ul>\n        <li>Bonus magico: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Bonus danno medio: rispecchia il bonus magico per rarità</li>\n        <li>CD di salvezza (per le bacchette): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Applicazione per tipo:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: nessun bonus di combattimento automatico (design libero)</li>\n      </ul>"
+        "html": "<p>I bonus sono intenzionalmente conservativi e legati alle fasce di rarità:</p>\n      <ul>\n        <li>Bonus magico: <code>Common 0</code>, <code>Uncommon +1</code>, <code>Rare +2</code>, <code>Very Rare +3</code>, <code>Legendary +3</code></li>\n        <li>Bonus danno medio: rispecchia il bonus magico per rarità</li>\n        <li>DC di salvezza (per le bacchette): <code>Common/Uncommon 13</code>, <code>Rare 15</code>, <code>Very Rare 17</code>, <code>Legendary 19</code></li>\n      </ul>\n      <p>Applicazione per tipo:</p>\n      <ul>\n        <li><code>Weapon</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code></li>\n        <li><code>Armor</code>: <code>bonusAC = bonus</code></li>\n        <li><code>Wand</code>: <code>bonusToHit = bonus</code>, <code>avgDamageBonus = avgDamage</code>, <code>bonusSaveDC = saveDC</code></li>\n        <li><code>Wondrous</code>: nessun bonus di combattimento automatico (design libero)</li>\n      </ul>"
       },
       {
         "heading": "Progetto d'oggetto",
@@ -713,7 +713,7 @@
       },
       {
         "heading": "Statblock",
-        "html": "<p>La sezione statblock è opzionale. Compilare qualsiasi campo di difesa o caratteristica abilita lo statblock completo al salvataggio.</p>\n      <ul>\n        <li><strong>CA</strong> — Classe Armatura (0–30).</li>\n        <li><strong>PF</strong> — Punti Ferita.</li>\n        <li><strong>Velocità</strong> — testo libero (es. \"30 ft, fly 60 ft\").</li>\n        <li><strong>Caratteristiche</strong> — FOR, DES, COS, INT, SAG, CAR (0–30 ciascuna). Il modificatore è calcolato automaticamente come <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
+        "html": "<p>La sezione statblock è opzionale. Compilare qualsiasi campo di difesa o caratteristica abilita lo statblock completo al salvataggio.</p>\n      <ul>\n        <li><strong>AC</strong> — Classe Armatura (0–30).</li>\n        <li><strong>HP</strong> — Punti Ferita.</li>\n        <li><strong>Velocità</strong> — testo libero (es. \"30 ft, fly 60 ft\").</li>\n        <li><strong>Caratteristiche</strong> — FOR, DES, COS, INT, SAG, CAR (0–30 ciascuna). Il modificatore è calcolato automaticamente come <code>floor((score − 10) / 2)</code>.</li>\n      </ul>"
       },
       {
         "heading": "Danni per round (DPR)",
