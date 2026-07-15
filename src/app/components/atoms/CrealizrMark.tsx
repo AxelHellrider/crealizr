@@ -33,7 +33,7 @@ export default function CrealizrMark({ activeBars, ...props }: CrealizrMarkProps
             style={{
               transformOrigin: bar.origin,
               transform: `scaleX(${activeBars === undefined || i < activeBars ? 1 : 0})`,
-              transition: "transform 250ms ease-out",
+              transition: "transform 350ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             <rect {...bar.rect} />

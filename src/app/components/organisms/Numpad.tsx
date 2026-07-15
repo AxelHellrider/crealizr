@@ -3,7 +3,7 @@
 import { useNumpad } from "@/app/context/NumpadContext";
 import { useMountTransition, useLastNonNull } from "@/app/hooks/useMountTransition";
 
-const SHEET_TRANSITION_MS = 300;
+const SHEET_TRANSITION_MS = 400;
 
 const ROWS = [
     ["7", "8", "9"],
@@ -36,14 +36,14 @@ export function Numpad() {
     return (
         <>
             <div
-                className={`fixed inset-0 z-[10000] bg-black/50 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+                className={`fixed inset-0 z-[10000] bg-black/50 transition-opacity duration-[400ms] ease-in-out ${visible ? "opacity-100" : "opacity-0"}`}
                 onPointerDown={() => { commit(); }}
             />
             <div
-                className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden transition-transform duration-300"
+                className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden transition-transform duration-[400ms]"
                 style={{
                     transform: visible ? "translateY(0)" : "translateY(100%)",
-                    transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
             >
                 {/* Header */}

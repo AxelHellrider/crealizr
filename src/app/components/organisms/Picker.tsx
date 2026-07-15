@@ -8,7 +8,7 @@ const ROW_H = 44;
 const VISIBLE_ROWS = 5;
 const WHEEL_H = ROW_H * VISIBLE_ROWS;
 const PAD = (WHEEL_H - ROW_H) / 2;
-const SHEET_TRANSITION_MS = 300;
+const SHEET_TRANSITION_MS = 400;
 
 export function Picker() {
     const picker = usePicker();
@@ -81,14 +81,14 @@ export function Picker() {
     return (
         <>
             <div
-                className={`fixed inset-0 z-[10000] bg-black/50 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+                className={`fixed inset-0 z-[10000] bg-black/50 transition-opacity duration-[400ms] ease-in-out ${visible ? "opacity-100" : "opacity-0"}`}
                 onPointerDown={commitCentered}
             />
             <div
-                className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden transition-transform duration-300"
+                className="fixed bottom-0 left-0 right-0 z-[10001] bg-background border-t border-gold/20 rounded-t-2xl shadow-2xl overflow-hidden transition-transform duration-[400ms]"
                 style={{
                     transform: visible ? "translateY(0)" : "translateY(100%)",
-                    transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
             >
                 {/* Header */}

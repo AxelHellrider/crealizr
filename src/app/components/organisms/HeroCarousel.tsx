@@ -100,7 +100,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             onBlur={() => setPaused(false)}
         >
             <div
-                className={`absolute inset-0 flex flex-col items-center justify-center transition-[opacity,transform] duration-[400ms] ease-out ${
+                className={`absolute inset-0 flex flex-col items-center justify-center transition-[opacity,transform] duration-[600ms] ease-in-out ${
                     entered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-6"
                 }`}
             >
