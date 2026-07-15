@@ -1,4 +1,5 @@
 import type {Metadata, Viewport} from "next";
+import { headers } from "next/headers";
 import { buildHreflang } from "@/app/lib/seo";
 import {Geist, Geist_Mono, Cinzel, Yeseva_One, Gentium_Plus} from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
@@ -93,6 +94,16 @@ export async function generateMetadata({
     params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
     const { locale } = await params;
+    // The middleware rewrites bare "/" to "/${defaultLocale}" internally so
+    // it can serve content without a redirect round-trip, but that means
+    // the resolved locale here is indistinguishable from an actual visit to
+    // "/en" unless we check for the header it sets. Self-canonicalizing to
+    // "/" in that case (instead of "/en") avoids a canonical pointing at a
+    // different URL than the one in the address bar — a URL that also
+    // happens to be one of the hreflang alternates below, which Lighthouse
+    // flags as an invalid canonical.
+    const isRewrittenFromRoot = (await headers()).get('x-rewritten-from-root') === '1';
+    const canonicalPath = isRewrittenFromRoot ? "/" : `/${locale}`;
     return {
         metadataBase: new URL(siteUrl),
         title: "CRealizr | Dungeons & Dragons Toolkit",
@@ -111,12 +122,12 @@ export async function generateMetadata({
             title: "CRealizr",
         },
         alternates: {
-            canonical: `/${locale}`,
+            canonical: canonicalPath,
             languages: buildHreflang("/"),
         },
         openGraph: {
             type: "website",
-            url: `/${locale}`,
+            url: canonicalPath,
             title: "CRealizr | Dungeons & Dragons Toolkit",
             description: "DM-first D&D 5e toolkit for dungeon masters — build encounters, scale monsters, and forge magic items. Supports 2014 and 2024 rulesets.",
             images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr Toolkit" }],

@@ -1,7 +1,6 @@
 import {Metadata} from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { buildHreflang } from "@/app/lib/seo";
 
 import { Button } from "@/app/components/atoms/Button";
 import { StatScalePreview } from "@/app/components/molecules/StatScalePreview";
@@ -66,14 +65,16 @@ export const metadata: Metadata = {
         "D&D encounter difficulty",
         "hex map D&D",
     ],
-    alternates: {
-        canonical: "/",
-        languages: buildHreflang("/"),
-    },
+    // No `alternates`/`openGraph.url` override here — the root layout's
+    // generateMetadata already computes the correct per-locale (and, for
+    // the bare "/" rewrite case, self-referencing) canonical URL. Hardcoding
+    // "/" here previously made every locale's homepage (and even /de, /fr,
+    // etc.) all declare the same canonical, which is wrong per-locale and,
+    // for "/", pointed at a different hreflang URL than the address bar —
+    // exactly what Lighthouse's canonical audit flags.
     openGraph: {
         title: "CRealizr — Free D&D 5e DM Toolkit",
         description: "Free D&D 5e toolkit for dungeon masters. Build balanced encounters with a live hex battlefield, scale monsters by CR, and forge magic items.",
-        url: "/",
         type: "website",
         siteName: "CRealizr",
         images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr — free D&D 5e DM toolkit" }],

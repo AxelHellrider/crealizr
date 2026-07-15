@@ -15,12 +15,16 @@ export default function middleware(request: NextRequest) {
   // a full extra request/response cycle before any content could render,
   // flagged by PageSpeed Insights as "Avoid multiple page redirects" and
   // contributing to document request latency. Rewriting keeps "/" in the
-  // address bar while routing internally to /en; each page's own
-  // `alternates.canonical` still points at the locale-prefixed URL for SEO.
+  // address bar while routing internally to /en. The custom header lets
+  // generateMetadata (layout.tsx) tell this case apart from a direct visit
+  // to /en, so it can self-canonicalize to "/" instead of pointing at a
+  // different hreflang URL than the one actually in the address bar.
   if (request.nextUrl.pathname === '/') {
     const url = request.nextUrl.clone();
     url.pathname = `/${defaultLocale}`;
-    return NextResponse.rewrite(url);
+    const headers = new Headers(request.headers);
+    headers.set('x-rewritten-from-root', '1');
+    return NextResponse.rewrite(url, { request: { headers } });
   }
 
   return intlMiddleware(request);
