@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "D&D Magic Item & Artifact Generator | CRealizr";
 const description =
     "Forge balanced D&D 5e magic items and artifacts. Set rarity, mechanics, lore, and crafting requirements — then export a print-ready card.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -18,14 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "magic item balance 5e",
             "homebrew item generator",
         ],
-        alternates: {
-            canonical: "/artifact-forge",
-            languages: buildHreflang("/artifact-forge"),
-        },
+        alternates: buildAlternates(locale, "/artifact-forge"),
         openGraph: {
             title,
             description,
-            url: "/artifact-forge",
+            url: buildCanonicalPath(locale, "/artifact-forge"),
             type: "website",
             siteName: "CRealizr",
             images: [

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "D&D Monster Scaler — Resize Any Creature by CR | CRealizr";
 const description =
     "Scale any D&D 5e monster to a new challenge rating. Get adjusted HP, AC, stats, attack bonus, save DC, and DPR. Export-ready statblocks with 2014 and 2024 guidance.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -19,14 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "2014 rules",
             "2024 rules",
         ],
-        alternates: {
-            canonical: "/monster-scaler",
-            languages: buildHreflang("/monster-scaler"),
-        },
+        alternates: buildAlternates(locale, "/monster-scaler"),
         openGraph: {
             title,
             description,
-            url: "/monster-scaler",
+            url: buildCanonicalPath(locale, "/monster-scaler"),
             type: "website",
             siteName: "CRealizr",
             images: [

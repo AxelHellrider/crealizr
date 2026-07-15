@@ -2,31 +2,30 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates } from "@/app/lib/seo";
 import type { LegalSection } from "@/app/types/legal";
 
-export const metadata: Metadata = {
-    title: "Disclaimer | CRealizr",
-    description: "Important information about the nature and limitations of CRealizr, an unofficial D&D fan toolkit.",
-    alternates: {
-        canonical: "/disclaimer",
-        languages: buildHreflang("/disclaimer"),
-    },
-    openGraph: {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    return {
         title: "Disclaimer | CRealizr",
         description: "Important information about the nature and limitations of CRealizr, an unofficial D&D fan toolkit.",
-        url: "/disclaimer",
-        type: "website",
-        siteName: "CRealizr",
-        images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Disclaimer | CRealizr",
-        description: "Important information about the nature and limitations of CRealizr, an unofficial D&D fan toolkit.",
-        images: ["/og-default.svg"],
-    },
-};
+        alternates: buildAlternates(locale, "/disclaimer"),
+        openGraph: {
+            title: "Disclaimer | CRealizr",
+            description: "Important information about the nature and limitations of CRealizr, an unofficial D&D fan toolkit.",
+            type: "website",
+            siteName: "CRealizr",
+            images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "Disclaimer | CRealizr",
+            description: "Important information about the nature and limitations of CRealizr, an unofficial D&D fan toolkit.",
+            images: ["/og-default.svg"],
+        },
+    };
+}
 
 export default async function DisclaimerPage() {
     const t = await getTranslations();

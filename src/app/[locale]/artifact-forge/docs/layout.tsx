@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "Artifact Forge – Item Rarity & Balance Docs | CRealizr";
 const description =
     "How the CRealizr Artifact Forge works: rarity bands, mechanical bonus guidelines, crafting requirements, and export-ready card format for D&D 5e magic items.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -16,14 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "magic item crafting D&D",
             "homebrew item rules",
         ],
-        alternates: {
-            canonical: "/artifact-forge/docs",
-            languages: buildHreflang("/artifact-forge/docs"),
-        },
+        alternates: buildAlternates(locale, "/artifact-forge/docs"),
         openGraph: {
             title,
             description,
-            url: "/artifact-forge/docs",
+            url: buildCanonicalPath(locale, "/artifact-forge/docs"),
             type: "website",
             siteName: "CRealizr",
             images: [

@@ -2,31 +2,30 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates } from "@/app/lib/seo";
 import type { LegalSection } from "@/app/types/legal";
 
-export const metadata: Metadata = {
-    title: "Terms of Use | CRealizr",
-    description: "The terms governing your use of the CRealizr D&D toolkit.",
-    alternates: {
-        canonical: "/terms",
-        languages: buildHreflang("/terms"),
-    },
-    openGraph: {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    return {
         title: "Terms of Use | CRealizr",
         description: "The terms governing your use of the CRealizr D&D toolkit.",
-        url: "/terms",
-        type: "website",
-        siteName: "CRealizr",
-        images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Terms of Use | CRealizr",
-        description: "The terms governing your use of the CRealizr D&D toolkit.",
-        images: ["/og-default.svg"],
-    },
-};
+        alternates: buildAlternates(locale, "/terms"),
+        openGraph: {
+            title: "Terms of Use | CRealizr",
+            description: "The terms governing your use of the CRealizr D&D toolkit.",
+            type: "website",
+            siteName: "CRealizr",
+            images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "CRealizr" }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "Terms of Use | CRealizr",
+            description: "The terms governing your use of the CRealizr D&D toolkit.",
+            images: ["/og-default.svg"],
+        },
+    };
+}
 
 export default async function TermsPage() {
     const t = await getTranslations();

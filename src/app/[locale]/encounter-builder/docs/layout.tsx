@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "Encounter Builder – How It Works | CRealizr";
 const description =
     "Full reference for CRealizr's encounter builder: XP budget vs CR match mode, hex battlefield, keyboard shortcuts, AoE hazards, cover rules, and suggestion math.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -18,14 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "hex map encounter",
             "cover rules D&D",
         ],
-        alternates: {
-            canonical: "/encounter-builder/docs",
-            languages: buildHreflang("/encounter-builder/docs"),
-        },
+        alternates: buildAlternates(locale, "/encounter-builder/docs"),
         openGraph: {
             title,
             description,
-            url: "/encounter-builder/docs",
+            url: buildCanonicalPath(locale, "/encounter-builder/docs"),
             type: "website",
             siteName: "CRealizr",
             images: [

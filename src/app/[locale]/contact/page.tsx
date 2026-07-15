@@ -3,30 +3,29 @@ import { getTranslations } from "next-intl/server";
 import { ContactForm } from "./ContactForm";
 import { PageSection } from "@/app/components/atoms/PageSection";
 import { PageHeader } from "@/app/components/atoms/PageHeader";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates } from "@/app/lib/seo";
 
-export const metadata: Metadata = {
-    title: "Contact the CRealizr Team",
-    description: "Get in touch with the CRealizr team — feedback, bug reports, feature requests, or just to say hello.",
-    alternates: {
-        canonical: "/contact",
-        languages: buildHreflang("/contact"),
-    },
-    openGraph: {
-        title: "Contact | CRealizr",
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    return {
+        title: "Contact the CRealizr Team",
         description: "Get in touch with the CRealizr team — feedback, bug reports, feature requests, or just to say hello.",
-        url: "/contact",
-        type: "website",
-        siteName: "CRealizr",
-        images: [{ url: "/og-contact.svg", width: 1200, height: 630, alt: "CRealizr" }],
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Contact | CRealizr",
-        description: "Get in touch with the CRealizr team — feedback, bug reports, or feature requests.",
-        images: ["/og-contact.svg"],
-    },
-};
+        alternates: buildAlternates(locale, "/contact"),
+        openGraph: {
+            title: "Contact | CRealizr",
+            description: "Get in touch with the CRealizr team — feedback, bug reports, feature requests, or just to say hello.",
+            type: "website",
+            siteName: "CRealizr",
+            images: [{ url: "/og-contact.svg", width: 1200, height: 630, alt: "CRealizr" }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "Contact | CRealizr",
+            description: "Get in touch with the CRealizr team — feedback, bug reports, or feature requests.",
+            images: ["/og-contact.svg"],
+        },
+    };
+}
 
 export default async function ContactPage() {
   const t = await getTranslations();

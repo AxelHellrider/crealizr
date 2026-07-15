@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { buildHreflang } from "@/app/lib/seo";
+import { buildAlternates, buildCanonicalPath } from "@/app/lib/seo";
 
 const title = "D&D 5e Encounter Builder | CRealizr";
 const description =
     "Build balanced D&D 5e encounters using XP budget or CR match mode. Features a live hex battlefield, AoE hazards, cover system, and 2014/2024 ruleset support.";
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     return {
         title,
         description,
@@ -21,14 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
             "encounter builder 2024",
             "2014 rules",
         ],
-        alternates: {
-            canonical: "/encounter-builder",
-            languages: buildHreflang("/encounter-builder"),
-        },
+        alternates: buildAlternates(locale, "/encounter-builder"),
         openGraph: {
             title,
             description,
-            url: "/encounter-builder",
+            url: buildCanonicalPath(locale, "/encounter-builder"),
             type: "website",
             siteName: "CRealizr",
             images: [
