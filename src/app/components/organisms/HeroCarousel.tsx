@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
 
 export type HeroSlide = {
     href?: string;
@@ -20,7 +19,13 @@ const AUTO_ADVANCE_MS = 6000;
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
+    // Starts true to match the server-rendered state (the hero is the page's
+    // LCP element and must be visible in the very first paint). Slide
+    // *changes* after mount briefly flip this off/on to retrigger the CSS
+    // crossfade below — see the effect further down.
+    const [entered, setEntered] = useState(true);
     const timer = useRef<number | null>(null);
+    const isFirstIndexRender = useRef(true);
 
     const [prefersReducedMotion] = useState(
         () => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -44,6 +49,28 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         timer.current = window.setInterval(advance, AUTO_ADVANCE_MS);
         return () => { if (timer.current) window.clearInterval(timer.current); };
     }, [paused, prefersReducedMotion, advance, slides.length]);
+
+    // Plain CSS crossfade instead of framer-motion — the hero is above the
+    // fold and was previously shipping an animation library's full client
+    // bundle just to fade in text. Flip `entered` off then back on a tick
+    // later so the opacity/transform classes below actually transition
+    // instead of jumping straight to their end state.
+    useEffect(() => {
+        if (isFirstIndexRender.current) {
+            isFirstIndexRender.current = false;
+            return;
+        }
+        if (prefersReducedMotion) return;
+        // Deferred into setTimeout (rather than called synchronously in the
+        // effect body) to avoid a cascading-render lint warning — same
+        // pattern used in RouteProgress.tsx.
+        const resetTimer = window.setTimeout(() => setEntered(false), 0);
+        const settleTimer = window.setTimeout(() => setEntered(true), 20);
+        return () => {
+            window.clearTimeout(resetTimer);
+            window.clearTimeout(settleTimer);
+        };
+    }, [index, prefersReducedMotion]);
 
     const slide = slides[index];
     const accentClasses = slide.accent === "gold"
@@ -72,29 +99,20 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             onFocus={() => setPaused(true)}
             onBlur={() => setPaused(false)}
         >
-            {/* initial={false}: skip the enter transition for the slide present on mount, so
-                the hero (the page's LCP element) is visible in the very first paint instead of
-                sitting at opacity:0 until framer-motion hydrates and animates it in. Slide
-                changes after mount still animate normally. */}
-            <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                    key={index}
-                    className="absolute inset-0 flex flex-col items-center justify-center"
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -24 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                    <div className={`absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none ${accentClasses.text}`} aria-hidden="true">
-                        <div className="w-[60vmin] h-[60vmin]">{slide.icon}</div>
-                    </div>
-                    {slide.href ? (
-                        <Link href={slide.href} scroll={false} className="contents">
-                            {body}
-                        </Link>
-                    ) : body}
-                </motion.div>
-            </AnimatePresence>
+            <div
+                className={`absolute inset-0 flex flex-col items-center justify-center transition-[opacity,transform] duration-[400ms] ease-out ${
+                    entered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-6"
+                }`}
+            >
+                <div className={`absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none ${accentClasses.text}`} aria-hidden="true">
+                    <div className="w-[60vmin] h-[60vmin]">{slide.icon}</div>
+                </div>
+                {slide.href ? (
+                    <Link href={slide.href} scroll={false} className="contents">
+                        {body}
+                    </Link>
+                ) : body}
+            </div>
 
             {slides.length > 1 && (
                 <>
