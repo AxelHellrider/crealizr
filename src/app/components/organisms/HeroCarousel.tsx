@@ -15,14 +15,20 @@ export type HeroSlide = {
 };
 
 const AUTO_ADVANCE_MS = 6000;
+const TRANSITION_MS = 600;
 
 export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     const [index, setIndex] = useState(0);
+    // The slide actually rendered — deliberately decoupled from `index` so
+    // content only swaps once the old slide has fully faded out (see the
+    // effect below). Swapping content in the same render as `index` changes
+    // (with only a CSS class flip to hide it) let the new slide flash in at
+    // full opacity for a frame before fading — this is what made the
+    // transition look snappy/cut instead of smooth.
+    const [displayIndex, setDisplayIndex] = useState(0);
     const [paused, setPaused] = useState(false);
     // Starts true to match the server-rendered state (the hero is the page's
-    // LCP element and must be visible in the very first paint). Slide
-    // *changes* after mount briefly flip this off/on to retrigger the CSS
-    // crossfade below — see the effect further down.
+    // LCP element and must be visible in the very first paint).
     const [entered, setEntered] = useState(true);
     const timer = useRef<number | null>(null);
     const isFirstIndexRender = useRef(true);
@@ -52,27 +58,33 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
     // Plain CSS crossfade instead of framer-motion — the hero is above the
     // fold and was previously shipping an animation library's full client
-    // bundle just to fade in text. Flip `entered` off then back on a tick
-    // later so the opacity/transform classes below actually transition
-    // instead of jumping straight to their end state.
+    // bundle just to fade in text. Fade the currently-displayed slide out,
+    // swap `displayIndex` to the new slide only once it's fully invisible,
+    // then fade the new one in — content changes while the class change
+    // isn't in the process of that fade for two separate transitions.
     useEffect(() => {
         if (isFirstIndexRender.current) {
             isFirstIndexRender.current = false;
             return;
         }
-        if (prefersReducedMotion) return;
         // Deferred into setTimeout (rather than called synchronously in the
         // effect body) to avoid a cascading-render lint warning — same
         // pattern used in RouteProgress.tsx.
-        const resetTimer = window.setTimeout(() => setEntered(false), 0);
-        const settleTimer = window.setTimeout(() => setEntered(true), 20);
+        if (prefersReducedMotion) {
+            const t = window.setTimeout(() => setDisplayIndex(index), 0);
+            return () => window.clearTimeout(t);
+        }
+        const fadeOutTimer = window.setTimeout(() => setEntered(false), 0);
+        const swapTimer = window.setTimeout(() => setDisplayIndex(index), TRANSITION_MS);
+        const fadeInTimer = window.setTimeout(() => setEntered(true), TRANSITION_MS + 20);
         return () => {
-            window.clearTimeout(resetTimer);
-            window.clearTimeout(settleTimer);
+            window.clearTimeout(fadeOutTimer);
+            window.clearTimeout(swapTimer);
+            window.clearTimeout(fadeInTimer);
         };
     }, [index, prefersReducedMotion]);
 
-    const slide = slides[index];
+    const slide = slides[displayIndex];
     const accentClasses = slide.accent === "gold"
         ? { text: "text-gold", kicker: "text-gold/50", border: "border-gold/15" }
         : { text: "text-silver", kicker: "text-silver/50", border: "border-silver/15" };
