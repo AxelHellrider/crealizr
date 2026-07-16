@@ -436,6 +436,7 @@
         "heading": "Nessuna Intelligenza Artificiale",
         "body": [
           "CRealizr non utilizza intelligenza artificiale, apprendimento automatico o modelli di IA generativa in nessuno dei suoi strumenti. Ogni suggerimento di scontro, calcolo di scalatura dei mostri, incontro di viaggio e progetto di oggetto è prodotto da una logica deterministica basata su regole, scritta e verificata da sviluppatori umani — lo stesso tipo di calcolo che un Dungeon Master farebbe a mano, solo più velocemente.",
+          "Per il processo di sviluppo del sito, l'IA viene utilizzata solo per implementare scenari di test, strutturare e organizzare il codice e gestire il versionamento del sito, al fine di rilasciare funzionalità in modo più rapido ma comunque efficace. Nessun processo o elemento dello strumento viene mai elaborato dall'IA, né alcun dato utente viene elaborato senza il consenso dell'utente tramite Google Analytics.",
           "Nessuno dei dati che inserisci viene inviato a un servizio di IA o a un modello di terze parti. Lo strumento è, e rimarrà, realizzato al 100% da esseri umani."
         ]
       },
