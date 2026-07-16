@@ -27,6 +27,13 @@ All notable changes are documented here. Versioning follows [Semantic Versioning
 
 ---
 
+## [1.4.2] – 2026-07-16
+
+### Changed
+- Disclaimer: split the AI-development disclosure out of "No Artificial Intelligence" into its own **AI Acknowledgement** section, so the no-generative-AI-in-tools claim and the local-dev-tooling disclosure read as two distinct statements. Translated across all 6 locales.
+
+---
+
 ## [1.4.1] – 2026-07-16
 
 ### Fixed
