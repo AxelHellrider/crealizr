@@ -435,9 +435,15 @@
       {
         "heading": "Keine künstliche Intelligenz",
         "body": [
-          "CRealizr verwendet in keinem seiner Tools künstliche Intelligenz, maschinelles Lernen oder generative KI-Modelle. Jeder Begegnungsvorschlag, jede Monsterskalierung, jede Reisebegegnung und jeder Gegenstandsentwurf wird durch deterministische, regelbasierte Logik erzeugt, die von menschlichen Entwicklern geschrieben und geprüft wurde — dieselbe Art von Mathematik, die ein Spielleiter von Hand durchführen würde, nur schneller.",
-          "Für den Entwicklungsprozess der Website wird KI ausschließlich eingesetzt, um Testszenarien zu implementieren, Code zu strukturieren und zu organisieren sowie die Versionierung der Website zu handhaben, um Funktionen schneller und dennoch effektiv bereitzustellen. Kein Prozess und kein Element im Toolkit wird jemals von KI verarbeitet, und keine Nutzerdaten werden ohne Nutzereinwilligung durch Google Analytics verarbeitet.",
-          "Keine der von Ihnen eingegebenen Daten wird an einen KI-Dienst oder ein Modell eines Drittanbieters gesendet. Das Toolkit ist und bleibt zu 100 % von Menschen erstellt."
+          "CRealizr verwendet in keinem seiner Tools künstliche Intelligenz, maschinelles Lernen oder generative KI-Modelle. Jeder Begegnungsvorschlag, jede Monsterskalierung, jede Reisebegegnung und jeder Gegenstandsentwurf wird durch deterministische, regelbasierte Logik erzeugt — dieselbe Art von Mathematik, die ein Spielleiter von Hand durchführen würde, nur schneller.",
+          "Keine der von Ihnen in die Tools eingegebenen Daten wird jemals an einen KI-Dienst oder ein Modell eines Drittanbieters gesendet."
+        ]
+      },
+      {
+        "heading": "KI-Hinweis",
+        "body": [
+          "KI wird ausschließlich als lokales Entwicklungshilfsmittel für das menschliche Team hinter CRealizr eingesetzt — zum Strukturieren und Organisieren von Code, zur Umsetzung von Testszenarien und für eine fortgeschrittene Versionskontrolle, damit Funktionen schneller ausgeliefert werden können, ohne Abstriche zu machen.",
+          "Dieser Einsatz beschränkt sich strikt auf den lokalen Entwicklungsprozess. Der KI werden niemals Nutzerdaten zugeführt, sie läuft nie gegen Produktionsdaten, und sie spielt keine Rolle bei der Ausgabe eines Tools — sie berührt weder die von Ihnen erzeugten Begegnungen, Monster, Gegenstände noch irgendetwas anderes."
         ]
       },
       {
