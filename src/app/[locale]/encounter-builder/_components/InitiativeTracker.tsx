@@ -84,23 +84,6 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                     className={`${inputCls} flex-1 min-w-[8rem]`}
                                     aria-label="Combatant name"
                                 />
-                                <input
-                                    type="number"
-                                    value={c.initiative ?? ""}
-                                    onChange={(e) => combat.updateCombatant(c.id, { initiative: e.target.value === "" ? null : Number(e.target.value) })}
-                                    placeholder="Init"
-                                    className={`${inputCls} w-16 sm:w-12 text-center`}
-                                    aria-label="Initiative"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => combat.rollInitiative(c.id)}
-                                    className={smallBtn}
-                                    aria-label="Roll initiative (1d20)"
-                                    title="Roll 1d20"
-                                >
-                                    d20
-                                </button>
                                 <button
                                     type="button"
                                     onClick={() => combat.removeCombatant(c.id)}
@@ -108,6 +91,42 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                     aria-label={`Remove ${c.name}`}
                                 >
                                     ✕
+                                </button>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-muted shrink-0">DEX</span>
+                                <input
+                                    type="number"
+                                    value={c.dexMod ?? ""}
+                                    onChange={(e) => combat.updateCombatant(c.id, { dexMod: e.target.value === "" ? null : Number(e.target.value) })}
+                                    placeholder="+0"
+                                    className={`${inputCls} w-14 text-center`}
+                                    aria-label="DEX modifier"
+                                    title="DEX modifier, added when rolling initiative"
+                                />
+                                <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-muted shrink-0">Init</span>
+                                <input
+                                    type="number"
+                                    value={c.initiative ?? ""}
+                                    onChange={(e) => combat.updateCombatant(c.id, { initiative: e.target.value === "" ? null : Number(e.target.value), initiativeRoll: null })}
+                                    placeholder="—"
+                                    className={`${inputCls} w-16 sm:w-12 text-center`}
+                                    aria-label="Initiative"
+                                />
+                                {c.initiativeRoll !== null && (
+                                    <span className="text-[10px] sm:text-[9px] text-muted/70 whitespace-nowrap" title="d20 roll + DEX modifier">
+                                        ({c.initiativeRoll}{c.dexMod ? ` ${c.dexMod > 0 ? "+" : ""}${c.dexMod}` : ""})
+                                    </span>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => combat.rollInitiative(c.id)}
+                                    className={`${smallBtn} ml-auto`}
+                                    aria-label="Roll initiative (1d20 + DEX modifier)"
+                                    title="Roll 1d20 + DEX modifier"
+                                >
+                                    d20
                                 </button>
                             </div>
 

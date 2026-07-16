@@ -13,6 +13,13 @@ export interface Combatant {
     kind: "party" | "enemy";
     isBoss?: boolean;
     initiative: number | null;
+    /** DEX modifier added on top of the die when rolling initiative — persists
+     * across rerolls so the DM only has to enter it once per combatant. */
+    dexMod: number | null;
+    /** The raw 1d20 result from the last roll, kept alongside `initiative`
+     * (roll + dexMod) so the breakdown can be shown. Cleared (null) when
+     * `initiative` is edited by hand instead of rolled. */
+    initiativeRoll: number | null;
     maxHP: number | null;
     currentHP: number | null;
     conditions: ConditionId[];

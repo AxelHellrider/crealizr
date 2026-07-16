@@ -2,8 +2,10 @@ import type { EncounterNode } from "@/app/types/encounterLayout";
 import type { Combatant } from "@/app/types/combat";
 import type { ConditionId } from "@/app/data/conditions";
 
-export type CombatantSeed = Omit<Combatant, "initiative" | "conditions"> & {
+export type CombatantSeed = Omit<Combatant, "initiative" | "dexMod" | "initiativeRoll" | "conditions"> & {
     initiative?: number | null;
+    dexMod?: number | null;
+    initiativeRoll?: number | null;
     conditions?: ConditionId[];
 };
 
@@ -30,6 +32,8 @@ export function seedFromNodes(nodes: EncounterNode[]): CombatantSeed[] {
                 name,
                 kind: n.kind,
                 isBoss: n.kind === "enemy" ? n.isBoss : undefined,
+                dexMod: null,
+                initiativeRoll: null,
                 maxHP: null,
                 currentHP: null,
                 conditions: n.conditions ?? [],

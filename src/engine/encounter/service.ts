@@ -76,7 +76,6 @@ export function buildEncounterSuggestions(
         level: opts.level,
         size: opts.size,
         difficulty: opts.difficulty,
-        ruleset: opts.ruleset,
         mode: opts.budgetMode,
     });
 

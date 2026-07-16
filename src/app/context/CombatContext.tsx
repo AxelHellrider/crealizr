@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef, ty
 import type { CombatState, Combatant } from "@/app/types/combat";
 import type { EncounterNode } from "@/app/types/encounterLayout";
 import { loadCombat, saveCombat, clearCombat } from "@/app/lib/combatDB";
-import { rollD20 } from "@/app/utils/dice";
+import { rollDie } from "@/app/utils/dice";
 import { seedFromNodes, type CombatantSeed } from "@/app/utils/combatSeed";
 
 type CombatContextValue = {
@@ -30,6 +30,16 @@ type CombatContextValue = {
 };
 
 const CombatContext = createContext<CombatContextValue | null>(null);
+
+function withDefaults(seed: CombatantSeed): Combatant {
+    return {
+        ...seed,
+        initiative: seed.initiative ?? null,
+        dexMod: seed.dexMod ?? null,
+        initiativeRoll: seed.initiativeRoll ?? null,
+        conditions: seed.conditions ?? [],
+    };
+}
 
 function sortByInitiative(combatants: Combatant[]): Combatant[] {
     return [...combatants].sort((a, b) => {
@@ -67,11 +77,7 @@ export function CombatProvider({ children }: { children: ReactNode }) {
     }, [combat]);
 
     const startCombat = useCallback((seed: CombatantSeed[]) => {
-        const combatants: Combatant[] = seed.map((c) => ({
-            ...c,
-            initiative: c.initiative ?? null,
-            conditions: c.conditions ?? [],
-        }));
+        const combatants: Combatant[] = seed.map(withDefaults);
         setCombat({ round: 1, turnIndex: 0, combatants });
     }, []);
 
@@ -79,11 +85,7 @@ export function CombatProvider({ children }: { children: ReactNode }) {
 
     const addCombatant = useCallback((seed: CombatantSeed) => {
         setCombat((prev) => {
-            const combatant: Combatant = {
-                ...seed,
-                initiative: seed.initiative ?? null,
-                conditions: seed.conditions ?? [],
-            };
+            const combatant = withDefaults(seed);
             if (!prev) return { round: 1, turnIndex: 0, combatants: [combatant] };
             return { ...prev, combatants: [...prev.combatants, combatant] };
         });
@@ -93,9 +95,9 @@ export function CombatProvider({ children }: { children: ReactNode }) {
         setCombat((prev) => {
             if (!prev) return prev;
             const existingIds = new Set(prev.combatants.map((c) => c.id));
-            const additions: Combatant[] = seedFromNodes(nodes)
+            const additions = seedFromNodes(nodes)
                 .filter((seed) => !existingIds.has(seed.id))
-                .map((seed) => ({ ...seed, initiative: seed.initiative ?? null, conditions: seed.conditions ?? [] }));
+                .map(withDefaults);
             if (additions.length === 0) return prev;
             return { ...prev, combatants: [...prev.combatants, ...additions] };
         });
@@ -113,13 +115,23 @@ export function CombatProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const rollInitiative = useCallback((id: string) => {
-        updateCombatant(id, { initiative: rollD20() });
-    }, [updateCombatant]);
+        setCombat((prev) => prev && {
+            ...prev,
+            combatants: prev.combatants.map((c) => {
+                if (c.id !== id) return c;
+                const roll = rollDie(20);
+                return { ...c, initiative: roll + (c.dexMod ?? 0), initiativeRoll: roll };
+            }),
+        });
+    }, []);
 
     const rollAllInitiative = useCallback(() => {
         setCombat((prev) => prev && {
             ...prev,
-            combatants: prev.combatants.map((c) => ({ ...c, initiative: rollD20() })),
+            combatants: prev.combatants.map((c) => {
+                const roll = rollDie(20);
+                return { ...c, initiative: roll + (c.dexMod ?? 0), initiativeRoll: roll };
+            }),
         });
     }, []);
 

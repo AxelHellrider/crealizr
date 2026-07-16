@@ -148,12 +148,12 @@ export function suggestEncounters(opts: {
     ruleset: Ruleset;
     budget: number;
 }): EncounterSuggestion[] {
-    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
-    const crs = Object.keys(rulesetXP).map(Number);
+    const xpPerCR = XP_PER_CR;
+    const crs = Object.keys(xpPerCR).map(Number);
     const results: EncounterSuggestion[] = [];
 
     for (const cr of crs) {
-        const xpEach = rulesetXP[String(cr)];
+        const xpEach = xpPerCR[String(cr)];
         for (let n = 1; n <= 8; n++) {
             const adj = Math.round(xpEach * n * encounterMultiplier(n));
             const fit = Math.min(opts.budget, adj) / Math.max(opts.budget, adj);
@@ -280,16 +280,16 @@ export function suggestBossWithMinions(opts: {
     relationCriteria?: "terrain" | "affiliation" | "genus" | "any";
     catalog?: readonly Monster[];
 }): BossMinionSuggestion[] {
-    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
+    const xpPerCR = XP_PER_CR;
     const results: BossMinionSuggestion[] = [];
 
     // Find suitable boss CR (should be higher than party level, typically 2-4 levels higher)
-    const bossCRs = Object.keys(rulesetXP)
+    const bossCRs = Object.keys(xpPerCR)
         .map(Number)
         .filter((cr) => cr >= opts.level && cr <= opts.level + 4);
 
     for (const bossCR of bossCRs) {
-        const bossXP = rulesetXP[String(bossCR)];
+        const bossXP = xpPerCR[String(bossCR)];
         const bossCount = 1;
         const bossAdjustedXP = Math.round(bossXP * encounterMultiplier(bossCount));
 
@@ -323,7 +323,7 @@ export function suggestBossWithMinions(opts: {
             .sort((a, b) => a - b);
 
         for (const minionCR of minionCRs) {
-            const minionXP = rulesetXP[String(minionCR)];
+            const minionXP = xpPerCR[String(minionCR)];
             for (let minionCount = 2; minionCount <= 8; minionCount++) {
                 const minionTotalXP = minionXP * minionCount;
                 const minionAdjustedXP = Math.round(minionTotalXP * encounterMultiplier(minionCount + 1));
@@ -366,8 +366,8 @@ export function suggestGroupEncounters(opts: {
     relationCriteria?: "terrain" | "affiliation" | "genus" | "any";
     catalog?: readonly Monster[];
 }): GroupSuggestion[] {
-    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
-    const crs = Object.entries(rulesetXP)
+    const xpPerCR = XP_PER_CR;
+    const crs = Object.entries(xpPerCR)
         .map(([cr, xp]) => ({ cr: Number(cr), xp }));
 
     const results: GroupSuggestion[] = [];
@@ -437,15 +437,15 @@ export function suggestBossWithMinionsCR(opts: {
 }): BossMinionSuggestion[] {
     const target = crTarget(opts.level, opts.difficulty);
     const budget = crBudgetForParty(opts.level, opts.size, opts.difficulty);
-    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
-    const allCRs = Object.keys(rulesetXP).map(Number).sort((a, b) => a - b);
+    const xpPerCR = XP_PER_CR;
+    const allCRs = Object.keys(xpPerCR).map(Number).sort((a, b) => a - b);
 
     // Boss CRs: slightly above target up to +4, and slightly below (min 0.125)
     const bossCRs = allCRs.filter(cr => cr >= Math.max(0.125, target - 1) && cr <= target + 4);
     const results: BossMinionSuggestion[] = [];
 
     for (const bossCR of bossCRs) {
-        const xpEach = rulesetXP[String(bossCR)];
+        const xpEach = xpPerCR[String(bossCR)];
 
         if (!opts.includeMinions) {
             const weight = crEncounterWeight([{ cr: bossCR, count: 1 }]);
@@ -459,11 +459,11 @@ export function suggestBossWithMinionsCR(opts: {
         const bossMonster = pickMonsterManualBenchmark(bossCR, opts.level * 31, opts.ruleset, opts.catalog);
         const related = getRelatedMonsters(bossMonster, opts.relationCriteria ?? "any", opts.ruleset, opts.catalog);
         const minionCRs = [...new Set(related.map(m => m.cr))]
-            .filter(cr => cr < bossCR && cr >= 0.125 && rulesetXP[String(cr)] !== undefined)
+            .filter(cr => cr < bossCR && cr >= 0.125 && xpPerCR[String(cr)] !== undefined)
             .sort((a, b) => a - b);
 
         for (const minionCR of minionCRs) {
-            const minionXP = rulesetXP[String(minionCR)];
+            const minionXP = xpPerCR[String(minionCR)];
             for (let n = 1; n <= opts.size + 2; n++) {
                 const members = [{ cr: bossCR, count: 1 }, { cr: minionCR, count: n }];
                 const weight = crEncounterWeight(members);
@@ -492,10 +492,10 @@ export function suggestGroupEncountersCR(opts: {
 }): GroupSuggestion[] {
     const target = crTarget(opts.level, opts.difficulty);
     const budget = crBudgetForParty(opts.level, opts.size, opts.difficulty);
-    const rulesetXP = XP_PER_CR[opts.ruleset] || XP_PER_CR["2014"];
+    const xpPerCR = XP_PER_CR;
 
     // Candidates: CRs within a ×4 range of the target
-    let candidates = Object.entries(rulesetXP)
+    let candidates = Object.entries(xpPerCR)
         .map(([cr, xp]) => ({ cr: Number(cr), xp }))
         .filter(({ cr }) => cr >= Math.max(0.125, target * 0.25) && cr <= target * 4);
 
