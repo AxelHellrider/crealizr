@@ -42,9 +42,26 @@ export function InitiativeTracker({ ruleset, catalog, className = "" }: Initiati
         setDeltaInputs((prev) => ({ ...prev, [combatant.id]: "" }));
     };
 
-    // Nearest-CR-first so the closest fits show up at the top of the picker.
-    const catalogNearCR = (cr: number | null) =>
-        [...catalog].sort((a, b) => Math.abs(a.cr - (cr ?? 0)) - Math.abs(b.cr - (cr ?? 0)));
+    // Only monsters at exactly the slot's CR — the encounter's XP/CR budget
+    // was already computed and the fight already started against that CR,
+    // so swapping to a different CR would silently invalidate the balance
+    // the DM chose. This is a reskin (which CR-3 goblin is it, mechanically),
+    // not a way to re-budget the encounter mid-fight.
+    //
+    // The initial auto-assignment (combatSeed.ts) can fall back to the
+    // *nearest* CR when the catalog has no exact match, so the currently
+    // assigned monster is always kept in the list even if it isn't an exact
+    // match itself — otherwise the picker would silently drop the current
+    // selection the moment you opened it.
+    const catalogAtCR = (cr: number | null, currentName: string | null) => {
+        if (cr === null) return [];
+        const exact = catalog.filter((m) => m.cr === cr);
+        if (currentName && !exact.some((m) => m.name === currentName)) {
+            const current = catalog.find((m) => m.name === currentName);
+            if (current) return [current, ...exact];
+        }
+        return exact;
+    };
 
     // Swapping keeps damage already taken (only resets currentHP to the new
     // max if the combatant was still at full HP under the old assignment).
@@ -133,8 +150,8 @@ export function InitiativeTracker({ ruleset, catalog, className = "" }: Initiati
                                             aria-label="Monster"
                                         >
                                             {!c.monsterName && <option value="">— No monster assigned —</option>}
-                                            {catalogNearCR(c.cr).map((m) => (
-                                                <option key={m.name} value={m.name}>{m.name} (CR {formatCR(m.cr)})</option>
+                                            {catalogAtCR(c.cr, c.monsterName).map((m) => (
+                                                <option key={m.name} value={m.name}>{m.name}{m.cr !== c.cr ? ` (CR ${formatCR(m.cr)})` : ""}</option>
                                             ))}
                                         </select>
                                     </div>
