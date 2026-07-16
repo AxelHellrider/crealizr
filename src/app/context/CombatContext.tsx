@@ -8,6 +8,7 @@ import type { Ruleset } from "@/engine/encounter";
 import { loadCombat, saveCombat, clearCombat } from "@/app/lib/combatDB";
 import { rollDie } from "@/app/utils/dice";
 import { seedFromNodes, type CombatantSeed } from "@/app/utils/combatSeed";
+import { sortByInitiative, advanceTurn, applyCombatantPatch } from "@/app/utils/combatLogic";
 
 type CombatContextValue = {
     combat: CombatState | null;
@@ -43,15 +44,6 @@ function withDefaults(seed: CombatantSeed): Combatant {
         initiativeRoll: seed.initiativeRoll ?? null,
         conditions: seed.conditions ?? [],
     };
-}
-
-function sortByInitiative(combatants: Combatant[]): Combatant[] {
-    return [...combatants].sort((a, b) => {
-        if (a.initiative === null && b.initiative === null) return 0;
-        if (a.initiative === null) return 1;
-        if (b.initiative === null) return -1;
-        return b.initiative - a.initiative;
-    });
 }
 
 export function CombatProvider({ children }: { children: ReactNode }) {
@@ -114,7 +106,7 @@ export function CombatProvider({ children }: { children: ReactNode }) {
     const updateCombatant = useCallback((id: string, patch: Partial<Combatant>) => {
         setCombat((prev) => prev && {
             ...prev,
-            combatants: prev.combatants.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+            combatants: prev.combatants.map((c) => (c.id === id ? applyCombatantPatch(c, patch) : c)),
         });
     }, []);
 
@@ -140,20 +132,11 @@ export function CombatProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const nextTurn = useCallback(() => {
-        setCombat((prev) => {
-            if (!prev || prev.combatants.length === 0) return prev;
-            const nextIndex = prev.turnIndex + 1;
-            if (nextIndex >= prev.combatants.length) return { ...prev, round: prev.round + 1, turnIndex: 0 };
-            return { ...prev, turnIndex: nextIndex };
-        });
+        setCombat((prev) => prev && advanceTurn(prev, "next"));
     }, []);
 
     const prevTurn = useCallback(() => {
-        setCombat((prev) => {
-            if (!prev || prev.combatants.length === 0) return prev;
-            if (prev.turnIndex === 0) return { ...prev, round: Math.max(1, prev.round - 1), turnIndex: prev.combatants.length - 1 };
-            return { ...prev, turnIndex: prev.turnIndex - 1 };
-        });
+        setCombat((prev) => prev && advanceTurn(prev, "prev"));
     }, []);
 
     const turnOrder = combat ? sortByInitiative(combat.combatants) : [];

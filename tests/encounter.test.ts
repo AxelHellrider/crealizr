@@ -60,6 +60,16 @@ describe("partyBudget", () => {
         const deadly = partyBudget({ level: 5, size: 4, difficulty: "deadly", ruleset: "2014", mode: "encounter" });
         expect(deadly).toBeGreaterThan(easy);
     });
+    it("daily mode multiplies the selected difficulty's threshold by 3.4, rounded", () => {
+        const encounter = partyBudget({ level: 5, size: 4, difficulty: "medium", mode: "encounter" });
+        const daily = partyBudget({ level: 5, size: 4, difficulty: "medium", mode: "daily" });
+        expect(daily).toBe(Math.round(encounter * 3.4));
+    });
+    it("daily mode scales with whichever difficulty is selected, not a single fixed per-level budget", () => {
+        const dailyEasy = partyBudget({ level: 5, size: 4, difficulty: "easy", mode: "daily" });
+        const dailyDeadly = partyBudget({ level: 5, size: 4, difficulty: "deadly", mode: "daily" });
+        expect(dailyDeadly).toBeGreaterThan(dailyEasy);
+    });
 });
 
 describe("suggestEncounters", () => {
