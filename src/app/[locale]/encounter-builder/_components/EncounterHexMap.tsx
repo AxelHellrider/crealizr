@@ -7,6 +7,8 @@ import { Stage, Layer, Line, Group, Text, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { useEncounterLayout } from "@/app/hooks/useEncounterLayout";
 import { useMapFullscreen } from "@/app/context/MapFullscreenContext";
+import { useCombat } from "@/app/context/CombatContext";
+import { seedFromNodes } from "@/app/utils/combatSeed";
 import { MapToolbar } from "./MapToolbar";
 import { NodeEditorPopover } from "./NodeEditorPopover";
 import { InitiativeTracker } from "./InitiativeTracker";
@@ -43,15 +45,32 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const [size, setSize]               = useState({ width: 320, height: 320 });
     const [mapMode, setMapMode]         = useState<MapMode>("select");
     const [cameraLocked, setCameraLocked] = useState(false);
-    const [combatOpen, setCombatOpen]   = useState(false);
     // Shared with the rest of the app (e.g. the PWA install badge hides itself while this is true).
     const { isFullscreen, setIsFullscreen } = useMapFullscreen();
     const [showRotateHint, setShowRotateHint] = useState(false);
+    const combat = useCombat();
+    const battleActive = !!combat.combat;
+
+    // Resume Battle Mode (fullscreen) on load if a combat was already in
+    // progress — e.g. the page was refreshed mid-fight. Only fires once,
+    // right after the persisted combat state finishes loading, so it never
+    // fights a later manual exit-fullscreen ("interrupt") action.
+    const autoResumedRef = useRef(false);
+    useEffect(() => {
+        if (autoResumedRef.current || combat.loading) return;
+        autoResumedRef.current = true;
+        if (combat.combat) setIsFullscreen(true);
+    }, [combat.loading, combat.combat, setIsFullscreen]);
 
     // Fixed vertical layout regardless of device/viewport — the battlefield
     // shouldn't reflow between mobile and desktop.
     const orientation = "v" as const;
     const layout      = useEncounterLayout(partySize, suggestion, mode, orientation);
+
+    const startEncounter = useCallback(() => {
+        combat.startCombat(seedFromNodes(layout.nodes));
+        setIsFullscreen(true);
+    }, [combat, layout.nodes, setIsFullscreen]);
 
     const [editingId,  setEditingId]  = useState<string | null>(null);
     const [popoverRect, setPopoverRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
@@ -505,8 +524,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
             }
             layout.clearManualNodes();
         },
-        combatOpen,
-        onCombatToggle: () => setCombatOpen(v => !v),
+        battleActive,
+        onStartEncounter: startEncounter,
+        onEndEncounter: combat.endCombat,
     };
 
     // ── Konva Stage (shared JSX, rendered in ONE place) ──────────────────────
@@ -672,9 +692,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                                 </div>
                             )}
                         </div>
-                        {combatOpen && (
+                        {battleActive && (
                             <div className="w-64 shrink-0 border border-gold/10 rounded-sm bg-card/40 p-2 overflow-y-auto">
-                                <InitiativeTracker nodes={layout.nodes} ruleset={ruleset} />
+                                <InitiativeTracker ruleset={ruleset} />
                             </div>
                         )}
                     </div>
@@ -727,7 +747,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         className="shrink-0 flex items-center justify-between gap-4 px-4 h-10 border-b border-gold/10"
                         style={{ paddingTop: "env(safe-area-inset-top)", height: "calc(2.5rem + env(safe-area-inset-top))" }}
                     >
-                        <span className="font-serif text-xs uppercase tracking-widest text-muted">Battlefield</span>
+                        <span className="font-serif text-xs uppercase tracking-widest text-muted">
+                            {battleActive ? `Battle Mode · Round ${combat.combat?.round}` : "Battlefield"}
+                        </span>
                         {mapMode !== "select" && (
                             <span className="text-[9px] text-muted/60 italic">Tap empty hex to place</span>
                         )}
@@ -735,10 +757,10 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                             type="button"
                             onClick={() => setIsFullscreen(false)}
                             className="ui-button shrink-0 ml-auto min-h-9 gap-1.5 px-3 text-[10px]"
-                            aria-label="Close fullscreen"
+                            aria-label={battleActive ? "Interrupt battle" : "Close fullscreen"}
                         >
                             <span aria-hidden="true">✕</span>
-                            <span>Close</span>
+                            <span>{battleActive ? "Interrupt" : "Close"}</span>
                         </button>
                     </div>
 
@@ -747,9 +769,9 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         {showRotateHint && <RotateHintBanner onDismiss={dismissRotateHint} />}
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
-                        {combatOpen && (
+                        {battleActive && (
                             <div className="absolute top-0 right-0 bottom-0 w-72 max-w-[85vw] border-l border-gold/20 bg-background p-3 overflow-y-auto z-10">
-                                <InitiativeTracker nodes={layout.nodes} ruleset={ruleset} />
+                                <InitiativeTracker ruleset={ruleset} />
                             </div>
                         )}
                     </div>

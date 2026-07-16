@@ -22,8 +22,9 @@ interface MapToolbarProps {
     onClearAll: () => void;
     isFullscreen: boolean;
     onFullscreenToggle: () => void;
-    combatOpen: boolean;
-    onCombatToggle: () => void;
+    battleActive: boolean;
+    onStartEncounter: () => void;
+    onEndEncounter: () => void;
 }
 
 export function MapToolbar({
@@ -32,7 +33,7 @@ export function MapToolbar({
     onZoomIn, onZoomOut,
     canClearAll, onClearAll,
     isFullscreen, onFullscreenToggle,
-    combatOpen, onCombatToggle,
+    battleActive, onStartEncounter, onEndEncounter,
 }: MapToolbarProps) {
 
     if (isFullscreen) {
@@ -66,10 +67,17 @@ export function MapToolbar({
                     </button>
                 )}
 
-                <button type="button" onClick={onCombatToggle}
-                    className={`${base} ${active(combatOpen)}`} aria-pressed={combatOpen}>
-                    Combat
-                </button>
+                {battleActive ? (
+                    <button type="button" onClick={onEndEncounter}
+                        className={`${base} text-crimson/80 hover:text-crimson active:text-crimson`}>
+                        End Encounter
+                    </button>
+                ) : (
+                    <button type="button" onClick={onStartEncounter}
+                        className={`${base} text-gold hover:bg-gold/10`}>
+                        Start Encounter
+                    </button>
+                )}
 
                 <button type="button" onClick={onFullscreenToggle}
                     className={`${base} text-foreground/70 hover:text-gold ml-auto border-l border-gold/10`}
@@ -126,9 +134,15 @@ export function MapToolbar({
 
                 <span className="w-px self-stretch bg-gold/10" aria-hidden />
 
-                <button type="button" onClick={onCombatToggle} className={btn(combatOpen)} aria-pressed={combatOpen}>
-                    Combat
-                </button>
+                {battleActive ? (
+                    <button type="button" onClick={onEndEncounter} className={btn(false, true)}>
+                        End Encounter
+                    </button>
+                ) : (
+                    <button type="button" onClick={onStartEncounter} className="min-h-9 sm:min-h-0 flex items-center gap-1.5 text-[11px] sm:text-[10px] uppercase tracking-widest px-2.5 sm:px-2 py-2 sm:py-1 rounded-sm border border-gold bg-gold/10 text-gold hover:bg-gold/20 transition-colors">
+                        Start Encounter
+                    </button>
+                )}
 
                 {mode !== "select" && (
                     <span className="text-[9px] text-muted/60 italic">Click empty hex to place</span>

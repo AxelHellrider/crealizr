@@ -3,69 +3,22 @@
 import { useState } from "react";
 import { useCombat } from "@/app/context/CombatContext";
 import { getConditions, type ConditionId } from "@/app/data/conditions";
-import type { EncounterNode } from "@/app/types/encounterLayout";
 import type { Combatant } from "@/app/types/combat";
 import type { Ruleset } from "@/engine/encounter";
 
 interface InitiativeTrackerProps {
-    nodes: EncounterNode[];
     ruleset: Ruleset;
     className?: string;
 }
 
-type Seed = Omit<Combatant, "id" | "initiative" | "conditions"> & {
-    initiative?: number | null;
-    conditions?: ConditionId[];
-};
-
-/** Party/enemy nodes currently on the map, turned into a starting combatant
- * list — HP isn't tracked on nodes at all (see encounterLayout.ts), so it
- * always starts blank; conditions carry over since nodes already track those. */
-function seedFromNodes(nodes: EncounterNode[]): Seed[] {
-    let pcCount = 0;
-    let monsterCount = 0;
-    return nodes
-        .filter((n): n is Extract<EncounterNode, { kind: "party" | "enemy" }> => n.kind === "party" || n.kind === "enemy")
-        .map((n) => {
-            let name: string;
-            if (n.kind === "party") { pcCount++; name = n.label || `PC ${pcCount}`; }
-            else if (n.isBoss) { name = n.label || "Boss"; }
-            else { monsterCount++; name = n.label || `Monster ${monsterCount}`; }
-            return {
-                name,
-                kind: n.kind,
-                isBoss: n.kind === "enemy" ? n.isBoss : undefined,
-                maxHP: null,
-                currentHP: null,
-                conditions: n.conditions ?? [],
-            };
-        });
-}
-
-export function InitiativeTracker({ nodes, ruleset, className = "" }: InitiativeTrackerProps) {
+/** Renders the active combat's turn order. The parent only mounts this once
+ * combat has actually started (see EncounterHexMap's "Start Encounter"
+ * action), so there's no empty/not-started state to render here. */
+export function InitiativeTracker({ ruleset, className = "" }: InitiativeTrackerProps) {
     const combat = useCombat();
     const [deltaInputs, setDeltaInputs] = useState<Record<string, string>>({});
 
-    if (!combat.combat) {
-        const seed = seedFromNodes(nodes);
-        return (
-            <div className={`flex flex-col items-center justify-center gap-3 p-6 text-center ${className}`}>
-                <p className="text-xs text-muted max-w-[220px]">
-                    {seed.length === 0
-                        ? "Place party and enemy nodes on the map first."
-                        : `Start combat with ${seed.length} combatant${seed.length === 1 ? "" : "s"} from the map.`}
-                </p>
-                <button
-                    type="button"
-                    disabled={seed.length === 0}
-                    onClick={() => combat.startCombat(seed)}
-                    className="ui-button min-h-9 px-4 text-[11px] uppercase tracking-widest disabled:opacity-30 disabled:pointer-events-none"
-                >
-                    Start Combat
-                </button>
-            </div>
-        );
-    }
+    if (!combat.combat) return null;
 
     const { turnOrder, activeCombatant, combat: state } = combat;
 
@@ -103,14 +56,9 @@ export function InitiativeTracker({ nodes, ruleset, className = "" }: Initiative
                     <button type="button" onClick={combat.nextTurn} className="ui-button min-h-7 px-2 text-[10px]" aria-label="Next turn">→</button>
                 </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-                <button type="button" onClick={combat.rollAllInitiative} className="ui-button flex-1 min-h-8 text-[10px] uppercase tracking-widest">
-                    Roll All Initiative
-                </button>
-                <button type="button" onClick={combat.endCombat} className="text-[10px] uppercase tracking-widest text-crimson/80 hover:text-crimson px-2 py-1">
-                    End
-                </button>
-            </div>
+            <button type="button" onClick={combat.rollAllInitiative} className="ui-button shrink-0 min-h-8 text-[10px] uppercase tracking-widest">
+                Roll All Initiative
+            </button>
 
             {/* Combatant list */}
             <div className="flex flex-col gap-2 overflow-y-auto min-h-0">
