@@ -435,9 +435,15 @@
       {
         "heading": "Aucune intelligence artificielle",
         "body": [
-          "CRealizr n'utilise nulle part dans ses outils d'intelligence artificielle, d'apprentissage automatique ou de modèles d'IA générative. Chaque suggestion de rencontre, calcul de mise à l'échelle de monstre, rencontre de voyage et plan d'objet est produit par une logique déterministe fondée sur des règles, écrite et vérifiée par des développeurs humains — le même type de calcul qu'un maître du jeu ferait à la main, en plus rapide.",
-          "Pour le processus de développement du site, l'IA n'est utilisée que pour mettre en œuvre des scénarios de test, structurer et organiser le code, et gérer le versionnage du site, afin de livrer des fonctionnalités de manière plus rapide, tout en restant efficace. Aucun processus ni élément de l'outil n'est jamais traité par l'IA, et aucune donnée utilisateur n'est traitée sans le consentement de l'utilisateur via Google Analytics.",
-          "Aucune des données que vous saisissez n'est envoyée à un service d'IA ou à un modèle tiers. L'outil est, et restera, entièrement conçu par des humains."
+          "CRealizr n'utilise nulle part dans ses outils d'intelligence artificielle, d'apprentissage automatique ou de modèles d'IA générative. Chaque suggestion de rencontre, calcul de mise à l'échelle de monstre, rencontre de voyage et plan d'objet est produit par une logique déterministe fondée sur des règles — le même type de calcul qu'un maître du jeu ferait à la main, en plus rapide.",
+          "Aucune des données que vous saisissez dans les outils n'est jamais envoyée à un service d'IA ou à un modèle tiers."
+        ]
+      },
+      {
+        "heading": "Mention relative à l'IA",
+        "body": [
+          "L'IA est utilisée exclusivement comme outil d'aide au développement local pour l'équipe humaine derrière CRealizr — pour structurer et organiser le code, mettre en œuvre des scénarios de test et gérer un contrôle de version avancé, afin de livrer des fonctionnalités plus rapidement sans sacrifier la qualité.",
+          "Cet usage est strictement limité au processus de développement local. L'IA n'est jamais alimentée avec des données utilisateur, ne s'exécute jamais sur des données de production, et ne joue aucun rôle dans le résultat d'un quelconque outil — elle ne touche ni les rencontres, ni les monstres, ni les objets, ni quoi que ce soit d'autre que vous générez."
         ]
       },
       {

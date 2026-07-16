@@ -435,9 +435,15 @@
       {
         "heading": "Nessuna Intelligenza Artificiale",
         "body": [
-          "CRealizr non utilizza intelligenza artificiale, apprendimento automatico o modelli di IA generativa in nessuno dei suoi strumenti. Ogni suggerimento di scontro, calcolo di scalatura dei mostri, incontro di viaggio e progetto di oggetto è prodotto da una logica deterministica basata su regole, scritta e verificata da sviluppatori umani — lo stesso tipo di calcolo che un Dungeon Master farebbe a mano, solo più velocemente.",
-          "Per il processo di sviluppo del sito, l'IA viene utilizzata solo per implementare scenari di test, strutturare e organizzare il codice e gestire il versionamento del sito, al fine di rilasciare funzionalità in modo più rapido ma comunque efficace. Nessun processo o elemento dello strumento viene mai elaborato dall'IA, né alcun dato utente viene elaborato senza il consenso dell'utente tramite Google Analytics.",
-          "Nessuno dei dati che inserisci viene inviato a un servizio di IA o a un modello di terze parti. Lo strumento è, e rimarrà, realizzato al 100% da esseri umani."
+          "CRealizr non utilizza intelligenza artificiale, apprendimento automatico o modelli di IA generativa in nessuno dei suoi strumenti. Ogni suggerimento di scontro, calcolo di scalatura dei mostri, incontro di viaggio e progetto di oggetto è prodotto da una logica deterministica basata su regole — lo stesso tipo di calcolo che un Dungeon Master farebbe a mano, solo più velocemente.",
+          "Nessuno dei dati che inserisci negli strumenti viene mai inviato a un servizio di IA o a un modello di terze parti."
+        ]
+      },
+      {
+        "heading": "Nota sull'IA",
+        "body": [
+          "L'IA viene utilizzata esclusivamente come supporto locale allo sviluppo per il team umano dietro CRealizr — per strutturare e organizzare il codice, implementare scenari di test e gestire un controllo di versione avanzato, così da rilasciare funzionalità più rapidamente senza tagliare gli angoli.",
+          "Questo utilizzo è rigorosamente limitato al processo di sviluppo locale. L'IA non riceve mai dati utente, non viene mai eseguita su dati di produzione e non ha alcun ruolo nell'output di alcuno strumento — non tocca gli scontri, i mostri, gli oggetti né nient'altro tu generi."
         ]
       },
       {
