@@ -1,4 +1,5 @@
 import type { ConditionId } from "@/app/data/conditions";
+import type { MonsterAction } from "@/app/types/monster";
 
 export type DeathSaves = {
     successes: number;
@@ -12,6 +13,18 @@ export interface Combatant {
     name: string;
     kind: "party" | "enemy";
     isBoss?: boolean;
+    /** The encounter slot's challenge rating (enemies only) — used to sort/filter
+     * the "swap monster" picker toward creatures of a similar CR. */
+    cr: number | null;
+    /** Which catalog monster this combatant currently represents (enemies only) —
+     * a name, not an id, since official catalog entries don't have stable ids.
+     * Drives the AC/actions/dexMod snapshot below; null means the DM never
+     * assigned one (no catalog match, or a homebrew placeholder). */
+    monsterName: string | null;
+    ac: number | null;
+    /** Snapshot of the assigned monster's actions at assignment time, for
+     * quick reference during the fight — not kept live-synced to the catalog. */
+    actions: MonsterAction[];
     initiative: number | null;
     /** DEX modifier added on top of the die when rolling initiative — persists
      * across rerolls so the DM only has to enter it once per combatant. */

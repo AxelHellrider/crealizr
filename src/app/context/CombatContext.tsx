@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import type { CombatState, Combatant } from "@/app/types/combat";
 import type { EncounterNode } from "@/app/types/encounterLayout";
+import type { Monster } from "@/app/types/monster";
+import type { Ruleset } from "@/engine/encounter";
 import { loadCombat, saveCombat, clearCombat } from "@/app/lib/combatDB";
 import { rollDie } from "@/app/utils/dice";
 import { seedFromNodes, type CombatantSeed } from "@/app/utils/combatSeed";
@@ -25,8 +27,10 @@ type CombatContextValue = {
     /** Adds any party/enemy node not already in the fight (matched by id) as
      * a new combatant, leaving everyone already in combat untouched — how
      * reinforcements (an NPC ally, a boss's extra minions) join mid-fight
-     * after the DM pauses to place them and resumes. */
-    syncNewCombatants: (nodes: EncounterNode[]) => void;
+     * after the DM pauses to place them and resumes. `catalog`/`ruleset`
+     * let new enemy nodes get a real monster auto-assigned, same as
+     * startCombat. */
+    syncNewCombatants: (nodes: EncounterNode[], catalog: readonly Monster[], ruleset: Ruleset) => void;
 };
 
 const CombatContext = createContext<CombatContextValue | null>(null);
@@ -91,11 +95,11 @@ export function CombatProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
-    const syncNewCombatants = useCallback((nodes: EncounterNode[]) => {
+    const syncNewCombatants = useCallback((nodes: EncounterNode[], catalog: readonly Monster[], ruleset: Ruleset) => {
         setCombat((prev) => {
             if (!prev) return prev;
             const existingIds = new Set(prev.combatants.map((c) => c.id));
-            const additions = seedFromNodes(nodes)
+            const additions = seedFromNodes(nodes, catalog, ruleset)
                 .filter((seed) => !existingIds.has(seed.id))
                 .map(withDefaults);
             if (additions.length === 0) return prev;

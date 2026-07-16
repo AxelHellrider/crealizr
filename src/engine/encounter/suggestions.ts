@@ -68,7 +68,7 @@ export function getMonstersForCR(cr: number, ruleset: Ruleset = "2014", customCa
  * same inputs always suggest the same monster; falls back to the catalog
  * entry with the closest CR when none matches exactly.
  */
-function pickMonsterManualBenchmark(cr: number, seed: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]) {
+export function pickMonsterManualBenchmark(cr: number, seed: number, ruleset: Ruleset = "2014", customCatalog?: readonly Monster[]) {
     const catalog = customCatalog ?? (ruleset === "2024" ? MONSTER_MANUAL_2024_CATALOG : MONSTER_MANUAL_2014_CATALOG);
     const exactMatches = catalog.filter((monster) => monster.cr === cr);
     if (exactMatches.length > 0) {

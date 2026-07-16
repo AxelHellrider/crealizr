@@ -27,19 +27,24 @@ import type {
 } from "@/app/types/encounterLayout";
 import { conditionAbbrs, toArmedTool, nodeStyle, nodeLabel, nodeSettingsSummary, hazardAoEHexes } from "@/app/utils/encounterNodeDisplay";
 import { clamp } from "@/app/lib/number";
+import type { Monster } from "@/app/types/monster";
 
 interface EncounterHexMapProps {
     partySize: number;
     suggestion: GroupSuggestion | BossMinionSuggestion | null;
     mode: EncounterMode;
     ruleset: Ruleset;
+    /** Official + homebrew monsters for the current ruleset — used to
+     * auto-assign a real creature to each abstract enemy slot when combat
+     * starts (see combatSeed.ts). */
+    catalog: readonly Monster[];
     onPartyChange?: (newSize: number) => void;
     onCoverBenefits?: (benefits: CoverBenefit[]) => void;
     onHazardEffects?: (effects: HazardEffect[]) => void;
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
-export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyChange, onCoverBenefits, onHazardEffects }: EncounterHexMapProps) {
+export function EncounterHexMap({ partySize, suggestion, mode, ruleset, catalog, onPartyChange, onCoverBenefits, onHazardEffects }: EncounterHexMapProps) {
     const t = useTranslations("encounterBuilder");
 
     const [size, setSize]               = useState({ width: 320, height: 320 });
@@ -68,17 +73,17 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
     const layout      = useEncounterLayout(partySize, suggestion, mode, orientation);
 
     const startEncounter = useCallback(() => {
-        combat.startCombat(seedFromNodes(layout.nodes));
+        combat.startCombat(seedFromNodes(layout.nodes, catalog, ruleset));
         setIsFullscreen(true);
-    }, [combat, layout.nodes, setIsFullscreen]);
+    }, [combat, layout.nodes, catalog, ruleset, setIsFullscreen]);
 
     // Resume from a pause: any node placed while paused (an NPC ally, a
     // boss's reinforcements) joins the fight as a new combatant — everyone
     // already in combat (HP, initiative, conditions) is left untouched.
     const resumeEncounter = useCallback(() => {
-        combat.syncNewCombatants(layout.nodes);
+        combat.syncNewCombatants(layout.nodes, catalog, ruleset);
         setIsFullscreen(true);
-    }, [combat, layout.nodes, setIsFullscreen]);
+    }, [combat, layout.nodes, catalog, ruleset, setIsFullscreen]);
 
     // Pausing just exits fullscreen — combat state (round/turn/HP/
     // conditions) stays intact in CombatContext/IndexedDB either way.
@@ -707,7 +712,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         </div>
                         {battleActive && (
                             <div className="w-96 max-w-[40vw] shrink-0 border border-gold/10 rounded-sm bg-card/40 p-2.5 overflow-y-auto overflow-x-hidden">
-                                <InitiativeTracker ruleset={ruleset} />
+                                <InitiativeTracker ruleset={ruleset} catalog={catalog} />
                             </div>
                         )}
                     </div>
@@ -786,7 +791,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                             on a phone leaves neither usable. Desktop/tablet: a wide side panel. */}
                         {battleActive && (
                             <div className="absolute inset-0 sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[26rem] sm:max-w-[85vw] sm:border-l border-gold/20 bg-background p-3 overflow-y-auto overflow-x-hidden z-10">
-                                <InitiativeTracker ruleset={ruleset} />
+                                <InitiativeTracker ruleset={ruleset} catalog={catalog} />
                             </div>
                         )}
                     </div>

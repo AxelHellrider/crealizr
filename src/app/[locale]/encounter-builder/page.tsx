@@ -166,6 +166,7 @@ export default function CombatBalancerPage() {
                                     suggestion={mapSuggestion}
                                     mode={state.mode}
                                     ruleset={state.ruleset}
+                                    catalog={catalog}
                                     onPartyChange={(newSize) => dispatch({ type: "SET_PARTY_SIZE", payload: newSize })}
                                     onCoverBenefits={setCoverBenefits}
                                     onHazardEffects={setHazardEffects}

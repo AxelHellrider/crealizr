@@ -4,10 +4,15 @@ import { useState } from "react";
 import { useCombat } from "@/app/context/CombatContext";
 import { getConditions, type ConditionId } from "@/app/data/conditions";
 import type { Combatant } from "@/app/types/combat";
+import type { Monster } from "@/app/types/monster";
 import type { Ruleset } from "@/engine/encounter";
+import { formatCR } from "@/app/lib/format";
 
 interface InitiativeTrackerProps {
     ruleset: Ruleset;
+    /** Official + homebrew monsters for the current ruleset — populates the
+     * per-combatant "swap monster" picker for enemies. */
+    catalog: readonly Monster[];
     className?: string;
 }
 
@@ -19,7 +24,7 @@ const smallBtn = "ui-button min-h-9 sm:min-h-7 px-2.5 sm:px-1.5 text-xs sm:text-
 /** Renders the active combat's turn order. The parent only mounts this once
  * combat has actually started (see EncounterHexMap's "Start Encounter"
  * action), so there's no empty/not-started state to render here. */
-export function InitiativeTracker({ ruleset, className = "" }: InitiativeTrackerProps) {
+export function InitiativeTracker({ ruleset, catalog, className = "" }: InitiativeTrackerProps) {
     const combat = useCombat();
     const [deltaInputs, setDeltaInputs] = useState<Record<string, string>>({});
 
@@ -35,6 +40,25 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
         const next = Math.max(0, Math.min(max, combatant.currentHP + sign * amount));
         combat.updateCombatant(combatant.id, { currentHP: next });
         setDeltaInputs((prev) => ({ ...prev, [combatant.id]: "" }));
+    };
+
+    // Nearest-CR-first so the closest fits show up at the top of the picker.
+    const catalogNearCR = (cr: number | null) =>
+        [...catalog].sort((a, b) => Math.abs(a.cr - (cr ?? 0)) - Math.abs(b.cr - (cr ?? 0)));
+
+    // Swapping keeps damage already taken (only resets currentHP to the new
+    // max if the combatant was still at full HP under the old assignment).
+    const swapMonster = (combatant: Combatant, monster: Monster) => {
+        const wasFull = combatant.currentHP === combatant.maxHP;
+        const newMaxHP = monster.stats?.hp ?? combatant.maxHP;
+        combat.updateCombatant(combatant.id, {
+            monsterName: monster.name,
+            ac: monster.stats?.ac ?? null,
+            actions: monster.actions ?? [],
+            dexMod: monster.stats ? Math.floor((monster.stats.dex - 10) / 2) : combatant.dexMod,
+            maxHP: newMaxHP,
+            currentHP: wasFull ? newMaxHP : combatant.currentHP,
+        });
     };
 
     const toggleCondition = (combatant: Combatant, id: ConditionId) => {
@@ -93,6 +117,43 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                     ✕
                                 </button>
                             </div>
+
+                            {c.kind === "enemy" && (
+                                <div className="flex flex-col gap-1.5">
+                                    <div className="flex flex-wrap items-center gap-1.5">
+                                        <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-muted shrink-0">AC</span>
+                                        <span className="text-sm sm:text-xs font-bold accent-gold w-6 text-center shrink-0">{c.ac ?? "—"}</span>
+                                        <select
+                                            value={c.monsterName ?? ""}
+                                            onChange={(e) => {
+                                                const monster = catalog.find((m) => m.name === e.target.value);
+                                                if (monster) swapMonster(c, monster);
+                                            }}
+                                            className="ui-select text-[10px] sm:text-[9px] py-1 sm:py-0.5 px-1.5 sm:px-1 flex-1 min-w-[9rem]"
+                                            aria-label="Monster"
+                                        >
+                                            {!c.monsterName && <option value="">— No monster assigned —</option>}
+                                            {catalogNearCR(c.cr).map((m) => (
+                                                <option key={m.name} value={m.name}>{m.name} (CR {formatCR(m.cr)})</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {c.actions.length > 0 && (
+                                        <details className="text-[10px] sm:text-[9px] text-muted">
+                                            <summary className="cursor-pointer uppercase tracking-widest hover:text-gold select-none">
+                                                Actions ({c.actions.length})
+                                            </summary>
+                                            <ul className="mt-1 flex flex-col gap-0.5 pl-3">
+                                                {c.actions.map((a, i) => (
+                                                    <li key={i}>
+                                                        <strong className="text-foreground">{a.name}</strong>{a.damage ? ` — ${a.damage}` : ""}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </details>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="flex flex-wrap items-center gap-1.5">
                                 <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-muted shrink-0">DEX</span>
