@@ -72,6 +72,18 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         setIsFullscreen(true);
     }, [combat, layout.nodes, setIsFullscreen]);
 
+    // Resume from a pause: any node placed while paused (an NPC ally, a
+    // boss's reinforcements) joins the fight as a new combatant — everyone
+    // already in combat (HP, initiative, conditions) is left untouched.
+    const resumeEncounter = useCallback(() => {
+        combat.syncNewCombatants(layout.nodes);
+        setIsFullscreen(true);
+    }, [combat, layout.nodes, setIsFullscreen]);
+
+    // Pausing just exits fullscreen — combat state (round/turn/HP/
+    // conditions) stays intact in CombatContext/IndexedDB either way.
+    const pauseEncounter = useCallback(() => setIsFullscreen(false), [setIsFullscreen]);
+
     const [editingId,  setEditingId]  = useState<string | null>(null);
     const [popoverRect, setPopoverRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
     const [stagePos,   setStagePos]   = useState({ x: 0, y: 0 });
@@ -526,6 +538,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
         },
         battleActive,
         onStartEncounter: startEncounter,
+        onResumeEncounter: resumeEncounter,
         onEndEncounter: combat.endCombat,
     };
 
@@ -693,7 +706,7 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                             )}
                         </div>
                         {battleActive && (
-                            <div className="w-64 shrink-0 border border-gold/10 rounded-sm bg-card/40 p-2 overflow-y-auto">
+                            <div className="w-96 max-w-[40vw] shrink-0 border border-gold/10 rounded-sm bg-card/40 p-2.5 overflow-y-auto overflow-x-hidden">
                                 <InitiativeTracker ruleset={ruleset} />
                             </div>
                         )}
@@ -755,12 +768,12 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         )}
                         <button
                             type="button"
-                            onClick={() => setIsFullscreen(false)}
+                            onClick={battleActive ? pauseEncounter : () => setIsFullscreen(false)}
                             className="ui-button shrink-0 ml-auto min-h-9 gap-1.5 px-3 text-[10px]"
-                            aria-label={battleActive ? "Interrupt battle" : "Close fullscreen"}
+                            aria-label={battleActive ? "Pause battle" : "Close fullscreen"}
                         >
                             <span aria-hidden="true">✕</span>
-                            <span>{battleActive ? "Interrupt" : "Close"}</span>
+                            <span>{battleActive ? "Pause" : "Close"}</span>
                         </button>
                     </div>
 
@@ -769,8 +782,10 @@ export function EncounterHexMap({ partySize, suggestion, mode, ruleset, onPartyC
                         {showRotateHint && <RotateHintBanner onDismiss={dismissRotateHint} />}
                         {stageJSX}
                         {marquee && <MarqueeBox marquee={marquee} />}
+                        {/* Mobile: full-screen takeover — trying to share the screen with the map
+                            on a phone leaves neither usable. Desktop/tablet: a wide side panel. */}
                         {battleActive && (
-                            <div className="absolute top-0 right-0 bottom-0 w-72 max-w-[85vw] border-l border-gold/20 bg-background p-3 overflow-y-auto z-10">
+                            <div className="absolute inset-0 sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[26rem] sm:max-w-[85vw] sm:border-l border-gold/20 bg-background p-3 overflow-y-auto overflow-x-hidden z-10">
                                 <InitiativeTracker ruleset={ruleset} />
                             </div>
                         )}

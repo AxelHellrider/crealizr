@@ -24,6 +24,7 @@ interface MapToolbarProps {
     onFullscreenToggle: () => void;
     battleActive: boolean;
     onStartEncounter: () => void;
+    onResumeEncounter: () => void;
     onEndEncounter: () => void;
 }
 
@@ -33,7 +34,7 @@ export function MapToolbar({
     onZoomIn, onZoomOut,
     canClearAll, onClearAll,
     isFullscreen, onFullscreenToggle,
-    battleActive, onStartEncounter, onEndEncounter,
+    battleActive, onStartEncounter, onResumeEncounter, onEndEncounter,
 }: MapToolbarProps) {
 
     if (isFullscreen) {
@@ -135,9 +136,14 @@ export function MapToolbar({
                 <span className="w-px self-stretch bg-gold/10" aria-hidden />
 
                 {battleActive ? (
-                    <button type="button" onClick={onEndEncounter} className={btn(false, true)}>
-                        End Encounter
-                    </button>
+                    <>
+                        <button type="button" onClick={onResumeEncounter} className="min-h-9 sm:min-h-0 flex items-center gap-1.5 text-[11px] sm:text-[10px] uppercase tracking-widest px-2.5 sm:px-2 py-2 sm:py-1 rounded-sm border border-gold bg-gold/10 text-gold hover:bg-gold/20 transition-colors">
+                            Resume Battle Mode
+                        </button>
+                        <button type="button" onClick={onEndEncounter} className={btn(false, true)}>
+                            End Encounter
+                        </button>
+                    </>
                 ) : (
                     <button type="button" onClick={onStartEncounter} className="min-h-9 sm:min-h-0 flex items-center gap-1.5 text-[11px] sm:text-[10px] uppercase tracking-widest px-2.5 sm:px-2 py-2 sm:py-1 rounded-sm border border-gold bg-gold/10 text-gold hover:bg-gold/20 transition-colors">
                         Start Encounter

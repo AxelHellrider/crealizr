@@ -2,15 +2,10 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import type { CombatState, Combatant } from "@/app/types/combat";
-import type { ConditionId } from "@/app/data/conditions";
+import type { EncounterNode } from "@/app/types/encounterLayout";
 import { loadCombat, saveCombat, clearCombat } from "@/app/lib/combatDB";
 import { rollD20 } from "@/app/utils/dice";
-import { newId } from "@/app/lib/id";
-
-type NewCombatant = Omit<Combatant, "id" | "initiative" | "conditions"> & {
-    initiative?: number | null;
-    conditions?: ConditionId[];
-};
+import { seedFromNodes, type CombatantSeed } from "@/app/utils/combatSeed";
 
 type CombatContextValue = {
     combat: CombatState | null;
@@ -18,15 +13,20 @@ type CombatContextValue = {
     /** Sorted by initiative descending (nulls last) — the actual turn order. */
     turnOrder: Combatant[];
     activeCombatant: Combatant | null;
-    startCombat: (seed: NewCombatant[]) => void;
+    startCombat: (seed: CombatantSeed[]) => void;
     endCombat: () => void;
-    addCombatant: (seed: NewCombatant) => void;
+    addCombatant: (seed: CombatantSeed) => void;
     removeCombatant: (id: string) => void;
     updateCombatant: (id: string, patch: Partial<Combatant>) => void;
     rollInitiative: (id: string) => void;
     rollAllInitiative: () => void;
     nextTurn: () => void;
     prevTurn: () => void;
+    /** Adds any party/enemy node not already in the fight (matched by id) as
+     * a new combatant, leaving everyone already in combat untouched — how
+     * reinforcements (an NPC ally, a boss's extra minions) join mid-fight
+     * after the DM pauses to place them and resumes. */
+    syncNewCombatants: (nodes: EncounterNode[]) => void;
 };
 
 const CombatContext = createContext<CombatContextValue | null>(null);
@@ -66,10 +66,9 @@ export function CombatProvider({ children }: { children: ReactNode }) {
         return () => clearTimeout(id);
     }, [combat]);
 
-    const startCombat = useCallback((seed: NewCombatant[]) => {
+    const startCombat = useCallback((seed: CombatantSeed[]) => {
         const combatants: Combatant[] = seed.map((c) => ({
             ...c,
-            id: newId(),
             initiative: c.initiative ?? null,
             conditions: c.conditions ?? [],
         }));
@@ -78,16 +77,27 @@ export function CombatProvider({ children }: { children: ReactNode }) {
 
     const endCombat = useCallback(() => setCombat(null), []);
 
-    const addCombatant = useCallback((seed: NewCombatant) => {
+    const addCombatant = useCallback((seed: CombatantSeed) => {
         setCombat((prev) => {
             const combatant: Combatant = {
                 ...seed,
-                id: newId(),
                 initiative: seed.initiative ?? null,
                 conditions: seed.conditions ?? [],
             };
             if (!prev) return { round: 1, turnIndex: 0, combatants: [combatant] };
             return { ...prev, combatants: [...prev.combatants, combatant] };
+        });
+    }, []);
+
+    const syncNewCombatants = useCallback((nodes: EncounterNode[]) => {
+        setCombat((prev) => {
+            if (!prev) return prev;
+            const existingIds = new Set(prev.combatants.map((c) => c.id));
+            const additions: Combatant[] = seedFromNodes(nodes)
+                .filter((seed) => !existingIds.has(seed.id))
+                .map((seed) => ({ ...seed, initiative: seed.initiative ?? null, conditions: seed.conditions ?? [] }));
+            if (additions.length === 0) return prev;
+            return { ...prev, combatants: [...prev.combatants, ...additions] };
         });
     }, []);
 
@@ -148,6 +158,7 @@ export function CombatProvider({ children }: { children: ReactNode }) {
             rollAllInitiative,
             nextTurn,
             prevTurn,
+            syncNewCombatants,
         }}>
             {children}
         </CombatContext>

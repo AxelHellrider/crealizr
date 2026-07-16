@@ -11,6 +11,11 @@ interface InitiativeTrackerProps {
     className?: string;
 }
 
+// Bigger by default (mobile — a DM is as likely to run this from a phone as
+// a desktop), shrinking back down at sm+ where there's more room to be dense.
+const inputCls = "ui-input text-sm sm:text-xs py-2 sm:py-1 px-2 sm:px-1.5";
+const smallBtn = "ui-button min-h-9 sm:min-h-7 px-2.5 sm:px-1.5 text-xs sm:text-[10px]";
+
 /** Renders the active combat's turn order. The parent only mounts this once
  * combat has actually started (see EncounterHexMap's "Start Encounter"
  * action), so there's no empty/not-started state to render here. */
@@ -45,38 +50,38 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
     };
 
     return (
-        <div className={`flex flex-col gap-2 ${className}`}>
+        <div className={`flex flex-col gap-2 min-w-0 overflow-x-hidden ${className}`}>
             {/* Round/turn controls */}
             <div className="flex items-center justify-between gap-2 shrink-0">
-                <div className="text-[10px] uppercase tracking-widest text-gold/90 font-bold truncate">
+                <div className="text-xs sm:text-[10px] uppercase tracking-widest text-gold/90 font-bold truncate min-w-0">
                     Round {state.round}{activeCombatant ? ` · ${activeCombatant.name}'s turn` : ""}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                    <button type="button" onClick={combat.prevTurn} className="ui-button min-h-7 px-2 text-[10px]" aria-label="Previous turn">←</button>
-                    <button type="button" onClick={combat.nextTurn} className="ui-button min-h-7 px-2 text-[10px]" aria-label="Next turn">→</button>
+                    <button type="button" onClick={combat.prevTurn} className={smallBtn} aria-label="Previous turn">←</button>
+                    <button type="button" onClick={combat.nextTurn} className={smallBtn} aria-label="Next turn">→</button>
                 </div>
             </div>
-            <button type="button" onClick={combat.rollAllInitiative} className="ui-button shrink-0 min-h-8 text-[10px] uppercase tracking-widest">
+            <button type="button" onClick={combat.rollAllInitiative} className={`${smallBtn} shrink-0 w-full min-h-10 sm:min-h-8 uppercase tracking-widest`}>
                 Roll All Initiative
             </button>
 
-            {/* Combatant list */}
-            <div className="flex flex-col gap-2 overflow-y-auto min-h-0">
+            {/* Combatant list — vertical scroll only; every row wraps instead of overflowing horizontally. */}
+            <div className="flex flex-col gap-2 overflow-y-auto overflow-x-hidden min-h-0">
                 {turnOrder.map((c) => {
                     const isActive = activeCombatant?.id === c.id;
                     const isDown = c.currentHP !== null && c.currentHP <= 0;
                     return (
                         <div
                             key={c.id}
-                            className={`border p-2 flex flex-col gap-1.5 transition-colors ${
+                            className={`border p-2.5 sm:p-2 flex flex-col gap-2 sm:gap-1.5 min-w-0 transition-colors ${
                                 isActive ? "border-gold bg-gold/10" : "border-gold/10 bg-card/40"
                             }`}
                         >
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex flex-wrap items-center gap-1.5">
                                 <input
                                     value={c.name}
                                     onChange={(e) => combat.updateCombatant(c.id, { name: e.target.value })}
-                                    className="ui-input flex-1 min-w-0 text-xs py-1 px-1.5"
+                                    className={`${inputCls} flex-1 min-w-[8rem]`}
                                     aria-label="Combatant name"
                                 />
                                 <input
@@ -84,13 +89,13 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                     value={c.initiative ?? ""}
                                     onChange={(e) => combat.updateCombatant(c.id, { initiative: e.target.value === "" ? null : Number(e.target.value) })}
                                     placeholder="Init"
-                                    className="ui-input w-12 text-xs py-1 px-1 text-center"
+                                    className={`${inputCls} w-16 sm:w-12 text-center`}
                                     aria-label="Initiative"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => combat.rollInitiative(c.id)}
-                                    className="ui-button min-h-7 px-1.5 text-[10px]"
+                                    className={smallBtn}
                                     aria-label="Roll initiative (1d20)"
                                     title="Roll 1d20"
                                 >
@@ -99,68 +104,70 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                 <button
                                     type="button"
                                     onClick={() => combat.removeCombatant(c.id)}
-                                    className="text-muted hover:text-crimson text-xs px-1"
+                                    className="text-muted hover:text-crimson text-sm sm:text-xs px-2 sm:px-1 min-h-9 sm:min-h-0"
                                     aria-label={`Remove ${c.name}`}
                                 >
                                     ✕
                                 </button>
                             </div>
 
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-[9px] uppercase tracking-widest text-muted shrink-0">HP</span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-muted shrink-0">HP</span>
                                 <input
                                     type="number"
                                     value={c.currentHP ?? ""}
                                     onChange={(e) => combat.updateCombatant(c.id, { currentHP: e.target.value === "" ? null : Number(e.target.value) })}
                                     placeholder="cur"
-                                    className={`ui-input w-14 text-xs py-1 px-1 text-center ${isDown ? "text-crimson border-crimson/40" : ""}`}
+                                    className={`${inputCls} w-16 sm:w-14 text-center ${isDown ? "text-crimson border-crimson/40" : ""}`}
                                     aria-label="Current HP"
                                 />
-                                <span className="text-muted text-xs">/</span>
+                                <span className="text-muted text-sm sm:text-xs">/</span>
                                 <input
                                     type="number"
                                     value={c.maxHP ?? ""}
                                     onChange={(e) => combat.updateCombatant(c.id, { maxHP: e.target.value === "" ? null : Number(e.target.value) })}
                                     placeholder="max"
-                                    className="ui-input w-14 text-xs py-1 px-1 text-center"
+                                    className={`${inputCls} w-16 sm:w-14 text-center`}
                                     aria-label="Max HP"
                                 />
-                                <input
-                                    type="number"
-                                    value={deltaInputs[c.id] ?? ""}
-                                    onChange={(e) => setDeltaInputs((prev) => ({ ...prev, [c.id]: e.target.value }))}
-                                    placeholder="amt"
-                                    className="ui-input w-12 text-xs py-1 px-1 text-center ml-auto"
-                                    aria-label="Damage/heal amount"
-                                />
-                                <button type="button" onClick={() => applyDelta(c, -1)} className="ui-button min-h-7 px-1.5 text-[10px] text-crimson" title="Apply damage" aria-label="Apply damage">−</button>
-                                <button type="button" onClick={() => applyDelta(c, 1)} className="ui-button min-h-7 px-1.5 text-[10px] text-green-400" title="Apply healing" aria-label="Apply healing">+</button>
+                                <div className="flex items-center gap-1 ml-auto">
+                                    <input
+                                        type="number"
+                                        value={deltaInputs[c.id] ?? ""}
+                                        onChange={(e) => setDeltaInputs((prev) => ({ ...prev, [c.id]: e.target.value }))}
+                                        placeholder="amt"
+                                        className={`${inputCls} w-14 text-center`}
+                                        aria-label="Damage/heal amount"
+                                    />
+                                    <button type="button" onClick={() => applyDelta(c, -1)} className={`${smallBtn} text-crimson`} title="Apply damage" aria-label="Apply damage">−</button>
+                                    <button type="button" onClick={() => applyDelta(c, 1)} className={`${smallBtn} text-green-400`} title="Apply healing" aria-label="Apply healing">+</button>
+                                </div>
                             </div>
 
                             {c.kind === "party" && isDown && (
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1">
-                                        <span className="text-[9px] uppercase tracking-widest text-green-400/80">Success</span>
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-green-400/80">Success</span>
                                         {[1, 2, 3].map((n) => (
                                             <button
                                                 key={n}
                                                 type="button"
                                                 onClick={() => setDeathSave(c, "successes", (c.deathSaves?.successes ?? 0) >= n ? n - 1 : n)}
-                                                className={`w-3.5 h-3.5 rounded-full border ${
+                                                className={`w-5 h-5 sm:w-3.5 sm:h-3.5 rounded-full border ${
                                                     (c.deathSaves?.successes ?? 0) >= n ? "bg-green-400 border-green-400" : "border-muted/40"
                                                 }`}
                                                 aria-label={`Death save success ${n}`}
                                             />
                                         ))}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <span className="text-[9px] uppercase tracking-widest text-crimson/80">Fail</span>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] sm:text-[9px] uppercase tracking-widest text-crimson/80">Fail</span>
                                         {[1, 2, 3].map((n) => (
                                             <button
                                                 key={n}
                                                 type="button"
                                                 onClick={() => setDeathSave(c, "failures", (c.deathSaves?.failures ?? 0) >= n ? n - 1 : n)}
-                                                className={`w-3.5 h-3.5 rounded-full border ${
+                                                className={`w-5 h-5 sm:w-3.5 sm:h-3.5 rounded-full border ${
                                                     (c.deathSaves?.failures ?? 0) >= n ? "bg-crimson border-crimson" : "border-muted/40"
                                                 }`}
                                                 aria-label={`Death save failure ${n}`}
@@ -170,7 +177,7 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                 </div>
                             )}
 
-                            <div className="flex flex-wrap items-center gap-1">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-1">
                                 {c.conditions.map((condId) => {
                                     const def = getConditions(ruleset).find((cd) => cd.id === condId);
                                     return (
@@ -179,7 +186,7 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                             type="button"
                                             onClick={() => toggleCondition(c, condId)}
                                             title={def?.description}
-                                            className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 border border-crimson/30 bg-crimson/10 text-crimson/90 rounded-sm hover:border-crimson/60 transition-colors"
+                                            className="text-[10px] sm:text-[9px] uppercase tracking-wide px-2 sm:px-1.5 py-1 sm:py-0.5 border border-crimson/30 bg-crimson/10 text-crimson/90 rounded-sm hover:border-crimson/60 transition-colors"
                                         >
                                             {def?.abbr ?? condId} ✕
                                         </button>
@@ -188,7 +195,7 @@ export function InitiativeTracker({ ruleset, className = "" }: InitiativeTracker
                                 <select
                                     value=""
                                     onChange={(e) => { if (e.target.value) toggleCondition(c, e.target.value as ConditionId); }}
-                                    className="ui-select text-[9px] py-0.5 px-1 w-24"
+                                    className="ui-select text-[10px] sm:text-[9px] py-1 sm:py-0.5 px-1.5 sm:px-1 w-28 sm:w-24"
                                     aria-label="Add condition"
                                 >
                                     <option value="">+ Condition</option>
