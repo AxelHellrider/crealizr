@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sortByInitiative, advanceTurn, applyCombatantPatch } from "@/app/utils/combatLogic";
+import { sortByInitiative, advanceTurn, applyCombatantPatch, migrateCombatant, migrateCombatState } from "@/app/utils/combatLogic";
 import type { Combatant, CombatState } from "@/app/types/combat";
 
 function makeCombatant(overrides: Partial<Combatant> = {}): Combatant {
@@ -103,5 +103,46 @@ describe("applyCombatantPatch", () => {
         const healthy = makeCombatant({ currentHP: 8 });
         const next = applyCombatantPatch(healthy, { currentHP: 10 });
         expect(next.deathSaves).toBeUndefined();
+    });
+});
+
+describe("migrateCombatant", () => {
+    it("fills in fields missing from a combatant persisted before they existed", () => {
+        // Simulates a record saved to IndexedDB before cr/monsterName/ac/actions
+        // (and later dexMod/initiativeRoll) were added to the Combatant shape —
+        // this is exactly the record shape that crashed InitiativeTracker on
+        // `c.actions.length` before this migration existed.
+        const stale = { id: "e1", name: "Goblin", kind: "enemy" as const, initiative: 12, maxHP: 7, currentHP: 7, conditions: [] };
+        const migrated = migrateCombatant(stale);
+        expect(migrated.actions).toEqual([]);
+        expect(migrated.cr).toBeNull();
+        expect(migrated.monsterName).toBeNull();
+        expect(migrated.ac).toBeNull();
+        expect(migrated.dexMod).toBeNull();
+        expect(migrated.initiativeRoll).toBeNull();
+        // Fields that were already present are preserved, not clobbered.
+        expect(migrated.initiative).toBe(12);
+        expect(migrated.maxHP).toBe(7);
+    });
+
+    it("is a no-op for an already-current combatant", () => {
+        const current = makeCombatant({ actions: [{ name: "Bite", damage: "1d6" }], ac: 15 });
+        expect(migrateCombatant(current)).toEqual(current);
+    });
+});
+
+describe("migrateCombatState", () => {
+    it("migrates every combatant in the session", () => {
+        const stale = {
+            round: 2,
+            turnIndex: 0,
+            combatants: [
+                { id: "p1", name: "PC", kind: "party" as const },
+                { id: "e1", name: "Goblin", kind: "enemy" as const },
+            ],
+        } as CombatState;
+        const migrated = migrateCombatState(stale);
+        expect(migrated.combatants.every((c) => Array.isArray(c.actions))).toBe(true);
+        expect(migrated.round).toBe(2);
     });
 });

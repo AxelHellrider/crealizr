@@ -1,5 +1,33 @@
 import type { CombatState, Combatant } from "@/app/types/combat";
 
+/** Fills in any fields missing from a persisted combatant record with safe
+ * defaults. Combatant has grown fields over time (cr/monsterName/ac/actions,
+ * then dexMod/initiativeRoll) — a combat saved to IndexedDB before one of
+ * those existed won't have it, and reading `undefined.length` etc. on that
+ * missing field crashes the tracker. Loading is the one boundary where data
+ * this old can still show up, so it's normalized right there. */
+export function migrateCombatant(raw: Partial<Combatant> & Pick<Combatant, "id" | "name" | "kind">): Combatant {
+    return {
+        ...raw,
+        cr: raw.cr ?? null,
+        monsterName: raw.monsterName ?? null,
+        ac: raw.ac ?? null,
+        actions: raw.actions ?? [],
+        initiative: raw.initiative ?? null,
+        dexMod: raw.dexMod ?? null,
+        initiativeRoll: raw.initiativeRoll ?? null,
+        maxHP: raw.maxHP ?? null,
+        currentHP: raw.currentHP ?? null,
+        conditions: raw.conditions ?? [],
+    };
+}
+
+/** Fills in any fields missing from a persisted combat session — see
+ * `migrateCombatant`. Safe to call on already-current data (no-op). */
+export function migrateCombatState(state: CombatState): CombatState {
+    return { ...state, combatants: state.combatants.map(migrateCombatant) };
+}
+
 /** Sorted by initiative descending (nulls last) — the actual turn order. */
 export function sortByInitiative(combatants: Combatant[]): Combatant[] {
     return [...combatants].sort((a, b) => {

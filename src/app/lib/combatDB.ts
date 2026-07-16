@@ -1,5 +1,6 @@
 import type { CombatState } from "@/app/types/combat";
 import { withStore, STORES } from "@/app/lib/db";
+import { migrateCombatState } from "@/app/utils/combatLogic";
 
 // Only one combat can be active at a time (matches the hex layout's own
 // single-current-encounter model), so it's stored as a single record under
@@ -17,7 +18,7 @@ export async function loadCombat(): Promise<CombatState | null> {
     if (!record) return null;
     const { id: _id, ...state } = record;
     void _id;
-    return state;
+    return migrateCombatState(state);
 }
 
 export function saveCombat(state: CombatState): Promise<void> {
