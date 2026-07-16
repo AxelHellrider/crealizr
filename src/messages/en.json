@@ -436,6 +436,7 @@
         "heading": "No Artificial Intelligence",
         "body": [
           "CRealizr does not use artificial intelligence, machine learning, or generative AI models anywhere in its tools. Every encounter suggestion, monster scaling calculation, travel encounter, and item blueprint is produced by deterministic, rule-based logic written and reviewed by human developers — the same kind of math a DM would do by hand, just faster.",
+          "For the development process of the website, AI is only being used to implement testing scenarios, scaffold & organize code and handle website versioning, in order to deliver features in a faster, yet effective manner. No process or item in the toolkit is ever processed by AI, nor any user data is processed without user consent from Google Analytics.",
           "None of the data you enter is sent to an AI service or third-party model. The toolkit is, and will remain, 100% human-made."
         ]
       },
