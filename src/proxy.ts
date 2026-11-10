@@ -9,7 +9,7 @@ const intlMiddleware = createMiddleware({
   localeDetection: true
 });
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   // Serve the default locale's content at the bare root without an extra
   // client-visible redirect round-trip. This used to be a 307 to /en —
   // a full extra request/response cycle before any content could render,
