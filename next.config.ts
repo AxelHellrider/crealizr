@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     experimental: {
         // Tree-shake heavy packages to reduce client bundle
         optimizePackageImports: ["framer-motion"],
+        // Container hosts report the *host's* core count via os.cpus(), so
+        // Next spawned 15 build workers on a small deploy box and the build
+        // stalled for 15+ minutes. Cap it; override with BUILD_CPUS.
+        cpus: Number(process.env.BUILD_CPUS) || 2,
     },
     async redirects() {
         return [
